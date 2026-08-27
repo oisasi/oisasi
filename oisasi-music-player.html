@@ -29,14 +29,6 @@ h1 em{font-style:normal;background:linear-gradient(transparent 55%,#b8e8f0 55%)}
 .now{font-size:16px;font-weight:700;color:#0a6a7a;margin-bottom:12px;min-height:1.4em}
 audio{width:100%;height:40px;margin-bottom:12px}
 
-.quality-row{display:flex;gap:8px;margin-bottom:14px}
-.q-btn{
-  flex:1;padding:8px 10px;border:1.5px solid #b0d8e0;border-radius:8px;
-  background:#f8fcfd;font-size:13px;cursor:pointer;color:#1a2a30;text-align:center;
-}
-.q-btn:hover{background:#e8f4f8}
-.q-btn.active{background:#d8eef4;border-color:#0a8a9a;font-weight:700;color:#0a5a6a}
-
 .track-list{display:flex;flex-direction:column;gap:6px}
 .track-btn{
   display:flex;align-items:center;gap:10px;width:100%;
@@ -67,16 +59,11 @@ footer{text-align:center;color:#8aa0a8;font-size:11px;margin-top:18px;padding-to
   <div class="now" id="nowPlaying">曲を選んでください</div>
   <audio id="audio" controls preload="none"></audio>
 
-  <div class="quality-row">
-    <button type="button" class="q-btn active" data-q="normal" onclick="setQuality(this)">通常</button>
-    <button type="button" class="q-btn" data-q="low" onclick="setQuality(this)">低音質</button>
-  </div>
-
   <div class="track-list">
-    <button type="button" class="track-btn" data-base="おいさしサービス" onclick="playTrack(this)">
+    <button type="button" class="track-btn" data-src="おいさしサービス.mp3" onclick="playTrack(this)">
       <span class="num">01</span><span class="name">おいさしサービス</span>
     </button>
-    <button type="button" class="track-btn" data-base="おいさしアクセル" onclick="playTrack(this)">
+    <button type="button" class="track-btn" data-src="おいさしアクセル.mp3" onclick="playTrack(this)">
       <span class="num">02</span><span class="name">おいさしアクセル</span>
     </button>
   </div>
@@ -90,37 +77,18 @@ footer{text-align:center;color:#8aa0a8;font-size:11px;margin-top:18px;padding-to
   <a href="https://ojg.netlify.app">ゲーム</a>
 </div>
 
-<footer>2026 Oisasi Music 試聴サイト / Oisasi Official<br>※ 通常：曲名.mp3　／　低音質：曲名低音質.mp3</footer>
+<footer>2026 Oisasi Music 試聴サイト / Oisasi Official<br>※ mp3を同じフォルダに置いてください</footer>
 
 <script>
 var audio = document.getElementById('audio');
 var nowPlaying = document.getElementById('nowPlaying');
-var currentBase = '';
-var quality = 'normal';
 
 function playTrack(btn) {
   document.querySelectorAll('.track-btn').forEach(function(b){ b.classList.remove('active'); });
   btn.classList.add('active');
-  currentBase = btn.getAttribute('data-base');
   nowPlaying.textContent = btn.querySelector('.name').textContent;
-  loadAudio();
+  audio.src = btn.getAttribute('data-src');
   audio.play().catch(function(){});
-}
-
-function setQuality(btn) {
-  document.querySelectorAll('.q-btn').forEach(function(b){ b.classList.remove('active'); });
-  btn.classList.add('active');
-  quality = btn.getAttribute('data-q');
-  if (currentBase) loadAudio();
-}
-
-function loadAudio() {
-  if (!currentBase) return;
-  // 通常：おいさしサービス.mp3 ／ 低音質：おいさしサービス低音質.mp3
-  var src = quality === 'low'
-    ? currentBase + '低音質.mp3'
-    : currentBase + '.mp3';
-  audio.src = src;
 }
 </script>
 </body>
