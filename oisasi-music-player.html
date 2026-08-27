@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>おいさしミュージック試聴サイト</title>
+<meta name="description" content="おいさしミュージック試聴サイト　@oisasi_music　2025年8月から2026年12月までの曲を試聴">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<style>
+*{margin:0;box-sizing:border-box}
+body{font:14px/1.65 system-ui,sans-serif;background:#f0f6f8;color:#1a2a30;max-width:480px;margin:auto;padding:16px}
+h1{font-size:22px;color:#0a8a9a;text-align:center;margin-bottom:4px}
+h1 em{font-style:normal;background:linear-gradient(transparent 55%,#b8e8f0 55%)}
+.sub{text-align:center;font-size:12px;color:#5a7078;margin-bottom:14px}
+.tag{display:inline-block;background:#d0eef2;color:#0a6a7a;font-size:11px;padding:2px 8px;border-radius:99px}
+.back{display:block;text-align:center;margin-bottom:12px;font-size:12px}
+.back a{color:#0a7a8a;text-decoration:none}
+.back a:hover{text-decoration:underline}
+
+/* プレイヤー本体 */
+.player{
+  background:#fff;
+  border:1.5px solid #a0d0d8;
+  border-radius:14px;
+  padding:16px;
+  box-shadow:0 2px 8px rgba(10,100,120,.08);
+}
+.player-label{font-size:11px;color:#6a8088;margin-bottom:8px;letter-spacing:.05em}
+.now{font-size:16px;font-weight:700;color:#0a6a7a;margin-bottom:12px;min-height:1.4em}
+audio{width:100%;height:40px;margin-bottom:12px}
+
+.quality-row{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.quality-row label{font-size:12px;color:#4a6068;white-space:nowrap}
+.quality-row select{
+  flex:1;min-width:140px;font-size:13px;padding:6px 10px;
+  border:1.5px solid #b0d8e0;border-radius:8px;background:#f8fcfd;color:#1a2a30;
+}
+
+.track-list{display:flex;flex-direction:column;gap:6px}
+.track-btn{
+  display:flex;align-items:center;gap:10px;width:100%;
+  padding:12px 14px;border:1.5px solid #d0e4e8;border-radius:10px;
+  background:#f8fcfd;font-size:14px;cursor:pointer;color:#1a2a30;text-align:left;
+}
+.track-btn:hover{background:#e8f4f8;border-color:#80c0d0}
+.track-btn.active{background:#d8eef4;border-color:#0a8a9a;font-weight:700;color:#0a5a6a}
+.track-btn .num{font-size:11px;color:#8aa0a8;min-width:1.2em}
+.track-btn .name{flex:1}
+
+.footer-links{margin-top:20px;text-align:center;font-size:12px}
+.footer-links a{color:#0a7a8a;margin:0 6px;text-decoration:none}
+.footer-links a:hover{text-decoration:underline}
+footer{text-align:center;color:#8aa0a8;font-size:11px;margin-top:18px;padding-top:12px;border-top:1px dashed #c8dce0}
+.yt{display:block;margin-top:14px;padding:10px;text-align:center;border:1.5px solid #a0d0d8;border-radius:10px;background:#fff;text-decoration:none;font-size:13px;font-weight:700;color:#0a6a7a}
+.yt:hover{background:#f0f8fa}
+</style>
+</head>
+<body>
+<div class="back"><a href="index.html">← おいさしホームページに戻る</a></div>
+
+<h1><em>おいさしミュージック<br>試聴サイト</em></h1>
+<p class="sub">2025年8月〜2026年12月の曲　<span class="tag">@oisasi_music</span></p>
+
+<div class="player">
+  <div class="player-label">NOW PLAYING</div>
+  <div class="now" id="nowPlaying">曲を選んでください</div>
+  <audio id="audio" controls preload="none"></audio>
+
+  <div class="quality-row">
+    <label for="quality">音質</label>
+    <select id="quality" onchange="changeQuality()">
+      <option value="high">高音質（320kbps）</option>
+      <option value="standard" selected>標準（128kbps）</option>
+      <option value="low">低音質（64kbps）</option>
+      <option value="ultra-low">超低音質（32kbps・爆速）</option>
+    </select>
+  </div>
+
+  <div class="track-list">
+    <button type="button" class="track-btn" data-src="おいさしサービス.mp3" onclick="playTrack(this)">
+      <span class="num">01</span><span class="name">おいさしサービス</span>
+    </button>
+    <button type="button" class="track-btn" data-src="おいさしアクセル.mp3" onclick="playTrack(this)">
+      <span class="num">02</span><span class="name">おいさしアクセル</span>
+    </button>
+  </div>
+</div>
+
+<a class="yt" href="https://www.youtube.com/@oisasi_music">🎵 公式YouTube @oisasi_music</a>
+
+<div class="footer-links">
+  <a href="index.html">おいさし公式</a>
+  <a href="oijiiw.html">おいじぃ魔女</a>
+  <a href="https://ojg.netlify.app">ゲーム</a>
+</div>
+
+<footer>2026 Oisasi Music 試聴サイト / Oisasi Official<br>※ mp3を同じフォルダに置いてください</footer>
+
+<script>
+var audio = document.getElementById('audio');
+var nowPlaying = document.getElementById('nowPlaying');
+var currentSrc = '';
+
+function playTrack(btn) {
+  document.querySelectorAll('.track-btn').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  currentSrc = btn.getAttribute('data-src');
+  nowPlaying.textContent = btn.querySelector('.name').textContent;
+  changeQuality();
+  audio.play().catch(function(){});
+}
+
+function changeQuality() {
+  if (!currentSrc) return;
+  var q = document.getElementById('quality').value;
+  var src = currentSrc;
+  if (q === 'high') src = currentSrc.replace('.mp3', '_high.mp3');
+  else if (q === 'low') src = currentSrc.replace('.mp3', '_low.mp3');
+  else if (q === 'ultra-low') src = currentSrc.replace('.mp3', '_ultralow.mp3');
+  audio.src = src;
+  audio.onerror = function() {
+    audio.src = currentSrc;
+    audio.onerror = null;
+  };
+}
+</script>
+</body>
+</html>
