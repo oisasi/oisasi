@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>オンラインおいじぃ魔女会話AI (OpenAIモデル限定版)</title>
+<title>オンラインおいじぃ魔女会話AI (120B専用版)</title>
 <style>
     body {
         font-family: 'Hiragino Maru Gothic ProN', 'Rounded M+ 1c', sans-serif;
@@ -97,7 +97,7 @@
         margin-left: auto;
         margin-right: auto;
     }
-    input[type="text"], input[type="password"], select {
+    input[type="text"], input[type="password"] {
         padding: 10px;
         border-radius: 8px;
         border: 2px solid #9b59b6;
@@ -105,7 +105,7 @@
         background-color: #1a0033;
         color: #fff;
     }
-    #api-key-input, #model-select {
+    #api-key-input {
         flex-grow: 1;
     }
     #user-input {
@@ -134,7 +134,7 @@
 </style>
 </head>
 <body>
-    <h1>🔮 オンラインおいじぃ魔女会話AI (OpenAI限定) 🔮</h1>
+    <h1>🔮 オンラインおいじぃ魔女会話AI 🔮</h1>
     
     <div id="key-config">
         <div class="input-row">
@@ -142,17 +142,11 @@
             <input type="password" id="api-key-input" placeholder="Groq APIキー (gsk_...)">
             <button onclick="saveApiKey()">保存</button>
         </div>
-        <div class="input-row">
-            <label>召喚するAI:</label>
-            <select id="model-select">
-                <option value="">APIキーを入力するとOpenAIモデルを取得するぞぃ</option>
-            </select>
-        </div>
-        <p id="key-status" style="font-size: 12px; margin: 0; color: #bbb;">※OpenAI系モデル（openai/〜）だけを表示中じゃ！</p>
+        <p id="key-status" style="font-size: 12px; margin: 0; color: #bbb;">※最強頭脳「openai/gpt-oss-120b」で直接会話するぞぃ！</p>
     </div>
     
     <div id="chat-box">
-        <div class="message majo-msg">フォッフォッフォ！よく来たのぞぃ、オイサシ！OpenAIの魔力を召喚して会話するぞぃ！</div>
+        <div class="message majo-msg">フォッフォッフォ！よく来たのぞぃ、オイサシ！最高性能の120Bモデルで会話するぞぃ！</div>
     </div>
     
     <div id="input-area">
@@ -161,6 +155,9 @@
     </div>
 
     <script>
+        // 使用モデルを固定
+        const TARGET_MODEL = "openai/gpt-oss-120b";
+
         let conversationMessages = [
             {
                 role: "system",
@@ -182,7 +179,8 @@
             const savedKey = localStorage.getItem("majo_groq_key");
             if (savedKey) {
                 document.getElementById("api-key-input").value = cleanKey(savedKey);
-                fetchGroqModels(cleanKey(savedKey));
+                document.getElementById("key-status").textContent = "✨ 保存されたキーで120Bモデルの召喚準備完了じゃ！";
+                document.getElementById("key-status").style.color = "#2ecc71";
             }
         };
 
@@ -190,7 +188,8 @@
             const key = cleanKey(document.getElementById("api-key-input").value);
             if (key) {
                 localStorage.setItem("majo_groq_key", key);
-                fetchGroqModels(key);
+                document.getElementById("key-status").textContent = "✨ APIキーを保存したぞぃ！準備完了じゃ！";
+                document.getElementById("key-status").style.color = "#2ecc71";
             } else {
                 localStorage.removeItem("majo_groq_key");
                 document.getElementById("key-status").textContent = "⚠️ キーが空欄ぞぃ！";
@@ -198,63 +197,14 @@
             }
         }
 
-        async function fetchGroqModels(apiKey) {
-            const statusEl = document.getElementById("key-status");
-            const selectEl = document.getElementById("model-select");
-            statusEl.textContent = "🔄 OpenAIモデルを検索中ぞぃ...";
-            statusEl.style.color = "#f1c40f";
-
-            try {
-                const res = await fetch("https://api.groq.com/openai/v1/models", {
-                    headers: { "Authorization": `Bearer ${apiKey}` }
-                });
-
-                if (!res.ok) throw new Error("APIキーが無効か通信失敗じゃ");
-
-                const data = await res.json();
-                
-                // openai/ から始まるモデルだけを抽出（whisperなどは除外）
-                const openAiModels = data.data.filter(m => {
-                    const id = m.id.toLowerCase();
-                    return m.active && id.startsWith("openai/") && !id.includes("whisper");
-                });
-
-                selectEl.innerHTML = "";
-                
-                if (openAiModels.length === 0) {
-                    const opt = document.createElement("option");
-                    opt.textContent = "OpenAI系モデルが見つからなかったぞぃ";
-                    selectEl.appendChild(opt);
-                } else {
-                    openAiModels.forEach(m => {
-                        const opt = document.createElement("option");
-                        opt.value = m.id;
-                        opt.textContent = m.id;
-                        selectEl.appendChild(opt);
-                    });
-                }
-
-                statusEl.textContent = "✨ OpenAI系モデルのセットが完了したぞぃ！";
-                statusEl.style.color = "#2ecc71";
-            } catch (err) {
-                statusEl.textContent = `⚠️ モデル取得失敗: ${err.message}`;
-                statusEl.style.color = "#e74c3c";
-            }
-        }
-
         async function sendMessage() {
             const apiKey = cleanKey(document.getElementById("api-key-input").value);
-            const selectedModel = document.getElementById("model-select").value;
             const inputField = document.getElementById("user-input");
             const sendBtn = document.getElementById("send-btn");
             const text = inputField.value.trim();
             
             if (!apiKey) {
-                alert("🔑 一番上の枠にGroq APIキーを入れて「保存」を押すのじゃ！");
-                return;
-            }
-            if (!selectedModel) {
-                alert("⚠️ 有効なモデルが選択されていないぞぃ！");
+                alert("🔑 上の枠にGroq APIキーを入れて「保存」を押すのじゃ！");
                 return;
             }
             if (text === "") return;
@@ -267,7 +217,7 @@
             sendBtn.disabled = true;
 
             const thinkingId = "thinking-" + Date.now();
-            addMessage("むむっ…OpenAIの魔力を練っているのぞぃ…", "majo-msg thinking", thinkingId);
+            addMessage("むむっ…120Bの莫大な魔力を練っているのぞぃ…", "majo-msg thinking", thinkingId);
 
             try {
                 const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
@@ -277,7 +227,7 @@
                         "Authorization": `Bearer ${apiKey}`
                     },
                     body: JSON.stringify({
-                        model: selectedModel,
+                        model: TARGET_MODEL,
                         messages: conversationMessages
                     })
                 });
