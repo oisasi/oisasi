@@ -16,6 +16,7 @@
     h1 {
         color: #f1c40f;
         text-shadow: 2px 2px 4px #000000;
+        margin-bottom: 10px;
     }
     #chat-box {
         width: 90%;
@@ -30,9 +31,10 @@
         box-shadow: 0 0 15px #9b59b6;
         display: flex;
         flex-direction: column;
+        box-sizing: border-box;
     }
     .message {
-        margin: 10px;
+        margin: 8px 0;
         padding: 12px 18px;
         border-radius: 20px;
         max-width: 75%;
@@ -55,10 +57,15 @@
     }
     #input-area {
         margin-top: 15px;
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
     }
     input[type="text"] {
-        width: 60%;
-        max-width: 400px;
+        flex-grow: 1;
         padding: 12px;
         border-radius: 8px;
         border: 2px solid #9b59b6;
@@ -105,11 +112,12 @@
     </div>
 
     <script>
-        // 【重要】APIキーとURLの設定ぞぃ！
-        const API_KEY = "AQ.Ab8RN6Iowbcs12jBFdOxX7LxkDFrT28f_9hpHZYvMshsU_KRmQ"; 
+        // 🔑 ここにあなたのAPIキーを直接貼り付けるのぞぃ（""は残す！）
+        const API_KEY = "ここに新しいAPIキーを入れる"; 
+        
+        // 正しいURLの設定（変数API_KEYをそのまま読み込む仕組みぞぃ）
         const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
 
-        // 過去の会話履歴を保存する配列
         let chatHistory = [];
 
         async function sendMessage() {
@@ -119,10 +127,7 @@
             
             if (text === "") return;
 
-            // ユーザーの入力を画面に追加
             addMessage(text, "user-msg");
-            
-            // 履歴にユーザーの発言を追加
             chatHistory.push({ role: "user", parts: [{ text: text }] });
             
             inputField.value = "";
@@ -148,11 +153,7 @@
                                 ・性格：少し偉そうですが、親しみやすくユーモアのある老魔女です。` 
                             }]
                         },
-                        contents: chatHistory,
-                        generationConfig: {
-                            temperature: 0.7,
-                            maxOutputTokens: 500
-                        }
+                        contents: chatHistory
                     })
                 });
 
@@ -161,7 +162,6 @@
                 const data = await response.json();
                 const majoReply = data.candidates[0].content.parts[0].text;
 
-                // 履歴に魔女の返答を追加
                 chatHistory.push({ role: "model", parts: [{ text: majoReply }] });
 
                 removeMessage(thinkingId);
@@ -169,9 +169,8 @@
 
             } catch (error) {
                 removeMessage(thinkingId);
-                addMessage("ぐあっ！魔力（APIキー）が足りないか、通信に失敗したぞい！設定を見直すのぞぃ！", "majo-msg");
+                addMessage("ぐあっ！APIキーが間違っているか、通信に失敗したぞい！", "majo-msg");
                 console.error(error);
-                // エラー時は最後のユーザー発言を履歴から消す
                 chatHistory.pop();
             } finally {
                 inputField.disabled = false;
@@ -186,22 +185,17 @@
             msgDiv.className = "message " + className;
             msgDiv.textContent = text;
             if (id) msgDiv.id = id;
-            
             chatBox.appendChild(msgDiv);
             chatBox.scrollTop = chatBox.scrollHeight;
         }
 
         function removeMessage(id) {
             const msgElement = document.getElementById(id);
-            if (msgElement) {
-                msgElement.remove();
-            }
+            if (msgElement) msgElement.remove();
         }
 
         document.getElementById('user-input').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-                sendMessage();
-            }
+            if (e.key === 'Enter') sendMessage();
         });
     </script>
 </body>
