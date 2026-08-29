@@ -18,12 +18,30 @@
         text-shadow: 2px 2px 4px #000000;
         margin-bottom: 10px;
     }
+    #key-config {
+        background-color: #2c003e;
+        padding: 12px;
+        border-radius: 10px;
+        max-width: 600px;
+        margin: 0 auto 15px auto;
+        border: 1px solid #9b59b6;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+    }
+    .key-input-container {
+        display: flex;
+        gap: 8px;
+        width: 100%;
+        max-width: 500px;
+    }
     #chat-box {
         width: 90%;
         max-width: 600px;
-        height: 500px;
+        height: 450px;
         background-color: #3b1059;
-        margin: 20px auto;
+        margin: 0 auto;
         border-radius: 15px;
         padding: 15px;
         overflow-y: auto;
@@ -72,29 +90,31 @@
         margin-left: auto;
         margin-right: auto;
     }
-    input[type="text"] {
-        flex-grow: 1;
-        padding: 12px;
+    input[type="text"], input[type="password"] {
+        padding: 10px;
         border-radius: 8px;
         border: 2px solid #9b59b6;
-        font-size: 16px;
-        background-color: #2c003e;
+        font-size: 14px;
+        background-color: #1a0033;
         color: #fff;
     }
-    input[type="text"]:focus {
-        outline: none;
-        border-color: #f1c40f;
+    #api-key-input {
+        flex-grow: 1;
+    }
+    #user-input {
+        flex-grow: 1;
+        font-size: 16px;
     }
     button {
-        padding: 12px 24px;
-        font-size: 16px;
+        padding: 10px 18px;
+        font-size: 14px;
         background-color: #9b59b6;
         border: none;
         border-radius: 8px;
         cursor: pointer;
         color: #fff;
         font-weight: bold;
-        transition: 0.3s;
+        transition: 0.2s;
     }
     button:hover {
         background-color: #f1c40f;
@@ -108,7 +128,15 @@
 </head>
 <body>
     <h1>🔮 オンラインおいじぃ魔女会話AI 🔮</h1>
-    <p>フォッフォッフォ！わたくしに何でも話しかけるがよいぞい！</p>
+    
+    <!-- APIキー設定エリア -->
+    <div id="key-config">
+        <div class="key-input-container">
+            <input type="password" id="api-key-input" placeholder="Gemini APIキー (AIzaSy...)">
+            <button onclick="saveApiKey()">保存するぞぃ</button>
+        </div>
+        <p id="key-status" style="font-size: 12px; margin: 0; color: #bbb;">※キーを入力して「保存するぞぃ」を押すと、次回から自動で読み込まれるぞぃ！</p>
+    </div>
     
     <div id="chat-box">
         <div class="message majo-msg">フォッフォッフォ！よく来たのぞぃ、オイサシ！さあ、始めるのぞぃ！</div>
@@ -120,25 +148,45 @@
     </div>
 
     <script>
-        // 🔑【重要】ここにGoogle AI Studioで取得した新しい「AIzaSy...」から始まるキーを入れるのぞぃ！
-        const API_KEY = "AQ.Ab8RN6KOX0oD7OxMFfz3TEi-OHBB-fUASGm_7WxdhAW_HR5Pcw"; 
-        
-        // Gemini APIエンドポイント
-        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
-
         let chatHistory = [];
 
+        // ページ読み込み時に保存されたAPIキーを取得
+        window.onload = function() {
+            const savedKey = localStorage.getItem("majo_gemini_key");
+            if (savedKey) {
+                document.getElementById("api-key-input").value = savedKey;
+                document.getElementById("key-status").textContent = "✨ 保存されたAPIキーがセットされたぞぃ！すぐに会話できるぞい！";
+                document.getElementById("key-status").style.color = "#2ecc71";
+            }
+        };
+
+        function saveApiKey() {
+            const key = document.getElementById("api-key-input").value.trim();
+            if (key) {
+                localStorage.setItem("majo_gemini_key", key);
+                document.getElementById("key-status").textContent = "✨ APIキーをブラウザに記憶させたぞぃ！次回からは入力不要じゃ！";
+                document.getElementById("key-status").style.color = "#2ecc71";
+            } else {
+                localStorage.removeItem("majo_gemini_key");
+                document.getElementById("key-status").textContent = "⚠️ キーが空欄ぞぃ！";
+                document.getElementById("key-status").style.color = "#e74c3c";
+            }
+        }
+
         async function sendMessage() {
+            const apiKey = document.getElementById("api-key-input").value.trim();
             const inputField = document.getElementById("user-input");
             const sendBtn = document.getElementById("send-btn");
             const text = inputField.value.trim();
             
-            if (text === "") return;
-
-            if (API_KEY === "YOUR_GEMINI_API_KEY" || !API_KEY.startsWith("AIzaSy")) {
-                addMessage("⚠️ APIキーが正しく設定されていないぞぃ！「AIzaSy」から始まる新しいキーをHTMLに貼り付けるのぞぃ！", "error-msg");
+            if (!apiKey) {
+                alert("🔑 一番上の枠にGemini APIキー（AIzaSyから始まるもの）を入れて「保存するぞぃ」を押すのじゃ！");
                 return;
             }
+            if (text === "") return;
+
+            // 最新の推奨エンドポイント (gemini-2.0-flash)
+            const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
 
             addMessage(text, "user-msg");
             chatHistory.push({ role: "user", parts: [{ text: text }] });
