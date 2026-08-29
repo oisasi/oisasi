@@ -41,6 +41,7 @@
         word-wrap: break-word;
         font-size: 16px;
         line-height: 1.4;
+        white-space: pre-wrap;
     }
     .user-msg {
         background-color: #3498db;
@@ -54,6 +55,15 @@
         text-align: left;
         border-bottom-left-radius: 2px;
         font-weight: bold;
+    }
+    /* リンクの装飾 */
+    .majo-msg a {
+        color: #0000ee;
+        text-decoration: underline;
+        word-break: break-all;
+    }
+    .majo-msg a:hover {
+        color: #551a8b;
     }
     .error-msg {
         background-color: #e74c3c;
@@ -106,7 +116,7 @@
     <h1>🔮 オンラインおいじぃ魔女会話AI 🔮</h1>
     
     <div id="chat-box">
-        <div class="message majo-msg">フォッフォッフォ！よく来たのぞぃ、オイサシ！さあ、始めるのぞぃ！</div>
+        <div class="message majo-msg">フォッフォッフォ！よく来たのぞぃ！さあ、SNSやホームページのことでも何でも聞くのぞぃ！</div>
     </div>
     
     <div id="input-area">
@@ -126,8 +136,24 @@
 ・二人称：お主、お主ら
 ・語尾：「〜ぞぃ」「〜のぞぃ」「〜ぞい」「〜からのぅ」「〜かのぅ」
 ・笑い声：「フォッフォッフォ！」「ヒッヒッヒ…」
-・ユーザーの名前は「オイサシ」です。
-・性格：少し偉そうですが、親しみやすくユーモアのある老魔女です。`
+・性格：少し偉そうですが、親しみやすくユーモアのある老魔女です。
+・おいじぃ魔女のsns 
+https://www.instagram.com/oijiiw(Instagram)
+https://www.youtube.com/@oijiiw(YouTube) https://www.facebook.com/oijiiw(Facebook) 
+https://x.com/oijiiw(X)
+https://www.tiktok.com/@oijiiw(TikTok)
+おいじぃ魔女のホームページはhttps://oisasi.f5.si/oijiiwです
+おいじぃ魔女雑学snsは
+https://www.instagram.com/oijiizatu(Instagram)
+https://www.youtube.com/@oijiizatu(YouTube) https://www.facebook.com/oijiizatu(Facebook) 
+https://x.com/oijiizatu(X)
+https://www.tiktok.com/@oijiizatu(TikTok)
+雑学ホームページはhttps://oisasi.f5.si/oijiizatuです
+・おいさしのsns 
+https://www.youtube.com/@oisasiofficial(YouTube) https://www.facebook.com/oisasiofficial(Facebook) 
+https://x.com/oisasiofficial(X)
+https://www.tiktok.com/@oisasiofficial(TikTok)
+・おいさし公式ホームページはhttps://oisasi.f5.siです。`
             }
         ];
 
@@ -185,14 +211,41 @@
             }
         }
 
+        // テキスト内のURLを検出してリンク化する関数
+        function linkify(text) {
+            const urlRegex = /(https?:\/\/[^\s\(\)\<\>]+)/g;
+            return text.replace(urlRegex, function(url) {
+                // 文末のピリオドなどを除外
+                let cleanUrl = url.replace(/[\.\,\;\:]$/, '');
+                return `<a href="${cleanUrl}" target="_blank" rel="noopener noreferrer">${cleanUrl}</a>`;
+            });
+        }
+
         function addMessage(text, className, id = null) {
             const chatBox = document.getElementById("chat-box");
             const msgDiv = document.createElement("div");
             msgDiv.className = "message " + className;
-            msgDiv.textContent = text;
+            
+            // URLが含まれる場合はリンク化してHTMLとして挿入、それ以外は通常テキスト
+            if (className.includes("majo-msg")) {
+                msgDiv.innerHTML = linkify(escapeHTML(text));
+            } else {
+                msgDiv.textContent = text;
+            }
+
             if (id) msgDiv.id = id;
             chatBox.appendChild(msgDiv);
             chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        // エスケープ処理（セキュリティ対策）
+        function escapeHTML(str) {
+            return str
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
         }
 
         function removeMessage(id) {
