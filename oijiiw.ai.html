@@ -37,7 +37,7 @@
         margin: 8px 0;
         padding: 12px 18px;
         border-radius: 20px;
-        max-width: 75%;
+        max-width: 80%;
         word-wrap: break-word;
         font-size: 16px;
         line-height: 1.4;
@@ -54,6 +54,14 @@
         text-align: left;
         border-bottom-left-radius: 2px;
         font-weight: bold;
+    }
+    .error-msg {
+        background-color: #e74c3c;
+        color: #ffffff;
+        align-self: center;
+        text-align: left;
+        font-size: 14px;
+        border-radius: 10px;
     }
     #input-area {
         margin-top: 15px;
@@ -112,10 +120,10 @@
     </div>
 
     <script>
-        // 🔑 ここにあなたのAPIキーを直接貼り付けるのぞぃ（""は残す！）
+        // 🔑【重要】ここにGoogle AI Studioで取得した新しい「AIzaSy...」から始まるキーを入れるのぞぃ！
         const API_KEY = "AIzaSyAuH5FXXjjZ-39wKuhWJF1RgeT75HRSqpc"; 
         
-        // 正しいURLの設定（変数API_KEYをそのまま読み込む仕組みぞぃ）
+        // Gemini APIエンドポイント
         const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
 
         let chatHistory = [];
@@ -126,6 +134,11 @@
             const text = inputField.value.trim();
             
             if (text === "") return;
+
+            if (API_KEY === "YOUR_GEMINI_API_KEY" || !API_KEY.startsWith("AIzaSy")) {
+                addMessage("⚠️ APIキーが正しく設定されていないぞぃ！「AIzaSy」から始まる新しいキーをHTMLに貼り付けるのぞぃ！", "error-msg");
+                return;
+            }
 
             addMessage(text, "user-msg");
             chatHistory.push({ role: "user", parts: [{ text: text }] });
@@ -157,9 +170,13 @@
                     })
                 });
 
-                if (!response.ok) throw new Error("APIエラーぞぃ！");
-
                 const data = await response.json();
+
+                if (!response.ok) {
+                    const errorDetail = data.error ? data.error.message : response.statusText;
+                    throw new Error(`[HTTP ${response.status}] ${errorDetail}`);
+                }
+
                 const majoReply = data.candidates[0].content.parts[0].text;
 
                 chatHistory.push({ role: "model", parts: [{ text: majoReply }] });
@@ -169,7 +186,7 @@
 
             } catch (error) {
                 removeMessage(thinkingId);
-                addMessage("ぐあっ！APIキーが間違っているか、通信に失敗したぞい！", "majo-msg");
+                addMessage(`ぐあっ！通信エラーが発生したぞい！\n詳細: ${error.message}`, "error-msg");
                 console.error(error);
                 chatHistory.pop();
             } finally {
