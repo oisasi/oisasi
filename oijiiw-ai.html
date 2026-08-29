@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>オンラインおいじぃ魔女会話AI (Groq版)</title>
+<title>オンラインおいじぃ魔女会話AI (Groq自動更新版)</title>
 <style>
     body {
         font-family: 'Hiragino Maru Gothic ProN', 'Rounded M+ 1c', sans-serif;
@@ -134,7 +134,7 @@
 </style>
 </head>
 <body>
-    <h1>🔮 オンラインおいじぃ魔女会話AI (Groq版) 🔮</h1>
+    <h1>🔮 オンラインおいじぃ魔女会話AI (Groq自動更新版) 🔮</h1>
     
     <div id="key-config">
         <div class="input-row">
@@ -145,17 +145,14 @@
         <div class="input-row">
             <label>召喚するAI:</label>
             <select id="model-select">
-                <option value="llama-3.1-8b-instant">Llama 3.1 8B（爆速・おすすめ！）</option>
-                <option value="llama3-70b-8192">Llama 3 70B（高精度）</option>
-                <option value="mixtral-8x7b-32768">Mixtral 8x7B（バランス重視）</option>
-                <option value="gemma2-9b-it">Gemma 2 9B（Google製）</option>
+                <option value="">APIキーを入力すると最新モデルを取得するぞぃ</option>
             </select>
         </div>
-        <p id="key-status" style="font-size: 12px; margin: 0; color: #bbb;">※Groqのキー（gsk_...）を入れて会話を開始するのじゃ！</p>
+        <p id="key-status" style="font-size: 12px; margin: 0; color: #bbb;">※Groqキーを保存すると、今利用可能な最新モデルを自動取得するぞぃ！</p>
     </div>
     
     <div id="chat-box">
-        <div class="message majo-msg">フォッフォッフォ！よく来たのぞぃ、オイサシ！Groqの爆速魔力で会話するぞぃ！</div>
+        <div class="message majo-msg">フォッフォッフォ！よく来たのぞぃ、オイサシ！最新のGroq魔術で会話するぞぃ！</div>
     </div>
     
     <div id="input-area">
@@ -185,8 +182,7 @@
             const savedKey = localStorage.getItem("majo_groq_key");
             if (savedKey) {
                 document.getElementById("api-key-input").value = cleanKey(savedKey);
-                document.getElementById("key-status").textContent = "✨ 保存されたGroqキーがセットされたぞぃ！";
-                document.getElementById("key-status").style.color = "#2ecc71";
+                fetchGroqModels(cleanKey(savedKey));
             }
         };
 
@@ -194,12 +190,45 @@
             const key = cleanKey(document.getElementById("api-key-input").value);
             if (key) {
                 localStorage.setItem("majo_groq_key", key);
-                document.getElementById("key-status").textContent = "✨ APIキーを保存したぞぃ！準備完了じゃ！";
-                document.getElementById("key-status").style.color = "#2ecc71";
+                fetchGroqModels(key);
             } else {
                 localStorage.removeItem("majo_groq_key");
                 document.getElementById("key-status").textContent = "⚠️ キーが空欄ぞぃ！";
                 document.getElementById("key-status").style.color = "#e74c3c";
+            }
+        }
+
+        // Groqから現在アクティブな最新モデル一覧を自動取得する関数
+        async function fetchGroqModels(apiKey) {
+            const statusEl = document.getElementById("key-status");
+            const selectEl = document.getElementById("model-select");
+            statusEl.textContent = "🔄 利用可能な最新モデルを探索中ぞぃ...";
+            statusEl.style.color = "#f1c40f";
+
+            try {
+                const res = await fetch("https://api.groq.com/openai/v1/models", {
+                    headers: { "Authorization": `Bearer ${apiKey}` }
+                });
+
+                if (!res.ok) throw new Error("APIキーが無効か通信失敗じゃ");
+
+                const data = await res.json();
+                // 非推奨でなく、かつチャットに使えるアクティブモデルを抽出
+                const activeModels = data.data.filter(m => m.active && !m.id.includes("whisper") && !m.id.includes("safetensors"));
+
+                selectEl.innerHTML = "";
+                activeModels.forEach(m => {
+                    const opt = document.createElement("option");
+                    opt.value = m.id;
+                    opt.textContent = m.id;
+                    selectEl.appendChild(opt);
+                });
+
+                statusEl.textContent = "✨ 最新モデルの取得に成功したぞぃ！すぐに会話できるぞい！";
+                statusEl.style.color = "#2ecc71";
+            } catch (err) {
+                statusEl.textContent = `⚠️ モデル取得失敗: ${err.message}`;
+                statusEl.style.color = "#e74c3c";
             }
         }
 
@@ -212,6 +241,10 @@
             
             if (!apiKey) {
                 alert("🔑 一番上の枠にGroq APIキー（gsk_から始まるもの）を入れて「保存」を押すのじゃ！");
+                return;
+            }
+            if (!selectedModel) {
+                alert("⚠️ 有効なモデルが選択されていないぞぃ！APIキーを確認して「保存」を押し直すのじゃ！");
                 return;
             }
             if (text === "") return;
