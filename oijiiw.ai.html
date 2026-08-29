@@ -129,13 +129,12 @@
 <body>
     <h1>🔮 オンラインおいじぃ魔女会話AI 🔮</h1>
     
-    <!-- APIキー設定エリア -->
     <div id="key-config">
         <div class="key-input-container">
-            <input type="password" id="api-key-input" placeholder="OpenAI APIキー (sk-...)">
+            <input type="password" id="api-key-input" placeholder="OpenRouter APIキー (sk-or-v1-...)">
             <button onclick="saveApiKey()">保存するぞぃ</button>
         </div>
-        <p id="key-status" style="font-size: 12px; margin: 0; color: #bbb;">※OpenAIのAPIキー（sk-から始まる文字列）を入れるのじゃ！</p>
+        <p id="key-status" style="font-size: 12px; margin: 0; color: #bbb;">※OpenRouterの無料APIキー（sk-or-v1-から始まる文字列）を入れるのじゃ！</p>
     </div>
     
     <div id="chat-box">
@@ -148,7 +147,6 @@
     </div>
 
     <script>
-        // 会話履歴の管理
         let conversationMessages = [
             {
                 role: "system",
@@ -162,12 +160,11 @@
             }
         ];
 
-        // ページ読み込み時に保存されたAPIキーを取得
         window.onload = function() {
-            const savedKey = localStorage.getItem("majo_openai_key");
+            const savedKey = localStorage.getItem("majo_openrouter_key");
             if (savedKey) {
                 document.getElementById("api-key-input").value = savedKey;
-                document.getElementById("key-status").textContent = "✨ 保存されたOpenAIキーがセットされたぞぃ！すぐに会話できるぞい！";
+                document.getElementById("key-status").textContent = "✨ 保存されたOpenRouterキーがセットされたぞぃ！すぐに会話できるぞい！";
                 document.getElementById("key-status").style.color = "#2ecc71";
             }
         };
@@ -175,11 +172,11 @@
         function saveApiKey() {
             const key = document.getElementById("api-key-input").value.trim();
             if (key) {
-                localStorage.setItem("majo_openai_key", key);
+                localStorage.setItem("majo_openrouter_key", key);
                 document.getElementById("key-status").textContent = "✨ APIキーをブラウザに記憶させたぞぃ！次回からは入力不要じゃ！";
                 document.getElementById("key-status").style.color = "#2ecc71";
             } else {
-                localStorage.removeItem("majo_openai_key");
+                localStorage.removeItem("majo_openrouter_key");
                 document.getElementById("key-status").textContent = "⚠️ キーが空欄ぞぃ！";
                 document.getElementById("key-status").style.color = "#e74c3c";
             }
@@ -192,7 +189,7 @@
             const text = inputField.value.trim();
             
             if (!apiKey) {
-                alert("🔑 一番上の枠にOpenAI APIキー（sk-から始まるもの）を入れて「保存するぞぃ」を押すのじゃ！");
+                alert("🔑 一番上の枠にOpenRouter APIキー（sk-or-v1-から始まるもの）を入れて「保存するぞぃ」を押すのじゃ！");
                 return;
             }
             if (text === "") return;
@@ -208,14 +205,14 @@
             addMessage("むむっ…魔力を練っているのぞぃ…", "majo-msg thinking", thinkingId);
 
             try {
-                const response = await fetch("https://api.openai.com/v1/chat/completions", {
+                const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
                         "Authorization": `Bearer ${apiKey}`
                     },
                     body: JSON.stringify({
-                        model: "gpt-4o-mini", // 高性能＆格安な最新モデル
+                        model: "meta-llama/llama-3.3-70b-instruct:free",
                         messages: conversationMessages
                     })
                 });
@@ -238,7 +235,7 @@
                 removeMessage(thinkingId);
                 addMessage(`ぐあっ！通信エラーが発生したぞい！\n詳細: ${error.message}`, "error-msg");
                 console.error(error);
-                conversationMessages.pop(); // エラー時は直前の発言履歴を取り消す
+                conversationMessages.pop();
             } finally {
                 inputField.disabled = false;
                 sendBtn.disabled = false;
