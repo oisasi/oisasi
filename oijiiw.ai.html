@@ -160,30 +160,43 @@
             }
         ];
 
+        // APIキーから余計な全角文字やスペースを除去する関数
+        function cleanApiKey(key) {
+            if (!key) return "";
+            // 非ASCII文字（全角文字や特殊記号）とスペースを全て除去
+            return key.replace(/[^\x00-\x7F]/g, "").replace(/\s+/g, "").trim();
+        }
+
         window.onload = function() {
             const savedKey = localStorage.getItem("majo_openrouter_key");
             if (savedKey) {
-                document.getElementById("api-key-input").value = savedKey;
+                document.getElementById("api-key-input").value = cleanApiKey(savedKey);
                 document.getElementById("key-status").textContent = "✨ 保存されたOpenRouterキーがセットされたぞぃ！すぐに会話できるぞい！";
                 document.getElementById("key-status").style.color = "#2ecc71";
             }
         };
 
         function saveApiKey() {
-            const key = document.getElementById("api-key-input").value.trim();
+            let rawKey = document.getElementById("api-key-input").value;
+            let key = cleanApiKey(rawKey);
+            
+            document.getElementById("api-key-input").value = key; // 画面の表示もキレイな半角に更新
+
             if (key) {
                 localStorage.setItem("majo_openrouter_key", key);
                 document.getElementById("key-status").textContent = "✨ APIキーをブラウザに記憶させたぞぃ！次回からは入力不要じゃ！";
                 document.getElementById("key-status").style.color = "#2ecc71";
             } else {
                 localStorage.removeItem("majo_openrouter_key");
-                document.getElementById("key-status").textContent = "⚠️ キーが空欄ぞぃ！";
+                document.getElementById("key-status").textContent = "⚠️ 有効なキーが空欄ぞぃ！(半角のsk-or-v1-から始まるキーを入れるのじゃ)";
                 document.getElementById("key-status").style.color = "#e74c3c";
             }
         }
 
         async function sendMessage() {
-            const apiKey = document.getElementById("api-key-input").value.trim();
+            let rawKey = document.getElementById("api-key-input").value;
+            let apiKey = cleanApiKey(rawKey);
+            
             const inputField = document.getElementById("user-input");
             const sendBtn = document.getElementById("send-btn");
             const text = inputField.value.trim();
@@ -212,7 +225,7 @@
                         "Authorization": `Bearer ${apiKey}`
                     },
                     body: JSON.stringify({
-                        model: "meta-llama/llama-3.1-8b-instruct:free",
+                        model: "openrouter/auto",
                         messages: conversationMessages
                     })
                 });
