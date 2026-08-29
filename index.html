@@ -1227,19 +1227,18 @@ footer { margin-top: 52px; text-align: center; }
   }
 
   async function updateOnlineStatus() {
-    if (!navigator.onLine) {
-      showOfflineOverlay();
-      return;
-    }
+    // オーバーレイが表示中（＝読み込み時にオフラインだった）場合のみ復旧チェックする。
+    // ブラウジング中に回線が切れても、いきなり全画面を出すことはしない。
+    if (!overlayIsShown) return;
     const ok = await checkConnectivity();
     if (ok) handleBackOnline();
-    else showOfflineOverlay();
   }
 
-  window.addEventListener('offline', showOfflineOverlay);
+  // 「offline」イベントでは全画面エラーを出さない（ブラウジング中の瞬断で
+  // いきなり表示されないようにするため）。表示するのはページ読み込み・再読み込み時のみ。
   window.addEventListener('online', updateOnlineStatus);
 
-  // Reload かどうかに関わらず、読み込み時点でオフラインなら全画面エラーを表示
+  // ページ読み込み・再読み込みの時点でオフラインなら全画面エラーを表示
   if (!navigator.onLine) {
     showOfflineOverlay();
   } else {
