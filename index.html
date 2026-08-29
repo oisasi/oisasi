@@ -32,7 +32,6 @@
   --radius: 18px;
   --header-h: 64px;
   --nav-max: 1100px;
-  --cursor: auto;
 }
 [data-theme="light"] {
   --bg: #f3f0f8;
@@ -93,12 +92,11 @@
   }
 }
 
-[data-cursor="default"] { --cursor: auto; }
-[data-cursor="pointer"] { --cursor: pointer; }
-[data-cursor="crosshair"] { --cursor: crosshair; }
-[data-cursor="dot"] { --cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20'%3E%3Ccircle cx='10' cy='10' r='5' fill='%23ff6bcb'/%3E%3C/svg%3E") 10 10, auto; }
-[data-cursor="star"] { --cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%23ffd166' d='M12 2l2.4 7.4H22l-6 4.6 2.3 7.4L12 17l-6.3 4.4L8 14l-6-4.6h7.6z'/%3E%3C/svg%3E") 12 12, auto; }
-[data-cursor="magic"] { --cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 24 24'%3E%3Cpath fill='%238b6cff' d='M7.5 5.6L5 7l1.4-2.5L5 2l2.5 1.4L10 2 8.6 4.5 10 7 7.5 5.6zm12 9.8L22 14l-1.4 2.5L22 19l-2.5-1.4L17 19l1.4-2.5L17 14l2.5 1.4zM22 2l-1.4 2.5L22 7l-2.5-1.4L17 7l1.4-2.5L17 2l2.5 1.4L22 2zm-8.8 9.5l1.4-2.5-2.5 1.4L9.6 8l1.4 2.5L8.5 12l2.5-1.4 1.4 2.5 1.4-2.5 2.5 1.4-1.4-2.5z'/%3E%3C/svg%3E") 14 14, auto; }
+/* おいさしオリジナルカーソル（星なし・わかりやすい矢印） */
+:root {
+  --cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 28 28'%3E%3Cpath fill='%23ff6bcb' stroke='%23ffffff' stroke-width='1.8' stroke-linejoin='round' d='M4 2 L4 22 L10 16 L14 25 L17.5 23.5 L13.5 14.5 L21 14.5 Z'/%3E%3C/svg%3E") 4 2, auto;
+  --cursor-hover: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 28 28'%3E%3Cpath fill='%238b6cff' stroke='%23ffffff' stroke-width='1.8' stroke-linejoin='round' d='M4 2 L4 22 L10 16 L14 25 L17.5 23.5 L13.5 14.5 L21 14.5 Z'/%3E%3C/svg%3E") 4 2, pointer;
+}
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
@@ -115,7 +113,9 @@ body {
   cursor: var(--cursor);
   transition: background 0.45s, color 0.35s;
 }
-a, button { cursor: var(--cursor); }
+a, button, .card, .pill, .sns, .icon-btn, .hamburger, .settings-options button {
+  cursor: var(--cursor-hover);
+}
 
 /* Background */
 .bg {
@@ -696,11 +696,11 @@ footer { margin-top: 52px; text-align: center; }
       <div class="logo-text"><span>おいさし</span></div>
     </a>
     <nav class="nav-desktop" aria-label="メインナビゲーション">
-      <a href="#main">メイン</a>
-      <a href="#witch">おいじぃ魔女</a>
-      <a href="#contents">コンテンツ</a>
-      <a href="#sns">SNS</a>
-      <a class="accent" href="https://oisasi.f5.si/character">キャラクター</a>
+      <a href="#main" data-i18n="nav_main">メイン</a>
+      <a href="#witch" data-i18n="nav_witch">おいじぃ魔女</a>
+      <a href="#contents" data-i18n="nav_contents">コンテンツ</a>
+      <a href="#sns" data-i18n="nav_sns">SNS</a>
+      <a class="accent" href="https://oisasi.f5.si/character" data-i18n="nav_character">キャラクター</a>
     </nav>
     <div class="header-actions">
       <button class="icon-btn" id="settingsBtn" aria-label="設定" title="設定">
@@ -718,36 +718,33 @@ footer { margin-top: 52px; text-align: center; }
 
 <div class="settings-panel" id="settingsPanel" role="dialog" aria-label="設定">
   <div class="settings-title">
-    設定
+    <span data-i18n="settings">設定</span>
     <button class="settings-close" id="settingsClose" aria-label="閉じる">×</button>
   </div>
   <div class="settings-group">
-    <span class="settings-label">テーマ</span>
+    <span class="settings-label" data-i18n="theme">テーマ</span>
     <div class="settings-options" id="themeOptions">
-      <button data-value="auto" class="active">自動</button>
-      <button data-value="dark">ダーク</button>
-      <button data-value="light">ライト</button>
+      <button data-value="auto" class="active" data-i18n="auto">自動</button>
+      <button data-value="dark" data-i18n="dark">ダーク</button>
+      <button data-value="light" data-i18n="light">ライト</button>
     </div>
   </div>
   <div class="settings-group">
-    <span class="settings-label">マウスカーソル</span>
-    <div class="settings-options" id="cursorOptions">
-      <button data-value="default" class="active">通常</button>
-      <button data-value="pointer">指</button>
-      <button data-value="crosshair">十字</button>
-      <button data-value="dot">ドット</button>
-      <button data-value="star">星</button>
-      <button data-value="magic">魔法</button>
+    <span class="settings-label" data-i18n="language">言語</span>
+    <div class="settings-options" id="langOptions">
+      <button data-value="auto" class="active" data-i18n="auto">自動</button>
+      <button data-value="ja">日本語</button>
+      <button data-value="en">English</button>
     </div>
   </div>
 </div>
 
 <nav class="nav-mobile" id="navMobile" aria-label="モバイルメニュー">
-  <a href="#main" onclick="closeAll()"><span class="icon">🏠</span> メインメニュー</a>
-  <a href="#witch" onclick="closeAll()"><span class="icon">🧙‍♀️</span> おいじぃ魔女</a>
-  <a href="#contents" onclick="closeAll()"><span class="icon">🎵</span> コンテンツ</a>
-  <a href="#sns" onclick="closeAll()"><span class="icon">📱</span> SNS</a>
-  <a href="https://oisasi.f5.si/character" onclick="closeAll()"><span class="icon">👤</span> キャラクター紹介</a>
+  <a href="#main" onclick="closeAll()"><span class="icon">🏠</span> <span data-i18n="nav_main_full">メインメニュー</span></a>
+  <a href="#witch" onclick="closeAll()"><span class="icon">🧙‍♀️</span> <span data-i18n="nav_witch">おいじぃ魔女</span></a>
+  <a href="#contents" onclick="closeAll()"><span class="icon">🎵</span> <span data-i18n="nav_contents">コンテンツ</span></a>
+  <a href="#sns" onclick="closeAll()"><span class="icon">📱</span> <span data-i18n="nav_sns">SNS</span></a>
+  <a href="https://oisasi.f5.si/character" onclick="closeAll()"><span class="icon">👤</span> <span data-i18n="nav_character_full">キャラクター紹介</span></a>
   <a href="faq.html" onclick="closeAll()"><span class="icon">💬</span> FAQ</a>
   <div class="nav-mobile-footer">OisasiOfficial</div>
 </nav>
@@ -755,35 +752,35 @@ footer { margin-top: 52px; text-align: center; }
 <div class="shell">
   <header class="hero">
     <div class="badge">Official</div>
-    <h1><span>おいさし公式<br>ホームページ</span></h1>
+    <h1><span data-i18n-html="hero_title">おいさし公式<br>ホームページ</span></h1>
     <p class="subtitle">OisasiOfficial Website</p>
-    <p class="lead">おいさし公式サイトです。</p>
+    <p class="lead" data-i18n="hero_lead">おいさし公式サイトです。</p>
   </header>
 
   <section class="section" id="main">
-    <div class="sec-title">メインメニュー</div>
+    <div class="sec-title" data-i18n="sec_main">メインメニュー</div>
     <div class="card-grid">
       <a class="card" href="https://oisasi.f5.si/logo">
         <div class="card-icon"><img src="おいさしロゴ.png" alt="おいさしロゴ"></div>
         <div class="card-body">
-          <div class="card-title">おいさしロゴページ</div>
-          <div class="card-desc">公式ロゴ・ビジュアル</div>
+          <div class="card-title" data-i18n="card_logo">おいさしロゴページ</div>
+          <div class="card-desc" data-i18n="card_logo_desc">公式ロゴ・ビジュアル</div>
         </div>
         <div class="card-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
       </a>
       <a class="card" href="https://oisasi.f5.si/character">
         <div class="card-icon"><img src="おいさし写真.png" alt="キャラクター"></div>
         <div class="card-body">
-          <div class="card-title">キャラクター紹介</div>
-          <div class="card-desc">メンバー・キャラ一覧</div>
+          <div class="card-title" data-i18n="card_char">キャラクター紹介</div>
+          <div class="card-desc" data-i18n="card_char_desc">メンバー・キャラ一覧</div>
         </div>
         <div class="card-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
       </a>
       <a class="card" href="faq.html">
         <div class="card-icon">💬</div>
         <div class="card-body">
-          <div class="card-title">FAQ・よくある質問</div>
-          <div class="card-desc">疑問をサクッと解決</div>
+          <div class="card-title" data-i18n="card_faq">FAQ・よくある質問</div>
+          <div class="card-desc" data-i18n="card_faq_desc">疑問をサクッと解決</div>
         </div>
         <div class="card-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
       </a>
@@ -791,21 +788,21 @@ footer { margin-top: 52px; text-align: center; }
   </section>
 
   <section class="section" id="witch">
-    <div class="sec-title">おいじぃ魔女</div>
+    <div class="sec-title" data-i18n="sec_witch">おいじぃ魔女</div>
     <div class="card-grid">
       <a class="card witch-card" href="oijiiw.html">
         <div class="card-icon"><img src="おいじぃ魔女.png" alt="おいじぃ魔女"></div>
         <div class="card-body">
-          <div class="card-title">おいじぃ魔女のホームページ</div>
-          <div class="card-desc">魔女の世界へようこそ</div>
+          <div class="card-title" data-i18n="card_witch">おいじぃ魔女のホームページ</div>
+          <div class="card-desc" data-i18n="card_witch_desc">魔女の世界へようこそ</div>
         </div>
         <div class="card-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
       </a>
       <a class="card witch-card" href="oijiizatu.html">
         <div class="card-icon"><img src="おいじぃ魔女.png" alt="おいじぃ魔女"></div>
         <div class="card-body">
-          <div class="card-title">おいじぃ魔女のヤバい雑学</div>
-          <div class="card-desc">衝撃の知識が満載</div>
+          <div class="card-title" data-i18n="card_trivia">おいじぃ魔女のヤバい雑学</div>
+          <div class="card-desc" data-i18n="card_trivia_desc">衝撃の知識が満載</div>
         </div>
         <div class="card-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
       </a>
@@ -813,25 +810,25 @@ footer { margin-top: 52px; text-align: center; }
   </section>
 
   <section class="section" id="contents">
-    <div class="sec-title">コンテンツ</div>
+    <div class="sec-title" data-i18n="sec_contents">コンテンツ</div>
     <div class="pills">
       <a class="pill" href="https://www.youtube.com/@oisasi_music">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
-        <span>音楽</span>
+        <span data-i18n="music">音楽</span>
       </a>
       <a class="pill" href="https://ojg.netlify.app">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 12h4M14 10v4M18 12h.01"/></svg>
-        <span>ゲーム</span>
+        <span data-i18n="game">ゲーム</span>
       </a>
       <a class="pill" href="https://oisasi.hatenablog.com">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-        <span>ブログ</span>
+        <span data-i18n="blog">ブログ</span>
       </a>
     </div>
   </section>
 
   <section class="section" id="sns">
-    <div class="sec-title">SNS（おいさし公式）</div>
+    <div class="sec-title" data-i18n="sec_sns">SNS（おいさし公式）</div>
     <div class="sns-grid">
       <a class="sns yt" href="https://www.youtube.com/@oisasiofficial" aria-label="YouTube">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.5 31.5 0 0 0 0 12a31.5 31.5 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.5 31.5 0 0 0 24 12a31.5 31.5 0 0 0-.5-5.8zM9.75 15.5v-7l6.5 3.5-6.5 3.5z"/></svg>
@@ -854,13 +851,13 @@ footer { margin-top: 52px; text-align: center; }
         <span>TikTok</span>
       </a>
     </div>
-    <p class="sns-note">おいじぃ魔女・雑学のSNSはこちら → <a href="https://lit.link/oisasi">lit.link/oisasi</a></p>
+    <p class="sns-note"><span data-i18n="sns_note">おいじぃ魔女・雑学のSNSはこちら</span> → <a href="https://lit.link/oisasi">lit.link/oisasi</a></p>
   </section>
 
   <footer>
     <div class="footer-pill">
       <span>✦</span>
-      OisasiOfficial — 設定からテーマ・カーソルを変更できます
+      <span data-i18n="footer">OisasiOfficial — 設定からテーマ・言語を変更できます</span>
     </div>
   </footer>
 </div>
@@ -875,10 +872,74 @@ footer { margin-top: 52px; text-align: center; }
   const settingsPanel = document.getElementById('settingsPanel');
   const settingsClose = document.getElementById('settingsClose');
 
-  const saved = {
-    theme: localStorage.getItem('oisasi-theme') || 'auto',
-    cursor: localStorage.getItem('oisasi-cursor') || 'default'
+  /* ===== i18n ===== */
+  const i18n = {
+    ja: {
+      settings: '設定', theme: 'テーマ', language: '言語',
+      auto: '自動', dark: 'ダーク', light: 'ライト',
+      nav_main: 'メイン', nav_witch: 'おいじぃ魔女', nav_contents: 'コンテンツ',
+      nav_sns: 'SNS', nav_character: 'キャラクター',
+      nav_main_full: 'メインメニュー', nav_character_full: 'キャラクター紹介',
+      hero_title: 'おいさし公式<br>ホームページ',
+      hero_lead: 'おいさし公式サイトです。',
+      sec_main: 'メインメニュー', sec_witch: 'おいじぃ魔女',
+      sec_contents: 'コンテンツ', sec_sns: 'SNS（おいさし公式）',
+      card_logo: 'おいさしロゴページ', card_logo_desc: '公式ロゴ・ビジュアル',
+      card_char: 'キャラクター紹介', card_char_desc: 'メンバー・キャラ一覧',
+      card_faq: 'FAQ・よくある質問', card_faq_desc: '疑問をサクッと解決',
+      card_witch: 'おいじぃ魔女のホームページ', card_witch_desc: '魔女の世界へようこそ',
+      card_trivia: 'おいじぃ魔女のヤバい雑学', card_trivia_desc: '衝撃の知識が満載',
+      music: '音楽', game: 'ゲーム', blog: 'ブログ',
+      sns_note: 'おいじぃ魔女・雑学のSNSはこちら',
+      footer: 'OisasiOfficial — 設定からテーマ・言語を変更できます'
+    },
+    en: {
+      settings: 'Settings', theme: 'Theme', language: 'Language',
+      auto: 'Auto', dark: 'Dark', light: 'Light',
+      nav_main: 'Main', nav_witch: 'Oijii Witch', nav_contents: 'Contents',
+      nav_sns: 'SNS', nav_character: 'Characters',
+      nav_main_full: 'Main Menu', nav_character_full: 'Characters',
+      hero_title: 'Oisasi Official<br>Website',
+      hero_lead: 'Welcome to the official Oisasi website.',
+      sec_main: 'Main Menu', sec_witch: 'Oijii Witch',
+      sec_contents: 'Contents', sec_sns: 'SNS (Oisasi Official)',
+      card_logo: 'Oisasi Logo Page', card_logo_desc: 'Official logo & visuals',
+      card_char: 'Characters', card_char_desc: 'Members & character list',
+      card_faq: 'FAQ', card_faq_desc: 'Quick answers to common questions',
+      card_witch: 'Oijii Witch Homepage', card_witch_desc: 'Welcome to the witch world',
+      card_trivia: 'Oijii Witch Trivia', card_trivia_desc: 'Shocking knowledge awaits',
+      music: 'Music', game: 'Games', blog: 'Blog',
+      sns_note: 'Oijii Witch & trivia SNS',
+      footer: 'OisasiOfficial — Change theme & language in Settings'
+    }
   };
+
+  function resolveLang(pref) {
+    if (pref === 'ja' || pref === 'en') return pref;
+    const nav = (navigator.language || 'ja').toLowerCase();
+    return nav.startsWith('ja') ? 'ja' : 'en';
+  }
+
+  function applyLang(pref) {
+    localStorage.setItem('oisasi-lang', pref);
+    const lang = resolveLang(pref);
+    html.setAttribute('lang', lang);
+    document.querySelectorAll('#langOptions button').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.value === pref);
+    });
+    const t = i18n[lang];
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      if (t[key] != null) el.textContent = t[key];
+    });
+    document.querySelectorAll('[data-i18n-html]').forEach(el => {
+      const key = el.getAttribute('data-i18n-html');
+      if (t[key] != null) el.innerHTML = t[key];
+    });
+  }
+
+  const savedTheme = localStorage.getItem('oisasi-theme') || 'auto';
+  const savedLang = localStorage.getItem('oisasi-lang') || 'auto';
 
   function applyTheme(theme) {
     html.setAttribute('data-theme', theme);
@@ -899,18 +960,9 @@ footer { margin-top: 52px; text-align: center; }
     }
   }
 
-  function applyCursor(cursor) {
-    html.setAttribute('data-cursor', cursor);
-    localStorage.setItem('oisasi-cursor', cursor);
-    document.querySelectorAll('#cursorOptions button').forEach(btn => {
-      btn.classList.toggle('active', btn.dataset.value === cursor);
-    });
-  }
+  applyTheme(savedTheme);
+  applyLang(savedLang);
 
-  applyTheme(saved.theme);
-  applyCursor(saved.cursor);
-
-  // Listen for system theme changes when on auto
   window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
     if (html.getAttribute('data-theme') === 'auto') updateThemeColor('auto');
   });
@@ -929,9 +981,9 @@ footer { margin-top: 52px; text-align: center; }
     const btn = e.target.closest('button');
     if (btn) applyTheme(btn.dataset.value);
   });
-  document.getElementById('cursorOptions').addEventListener('click', e => {
+  document.getElementById('langOptions').addEventListener('click', e => {
     const btn = e.target.closest('button');
-    if (btn) applyCursor(btn.dataset.value);
+    if (btn) applyLang(btn.dataset.value);
   });
 
   function toggleMenu() {
