@@ -1,413 +1,407 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="ja" data-theme="dark">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>おいさし公式ホームページ | OisasiOfficial</title>
-<meta name="description" content="おいさし公式ホームページ OisasiOfficial - 超最強デザイン">
+<meta name="description" content="おいさし公式ホームページ OisasiOfficial">
 <meta name="theme-color" content="#0a0a12">
 <link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <style>
-:root {
+:root, [data-theme="dark"] {
   --bg: #07070f;
-  --surface: rgba(255,255,255,0.045);
-  --surface-hover: rgba(255,255,255,0.09);
-  --border: rgba(255,255,255,0.1);
+  --bg-elevated: #0e0e1a;
+  --surface: rgba(255,255,255,0.055);
+  --surface-hover: rgba(255,255,255,0.1);
+  --border: rgba(255,255,255,0.11);
   --text: #f4f4fc;
   --muted: #9b9bb8;
   --pink: #ff6bcb;
   --purple: #8b6cff;
   --cyan: #00e5ff;
   --gold: #ffd166;
-  --radius: 18px;
+  --header-bg: rgba(7,7,15,0.78);
+  --header-bg-scrolled: rgba(7,7,15,0.94);
+  --menu-bg: rgba(7,7,15,0.97);
+  --card-glow: 0 0 28px rgba(255,107,203,0.35);
   --shadow: 0 20px 50px rgba(0,0,0,0.45);
-  --glow-pink: 0 0 28px rgba(255,107,203,0.35);
+  --radius: 18px;
+  --header-h: 64px;
+  --nav-max: 1100px;
+  --font: system-ui, -apple-system, "Segoe UI", Roboto, "Hiragino Sans", sans-serif;
+  --cursor: auto;
 }
+[data-theme="light"] {
+  --bg: #f4f2f8;
+  --bg-elevated: #ffffff;
+  --surface: rgba(0,0,0,0.04);
+  --surface-hover: rgba(0,0,0,0.07);
+  --border: rgba(0,0,0,0.09);
+  --text: #1a1a2e;
+  --muted: #5c5c78;
+  --pink: #e84a9a;
+  --purple: #6b4ce0;
+  --cyan: #0099b8;
+  --gold: #c99200;
+  --header-bg: rgba(255,255,255,0.82);
+  --header-bg-scrolled: rgba(255,255,255,0.95);
+  --menu-bg: rgba(255,255,255,0.97);
+  --card-glow: 0 0 24px rgba(232,74,154,0.25);
+  --shadow: 0 16px 40px rgba(0,0,0,0.12);
+}
+[data-font="system"] { --font: system-ui, -apple-system, "Segoe UI", Roboto, "Hiragino Sans", sans-serif; }
+[data-font="rounded"] { --font: "Hiragino Maru Gothic ProN", "Yu Gothic", "Meiryo", system-ui, sans-serif; }
+[data-font="serif"] { --font: "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif; }
+[data-font="mono"] { --font: "SF Mono", "Consolas", "Monaco", "Courier New", monospace; }
+[data-font="display"] { --font: "Arial Black", "Impact", "Hiragino Kaku Gothic ProN", sans-serif; }
+[data-cursor="default"] { --cursor: auto; }
+[data-cursor="pointer"] { --cursor: pointer; }
+[data-cursor="crosshair"] { --cursor: crosshair; }
+[data-cursor="dot"] { --cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20'%3E%3Ccircle cx='10' cy='10' r='5' fill='%23ff6bcb'/%3E%3C/svg%3E") 10 10, auto; }
+[data-cursor="star"] { --cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%23ffd166' d='M12 2l2.4 7.4H22l-6 4.6 2.3 7.4L12 17l-6.3 4.4L8 14l-6-4.6h7.6z'/%3E%3C/svg%3E") 12 12, auto; }
+[data-cursor="magic"] { --cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 24 24'%3E%3Cpath fill='%238b6cff' d='M7.5 5.6L5 7l1.4-2.5L5 2l2.5 1.4L10 2 8.6 4.5 10 7 7.5 5.6zm12 9.8L22 14l-1.4 2.5L22 19l-2.5-1.4L17 19l1.4-2.5L17 14l2.5 1.4zM22 2l-1.4 2.5L22 7l-2.5-1.4L17 7l1.4-2.5L17 2l2.5 1.4L22 2zm-8.8 9.5l1.4-2.5-2.5 1.4L9.6 8l1.4 2.5L8.5 12l2.5-1.4 1.4 2.5 1.4-2.5 2.5 1.4-1.4-2.5z'/%3E%3C/svg%3E") 14 14, auto; }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
 html { scroll-behavior: smooth; }
-
 body {
-  font: 15px/1.65 system-ui, -apple-system, "Segoe UI", Roboto, "Hiragino Sans", sans-serif;
+  font-family: var(--font);
+  font-size: 15px;
+  line-height: 1.65;
   color: var(--text);
   background: var(--bg);
   min-height: 100dvh;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
+  padding-top: var(--header-h);
+  cursor: var(--cursor);
+  transition: background 0.4s, color 0.3s;
 }
+a, button { cursor: var(--cursor); }
 
-/* ===== Background ===== */
 .bg {
-  position: fixed;
-  inset: 0;
-  z-index: -2;
+  position: fixed; inset: 0; z-index: -2;
   background:
-    radial-gradient(ellipse 90% 60% at 15% -10%, rgba(139,108,255,0.38), transparent 55%),
-    radial-gradient(ellipse 70% 50% at 90% 5%, rgba(255,107,203,0.28), transparent 50%),
-    radial-gradient(ellipse 60% 40% at 50% 110%, rgba(0,229,255,0.12), transparent 50%),
+    radial-gradient(ellipse 90% 60% at 15% -10%, color-mix(in srgb, var(--purple) 38%, transparent), transparent 55%),
+    radial-gradient(ellipse 70% 50% at 90% 5%, color-mix(in srgb, var(--pink) 28%, transparent), transparent 50%),
+    radial-gradient(ellipse 60% 40% at 50% 110%, color-mix(in srgb, var(--cyan) 12%, transparent), transparent 50%),
     var(--bg);
+  transition: background 0.5s;
   animation: bgShift 18s ease-in-out infinite alternate;
 }
 @keyframes bgShift {
   0% { filter: hue-rotate(0deg) brightness(1); }
-  100% { filter: hue-rotate(12deg) brightness(1.05); }
+  100% { filter: hue-rotate(10deg) brightness(1.04); }
 }
-
-/* floating orbs */
 .orb {
-  position: fixed;
-  border-radius: 50%;
-  filter: blur(60px);
-  opacity: 0.35;
-  pointer-events: none;
-  z-index: -1;
-  animation: orbFloat 22s ease-in-out infinite;
+  position: fixed; border-radius: 50%; filter: blur(60px); opacity: 0.3;
+  pointer-events: none; z-index: -1; animation: orbFloat 22s ease-in-out infinite; transition: opacity 0.4s;
 }
-.orb-1 { width: 280px; height: 280px; background: var(--pink); top: -80px; left: -60px; animation-delay: 0s; }
+[data-theme="light"] .orb { opacity: 0.18; }
+.orb-1 { width: 280px; height: 280px; background: var(--pink); top: -80px; left: -60px; }
 .orb-2 { width: 220px; height: 220px; background: var(--purple); bottom: 10%; right: -40px; animation-delay: -7s; }
-.orb-3 { width: 160px; height: 160px; background: var(--cyan); top: 45%; left: 60%; animation-delay: -14s; opacity: 0.2; }
+.orb-3 { width: 160px; height: 160px; background: var(--cyan); top: 45%; left: 60%; animation-delay: -14s; opacity: 0.18; }
 @keyframes orbFloat {
   0%, 100% { transform: translate(0,0) scale(1); }
   33% { transform: translate(30px,-40px) scale(1.08); }
   66% { transform: translate(-20px,25px) scale(0.95); }
 }
-
-/* particles */
 .particles { position: fixed; inset: 0; pointer-events: none; z-index: -1; overflow: hidden; }
 .p {
-  position: absolute;
-  bottom: -10px;
-  width: 3px; height: 3px;
-  border-radius: 50%;
-  background: #fff;
-  opacity: 0;
-  animation: rise linear infinite;
+  position: absolute; bottom: -10px; width: 3px; height: 3px; border-radius: 50%;
+  background: #fff; opacity: 0; animation: rise linear infinite;
 }
+[data-theme="light"] .p { background: var(--purple); }
 @keyframes rise {
   0% { transform: translateY(0) scale(0); opacity: 0; }
-  15% { opacity: 0.5; }
-  85% { opacity: 0.25; }
+  15% { opacity: 0.45; }
+  85% { opacity: 0.2; }
   100% { transform: translateY(-105vh) scale(1); opacity: 0; }
 }
 
-/* ===== Layout ===== */
-.shell {
-  max-width: 540px;
-  margin: 0 auto;
-  padding: 32px 18px 80px;
-  position: relative;
+.header {
+  position: fixed; top: 0; left: 0; right: 0; height: var(--header-h); z-index: 1000;
+  background: var(--header-bg);
+  backdrop-filter: blur(18px) saturate(1.5);
+  -webkit-backdrop-filter: blur(18px) saturate(1.5);
+  border-bottom: 1px solid var(--border);
+  transition: background 0.3s, box-shadow 0.3s;
 }
-
-/* ===== Hero ===== */
-.hero {
-  text-align: center;
-  padding: 12px 0 40px;
-  animation: fadeUp 0.9s cubic-bezier(0.22,1,0.36,1) both;
+.header.scrolled {
+  background: var(--header-bg-scrolled);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.25);
 }
-.badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 5px 14px;
-  border-radius: 999px;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--gold);
-  background: rgba(255,209,102,0.1);
-  border: 1px solid rgba(255,209,102,0.25);
-  margin-bottom: 18px;
+.header-inner {
+  max-width: var(--nav-max); height: 100%; margin: 0 auto;
+  padding: 0 16px 0 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px;
 }
-.badge::before {
-  content: "";
-  width: 6px; height: 6px;
-  border-radius: 50%;
-  background: var(--gold);
-  box-shadow: 0 0 8px var(--gold);
-  animation: pulse 2s ease-in-out infinite;
+.logo {
+  display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text);
+  font-weight: 800; font-size: 17px; letter-spacing: -0.02em; flex-shrink: 0; z-index: 1001;
 }
-@keyframes pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.5; transform: scale(0.85); }
-}
-
-h1 {
-  font-size: clamp(26px, 7vw, 32px);
-  font-weight: 800;
-  line-height: 1.2;
-  letter-spacing: -0.03em;
-  margin-bottom: 8px;
-}
-h1 span {
-  background: linear-gradient(120deg, #fff 10%, var(--pink) 45%, var(--purple) 75%, var(--cyan) 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-.subtitle {
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--muted);
-  letter-spacing: 0.06em;
-  margin-bottom: 14px;
-}
-.lead {
-  font-size: 14.5px;
-  color: var(--muted);
-  max-width: 320px;
-  margin: 0 auto;
-}
-
-/* ===== Section ===== */
-.section {
-  margin-bottom: 36px;
-  animation: fadeUp 0.8s cubic-bezier(0.22,1,0.36,1) both;
-}
-.section:nth-child(2) { animation-delay: 0.08s; }
-.section:nth-child(3) { animation-delay: 0.16s; }
-.section:nth-child(4) { animation-delay: 0.24s; }
-.section:nth-child(5) { animation-delay: 0.32s; }
-
-.sec-title {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin-bottom: 14px;
-}
-.sec-title::after {
-  content: "";
-  flex: 1;
-  height: 1px;
-  background: linear-gradient(90deg, var(--border), transparent);
-}
-
-/* ===== Main Cards (big actions) ===== */
-.card-grid {
-  display: grid;
-  gap: 12px;
-}
-.card {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 18px 18px;
-  border-radius: var(--radius);
+.logo-img {
+  width: 36px; height: 36px; border-radius: 10px; object-fit: contain;
   background: var(--surface);
-  border: 1px solid var(--border);
-  text-decoration: none;
-  color: var(--text);
-  position: relative;
-  overflow: hidden;
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--pink) 30%, transparent);
+}
+.logo-text span {
+  background: linear-gradient(120deg, var(--text), var(--pink));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.nav-desktop { display: none; align-items: center; gap: 4px; }
+.nav-desktop a {
+  padding: 8px 13px; border-radius: 10px; color: var(--muted); text-decoration: none;
+  font-size: 14px; font-weight: 600; transition: all 0.25s; white-space: nowrap;
+}
+.nav-desktop a:hover { color: var(--text); background: var(--surface); }
+.nav-desktop a.accent {
+  background: linear-gradient(135deg, var(--pink), var(--purple)); color: #fff;
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--pink) 30%, transparent);
+}
+.nav-desktop a.accent:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px color-mix(in srgb, var(--pink) 45%, transparent);
+}
+.header-actions { display: flex; align-items: center; gap: 8px; z-index: 1001; }
+.icon-btn {
+  width: 40px; height: 40px; border: none; border-radius: 12px; background: var(--surface);
+  color: var(--text); display: grid; place-items: center; cursor: var(--cursor);
+  transition: background 0.25s, transform 0.2s;
+}
+.icon-btn:hover { background: var(--surface-hover); }
+.icon-btn:active { transform: scale(0.94); }
+.icon-btn svg { width: 20px; height: 20px; }
+.hamburger {
+  display: flex; flex-direction: column; justify-content: center; gap: 5px;
+  width: 40px; height: 40px; padding: 10px; border: none; background: var(--surface);
+  border-radius: 12px; cursor: var(--cursor); transition: background 0.25s;
+}
+.hamburger:hover { background: var(--surface-hover); }
+.hamburger span {
+  display: block; height: 2px; width: 100%; background: var(--text); border-radius: 2px;
+  transition: all 0.35s cubic-bezier(0.22,1,0.36,1); transform-origin: center;
+}
+.hamburger.active span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.hamburger.active span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+.hamburger.active span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+.settings-panel {
+  position: fixed; top: calc(var(--header-h) + 10px); right: 16px;
+  width: min(320px, calc(100vw - 32px));
+  background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 20px;
+  box-shadow: var(--shadow); z-index: 1100; padding: 20px;
+  opacity: 0; visibility: hidden; transform: translateY(-12px) scale(0.96);
+  transition: all 0.3s cubic-bezier(0.22,1,0.36,1); pointer-events: none;
+}
+.settings-panel.open {
+  opacity: 1; visibility: visible; transform: translateY(0) scale(1); pointer-events: auto;
+}
+.settings-title {
+  font-size: 13px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between;
+}
+.settings-close {
+  width: 28px; height: 28px; border: none; border-radius: 8px; background: var(--surface);
+  color: var(--muted); display: grid; place-items: center; cursor: var(--cursor); font-size: 16px; line-height: 1;
+}
+.settings-close:hover { background: var(--surface-hover); color: var(--text); }
+.settings-group { margin-bottom: 18px; }
+.settings-group:last-child { margin-bottom: 0; }
+.settings-label { font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 8px; display: block; }
+.settings-options { display: flex; flex-wrap: wrap; gap: 8px; }
+.settings-options button {
+  flex: 1; min-width: 70px; padding: 10px 8px; border-radius: 12px; border: 1px solid var(--border);
+  background: var(--surface); color: var(--text); font-size: 13px; font-weight: 600; font-family: inherit;
+  cursor: var(--cursor); transition: all 0.25s;
+}
+.settings-options button:hover {
+  background: var(--surface-hover); border-color: color-mix(in srgb, var(--pink) 40%, var(--border));
+}
+.settings-options button.active {
+  background: linear-gradient(135deg, var(--pink), var(--purple)); border-color: transparent; color: #fff;
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--pink) 35%, transparent);
+}
+
+.nav-mobile {
+  position: fixed; inset: 0; z-index: 999; background: var(--menu-bg);
+  backdrop-filter: blur(22px); -webkit-backdrop-filter: blur(22px);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+  opacity: 0; visibility: hidden; pointer-events: none;
   transition: all 0.4s cubic-bezier(0.22,1,0.36,1);
 }
+.nav-mobile.open { opacity: 1; visibility: visible; pointer-events: auto; }
+.nav-mobile a {
+  display: flex; align-items: center; gap: 14px; padding: 16px 28px; min-width: 260px;
+  border-radius: 16px; color: var(--text); text-decoration: none; font-size: 18px; font-weight: 700;
+  background: var(--surface); border: 1px solid var(--border);
+  transform: translateY(20px); opacity: 0; transition: all 0.4s cubic-bezier(0.22,1,0.36,1);
+}
+.nav-mobile.open a { transform: translateY(0); opacity: 1; }
+.nav-mobile.open a:nth-child(1) { transition-delay: 0.05s; }
+.nav-mobile.open a:nth-child(2) { transition-delay: 0.1s; }
+.nav-mobile.open a:nth-child(3) { transition-delay: 0.15s; }
+.nav-mobile.open a:nth-child(4) { transition-delay: 0.2s; }
+.nav-mobile.open a:nth-child(5) { transition-delay: 0.25s; }
+.nav-mobile.open a:nth-child(6) { transition-delay: 0.3s; }
+.nav-mobile a:hover, .nav-mobile a:active {
+  background: linear-gradient(135deg, color-mix(in srgb, var(--pink) 20%, transparent), color-mix(in srgb, var(--purple) 15%, transparent));
+  border-color: color-mix(in srgb, var(--pink) 40%, transparent); transform: scale(1.03);
+}
+.nav-mobile .icon {
+  width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; font-size: 18px;
+  background: linear-gradient(145deg, color-mix(in srgb, var(--pink) 25%, transparent), color-mix(in srgb, var(--purple) 20%, transparent));
+}
+.nav-mobile-footer { margin-top: 32px; font-size: 13px; color: var(--muted); opacity: 0; transition: opacity 0.4s 0.35s; }
+.nav-mobile.open .nav-mobile-footer { opacity: 1; }
+
+.shell { max-width: 540px; margin: 0 auto; padding: 28px 18px 80px; position: relative; }
+@media (min-width: 900px) { .shell { max-width: 640px; padding-top: 40px; } }
+
+.hero { text-align: center; padding: 20px 0 44px; animation: fadeUp 0.9s cubic-bezier(0.22,1,0.36,1) both; }
+.badge {
+  display: inline-flex; align-items: center; gap: 6px; padding: 5px 14px; border-radius: 999px;
+  font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gold);
+  background: color-mix(in srgb, var(--gold) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--gold) 28%, transparent); margin-bottom: 18px;
+}
+.badge::before {
+  content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--gold);
+  box-shadow: 0 0 8px var(--gold); animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.85); } }
+h1 { font-size: clamp(26px, 7vw, 34px); font-weight: 800; line-height: 1.2; letter-spacing: -0.03em; margin-bottom: 8px; }
+h1 span {
+  background: linear-gradient(120deg, var(--text) 10%, var(--pink) 45%, var(--purple) 75%, var(--cyan) 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.subtitle { font-size: 13px; font-weight: 500; color: var(--muted); letter-spacing: 0.06em; margin-bottom: 14px; }
+.lead { font-size: 14.5px; color: var(--muted); max-width: 340px; margin: 0 auto; }
+
+.section { margin-bottom: 40px; animation: fadeUp 0.8s cubic-bezier(0.22,1,0.36,1) both; }
+.section:nth-of-type(1) { animation-delay: 0.06s; }
+.section:nth-of-type(2) { animation-delay: 0.12s; }
+.section:nth-of-type(3) { animation-delay: 0.18s; }
+.section:nth-of-type(4) { animation-delay: 0.24s; }
+.sec-title {
+  display: flex; align-items: center; gap: 12px; font-size: 12px; font-weight: 700;
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px;
+}
+.sec-title::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, var(--border), transparent); }
+
+.card-grid { display: grid; gap: 12px; }
+.card {
+  display: flex; align-items: center; gap: 16px; padding: 18px; border-radius: var(--radius);
+  background: var(--surface); border: 1px solid var(--border); text-decoration: none; color: var(--text);
+  position: relative; overflow: hidden; transition: all 0.4s cubic-bezier(0.22,1,0.36,1);
+}
 .card::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, rgba(255,107,203,0.12), rgba(139,108,255,0.1));
-  opacity: 0;
-  transition: opacity 0.4s;
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--pink) 12%, transparent), color-mix(in srgb, var(--purple) 10%, transparent));
+  opacity: 0; transition: opacity 0.4s;
 }
 .card:hover {
-  transform: translateY(-5px);
-  background: var(--surface-hover);
-  border-color: rgba(255,107,203,0.4);
-  box-shadow: var(--glow-pink), var(--shadow);
+  transform: translateY(-5px); background: var(--surface-hover);
+  border-color: color-mix(in srgb, var(--pink) 45%, transparent);
+  box-shadow: var(--card-glow), var(--shadow);
 }
 .card:hover::before { opacity: 1; }
 .card:active { transform: translateY(-2px) scale(0.985); }
-
 .card-icon {
-  flex-shrink: 0;
-  width: 46px; height: 46px;
-  border-radius: 14px;
-  display: grid;
-  place-items: center;
-  font-size: 22px;
-  background: linear-gradient(145deg, rgba(255,107,203,0.2), rgba(139,108,255,0.15));
-  border: 1px solid rgba(255,255,255,0.08);
+  flex-shrink: 0; width: 46px; height: 46px; border-radius: 14px; display: grid; place-items: center; font-size: 22px;
+  background: linear-gradient(145deg, color-mix(in srgb, var(--pink) 20%, transparent), color-mix(in srgb, var(--purple) 15%, transparent));
+  border: 1px solid color-mix(in srgb, var(--text) 8%, transparent);
   transition: transform 0.4s cubic-bezier(0.22,1,0.36,1);
 }
 .card:hover .card-icon { transform: scale(1.1) rotate(-4deg); }
-
 .card-body { flex: 1; min-width: 0; }
 .card-title { font-size: 15.5px; font-weight: 700; margin-bottom: 2px; }
 .card-desc { font-size: 12.5px; color: var(--muted); }
-
 .card-arrow {
-  flex-shrink: 0;
-  width: 28px; height: 28px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  background: rgba(255,255,255,0.06);
-  color: var(--muted);
-  transition: all 0.35s;
+  flex-shrink: 0; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center;
+  background: color-mix(in srgb, var(--text) 6%, transparent); color: var(--muted); transition: all 0.35s;
 }
-.card:hover .card-arrow {
-  background: var(--pink);
-  color: #fff;
-  transform: translateX(3px);
-}
-
-/* Witch special cards */
+.card:hover .card-arrow { background: var(--pink); color: #fff; transform: translateX(3px); }
 .witch-card {
-  background: linear-gradient(135deg, rgba(139,108,255,0.12), rgba(255,107,203,0.08));
-  border-color: rgba(139,108,255,0.25);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--purple) 12%, transparent), color-mix(in srgb, var(--pink) 8%, transparent));
+  border-color: color-mix(in srgb, var(--purple) 28%, transparent);
 }
 .witch-card:hover {
-  border-color: rgba(139,108,255,0.55);
-  box-shadow: 0 0 32px rgba(139,108,255,0.3), var(--shadow);
+  border-color: color-mix(in srgb, var(--purple) 55%, transparent);
+  box-shadow: 0 0 32px color-mix(in srgb, var(--purple) 30%, transparent), var(--shadow);
 }
 .witch-card .card-icon {
-  background: linear-gradient(145deg, rgba(139,108,255,0.3), rgba(255,107,203,0.2));
+  background: linear-gradient(145deg, color-mix(in srgb, var(--purple) 30%, transparent), color-mix(in srgb, var(--pink) 20%, transparent));
 }
 
-/* ===== Content pills ===== */
-.pills {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
+.pills { display: flex; flex-wrap: wrap; gap: 10px; }
 .pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 11px 18px;
-  border-radius: 999px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  color: var(--text);
-  text-decoration: none;
-  font-size: 14px;
-  font-weight: 600;
-  transition: all 0.35s cubic-bezier(0.22,1,0.36,1);
+  display: inline-flex; align-items: center; gap: 8px; padding: 11px 18px; border-radius: 999px;
+  background: var(--surface); border: 1px solid var(--border); color: var(--text);
+  text-decoration: none; font-size: 14px; font-weight: 600; transition: all 0.35s cubic-bezier(0.22,1,0.36,1);
 }
 .pill:hover {
-  transform: translateY(-4px);
-  background: linear-gradient(135deg, var(--pink), var(--purple));
-  border-color: transparent;
-  box-shadow: 0 10px 24px rgba(255,107,203,0.35);
+  transform: translateY(-4px); background: linear-gradient(135deg, var(--pink), var(--purple));
+  border-color: transparent; color: #fff; box-shadow: 0 10px 24px color-mix(in srgb, var(--pink) 35%, transparent);
 }
 .pill svg { width: 16px; height: 16px; flex-shrink: 0; }
 
-/* ===== SNS ===== */
-.sns-grid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 10px;
-}
+.sns-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
 .sns {
-  aspect-ratio: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  border-radius: 16px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  text-decoration: none;
-  color: var(--text);
-  transition: all 0.35s cubic-bezier(0.22,1,0.36,1);
-  position: relative;
-  overflow: hidden;
+  aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+  border-radius: 16px; background: var(--surface); border: 1px solid var(--border); text-decoration: none;
+  color: var(--text); transition: all 0.35s cubic-bezier(0.22,1,0.36,1); position: relative; overflow: hidden;
 }
-.sns::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  opacity: 0;
-  transition: opacity 0.35s;
-}
-.sns:hover {
-  transform: translateY(-6px) scale(1.04);
-  border-color: transparent;
-}
+.sns::after { content: ""; position: absolute; inset: 0; opacity: 0; transition: opacity 0.35s; }
+.sns:hover { transform: translateY(-6px) scale(1.04); border-color: transparent; color: #fff; }
 .sns:hover::after { opacity: 1; }
 .sns svg { width: 24px; height: 24px; position: relative; z-index: 1; transition: transform 0.35s; }
 .sns:hover svg { transform: scale(1.15); }
-.sns span {
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  position: relative;
-  z-index: 1;
-  opacity: 0.85;
-}
-
-/* brand hover colors */
+.sns span { font-size: 10px; font-weight: 600; letter-spacing: 0.02em; position: relative; z-index: 1; opacity: 0.85; }
 .sns.yt:hover { box-shadow: 0 12px 28px rgba(255,0,0,0.3); }
 .sns.yt:hover::after { background: linear-gradient(145deg, #ff0000, #cc0000); }
 .sns.ig:hover { box-shadow: 0 12px 28px rgba(225,48,108,0.35); }
 .sns.ig:hover::after { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
 .sns.fb:hover { box-shadow: 0 12px 28px rgba(24,119,242,0.35); }
 .sns.fb:hover::after { background: #1877f2; }
-.sns.x:hover { box-shadow: 0 12px 28px rgba(255,255,255,0.15); }
+.sns.x:hover { box-shadow: 0 12px 28px rgba(0,0,0,0.25); }
 .sns.x:hover::after { background: #111; }
 .sns.tk:hover { box-shadow: 0 12px 28px rgba(0,242,234,0.25); }
 .sns.tk:hover::after { background: linear-gradient(135deg, #25f4ee, #fe2c55, #000); }
 
-.sns-note {
-  margin-top: 18px;
-  text-align: center;
-  font-size: 13px;
-  color: var(--muted);
-}
-.sns-note a {
-  color: var(--cyan);
-  font-weight: 600;
-  text-decoration: none;
-  transition: color 0.2s;
-}
+.sns-note { margin-top: 18px; text-align: center; font-size: 13px; color: var(--muted); }
+.sns-note a { color: var(--cyan); font-weight: 600; text-decoration: none; transition: color 0.2s; }
 .sns-note a:hover { color: var(--pink); }
 
-/* ===== Footer ===== */
-footer {
-  margin-top: 48px;
-  text-align: center;
-  animation: fadeUp 0.9s 0.4s both;
-}
+footer { margin-top: 48px; text-align: center; animation: fadeUp 0.9s 0.35s both; }
 .footer-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  border-radius: 999px;
-  font-size: 11.5px;
-  color: #777;
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.05);
+  display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 999px;
+  font-size: 11.5px; color: var(--muted); background: var(--surface); border: 1px solid var(--border);
 }
 
-/* ===== Animations ===== */
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(28px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
+@media (min-width: 768px) {
+  .hamburger { display: none; }
+  .nav-desktop { display: flex; }
+  .nav-mobile { display: none !important; }
+}
+@media (max-width: 420px) {
+  .sns-grid { gap: 8px; }
+  .sns span { font-size: 9px; }
+  .card { padding: 15px; gap: 12px; }
+  .card-icon { width: 42px; height: 42px; font-size: 20px; }
+  .logo-text { font-size: 15px; }
+  .settings-panel { right: 10px; }
+}
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
-}
-
-/* small screens tweak */
-@media (max-width: 380px) {
-  .sns-grid { gap: 8px; }
-  .sns span { font-size: 9px; }
-  .card { padding: 15px; gap: 12px; }
-  .card-icon { width: 42px; height: 42px; font-size: 20px; }
 }
 </style>
 </head>
@@ -417,7 +411,6 @@ footer {
 <div class="orb orb-1"></div>
 <div class="orb orb-2"></div>
 <div class="orb orb-3"></div>
-
 <div class="particles" aria-hidden="true">
   <div class="p" style="left:8%;animation-duration:13s;animation-delay:0s;background:var(--pink)"></div>
   <div class="p" style="left:22%;animation-duration:17s;animation-delay:2.2s;background:var(--purple)"></div>
@@ -427,9 +420,79 @@ footer {
   <div class="p" style="left:88%;animation-duration:14s;animation-delay:0.8s;background:var(--gold)"></div>
 </div>
 
-<div class="shell">
+<header class="header" id="header">
+  <div class="header-inner">
+    <a href="#" class="logo" onclick="closeAll()">
+      <img class="logo-img" src="おいさしロゴ.png" alt="おいさし" width="36" height="36">
+      <div class="logo-text"><span>おいさし</span></div>
+    </a>
+    <nav class="nav-desktop" aria-label="メインナビゲーション">
+      <a href="#main">メイン</a>
+      <a href="#witch">おいじぃ魔女</a>
+      <a href="#contents">コンテンツ</a>
+      <a href="#sns">SNS</a>
+      <a class="accent" href="https://oisasi.f5.si/character">キャラクター</a>
+    </nav>
+    <div class="header-actions">
+      <button class="icon-btn" id="settingsBtn" aria-label="設定" title="設定">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+      </button>
+      <button class="hamburger" id="hamburger" aria-label="メニューを開く" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</header>
 
-  <!-- HERO -->
+<div class="settings-panel" id="settingsPanel" role="dialog" aria-label="設定">
+  <div class="settings-title">
+    設定
+    <button class="settings-close" id="settingsClose" aria-label="閉じる">×</button>
+  </div>
+  <div class="settings-group">
+    <span class="settings-label">テーマ</span>
+    <div class="settings-options" id="themeOptions">
+      <button data-value="dark" class="active">ダーク</button>
+      <button data-value="light">ライト</button>
+    </div>
+  </div>
+  <div class="settings-group">
+    <span class="settings-label">フォント</span>
+    <div class="settings-options" id="fontOptions">
+      <button data-value="system" class="active">システム</button>
+      <button data-value="rounded">丸ゴ</button>
+      <button data-value="serif">明朝</button>
+      <button data-value="mono">等幅</button>
+      <button data-value="display">太字</button>
+    </div>
+  </div>
+  <div class="settings-group">
+    <span class="settings-label">マウスカーソル</span>
+    <div class="settings-options" id="cursorOptions">
+      <button data-value="default" class="active">通常</button>
+      <button data-value="pointer">指</button>
+      <button data-value="crosshair">十字</button>
+      <button data-value="dot">ドット</button>
+      <button data-value="star">星</button>
+      <button data-value="magic">魔法</button>
+    </div>
+  </div>
+</div>
+
+<nav class="nav-mobile" id="navMobile" aria-label="モバイルメニュー">
+  <a href="#main" onclick="closeAll()"><span class="icon">🏠</span> メインメニュー</a>
+  <a href="#witch" onclick="closeAll()"><span class="icon">🧙‍♀️</span> おいじぃ魔女</a>
+  <a href="#contents" onclick="closeAll()"><span class="icon">🎵</span> コンテンツ</a>
+  <a href="#sns" onclick="closeAll()"><span class="icon">📱</span> SNS</a>
+  <a href="https://oisasi.f5.si/character" onclick="closeAll()"><span class="icon">👤</span> キャラクター紹介</a>
+  <a href="faq.html" onclick="closeAll()"><span class="icon">💬</span> FAQ</a>
+  <div class="nav-mobile-footer">OisasiOfficial</div>
+</nav>
+
+<div class="shell">
   <header class="hero">
     <div class="badge">Official</div>
     <h1><span>おいさし公式<br>ホームページ</span></h1>
@@ -437,8 +500,7 @@ footer {
     <p class="lead">おいさし公式サイトです。</p>
   </header>
 
-  <!-- MAIN -->
-  <section class="section">
+  <section class="section" id="main">
     <div class="sec-title">メインメニュー</div>
     <div class="card-grid">
       <a class="card" href="https://oisasi.f5.si/logo">
@@ -447,9 +509,7 @@ footer {
           <div class="card-title">おいさしロゴページ</div>
           <div class="card-desc">公式ロゴ・ビジュアル</div>
         </div>
-        <div class="card-arrow">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-        </div>
+        <div class="card-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
       </a>
       <a class="card" href="https://oisasi.f5.si/character">
         <div class="card-icon">👤</div>
@@ -457,9 +517,7 @@ footer {
           <div class="card-title">キャラクター紹介</div>
           <div class="card-desc">メンバー・キャラ一覧</div>
         </div>
-        <div class="card-arrow">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-        </div>
+        <div class="card-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
       </a>
       <a class="card" href="faq.html">
         <div class="card-icon">💬</div>
@@ -467,15 +525,12 @@ footer {
           <div class="card-title">FAQ・よくある質問</div>
           <div class="card-desc">疑問をサクッと解決</div>
         </div>
-        <div class="card-arrow">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-        </div>
+        <div class="card-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
       </a>
     </div>
   </section>
 
-  <!-- WITCH -->
-  <section class="section">
+  <section class="section" id="witch">
     <div class="sec-title">おいじぃ魔女</div>
     <div class="card-grid">
       <a class="card witch-card" href="oijiiw.html">
@@ -484,9 +539,7 @@ footer {
           <div class="card-title">おいじぃ魔女のホームページ</div>
           <div class="card-desc">魔女の世界へようこそ</div>
         </div>
-        <div class="card-arrow">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-        </div>
+        <div class="card-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
       </a>
       <a class="card witch-card" href="oijiizatu.html">
         <div class="card-icon">✦</div>
@@ -494,15 +547,12 @@ footer {
           <div class="card-title">おいじぃ魔女のヤバい雑学</div>
           <div class="card-desc">衝撃の知識が満載</div>
         </div>
-        <div class="card-arrow">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-        </div>
+        <div class="card-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
       </a>
     </div>
   </section>
 
-  <!-- CONTENTS -->
-  <section class="section">
+  <section class="section" id="contents">
     <div class="sec-title">コンテンツ</div>
     <div class="pills">
       <a class="pill" href="https://www.youtube.com/@oisasi_music">
@@ -520,31 +570,25 @@ footer {
     </div>
   </section>
 
-  <!-- SNS -->
-  <section class="section">
+  <section class="section" id="sns">
     <div class="sec-title">SNS（おいさし公式）</div>
     <div class="sns-grid">
-      <!-- YouTube -->
       <a class="sns yt" href="https://www.youtube.com/@oisasiofficial" aria-label="YouTube">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.5 31.5 0 0 0 0 12a31.5 31.5 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.5 31.5 0 0 0 24 12a31.5 31.5 0 0 0-.5-5.8zM9.75 15.5v-7l6.5 3.5-6.5 3.5z"/></svg>
         <span>YouTube</span>
       </a>
-      <!-- Instagram -->
       <a class="sns ig" href="https://www.instagram.com/oisasiofficial/" aria-label="Instagram">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.2c3.2 0 3.6 0 4.9.1 3.3.1 4.8 1.7 4.9 4.9.1 1.3.1 1.7.1 4.9s0 3.6-.1 4.9c-.1 3.2-1.7 4.8-4.9 4.9-1.3.1-1.7.1-4.9.1s-3.6 0-4.9-.1c-3.3-.1-4.8-1.7-4.9-4.9-.1-1.3-.1-1.7-.1-4.9s0-3.6.1-4.9c.1-3.2 1.7-4.8 4.9-4.9 1.3-.1 1.7-.1 4.9-.1zM12 0C8.7 0 8.3 0 7 .1 2.7.3.3 2.7.1 7 0 8.3 0 8.7 0 12s0 3.7.1 5c.2 4.3 2.6 6.7 6.9 6.9 1.3.1 1.7.1 5 .1s3.7 0 5-.1c4.3-.2 6.7-2.6 6.9-6.9.1-1.3.1-1.7.1-5s0-3.7-.1-5c-.2-4.3-2.6-6.7-6.9-6.9C15.7 0 15.3 0 12 0zm0 5.8a6.2 6.2 0 1 0 0 12.4 6.2 6.2 0 0 0 0-12.4zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.4-10.5a1.4 1.4 0 1 1-2.9 0 1.4 1.4 0 0 1 2.9 0z"/></svg>
         <span>Instagram</span>
       </a>
-      <!-- Facebook -->
       <a class="sns fb" href="https://www.facebook.com/oisasiofficial" aria-label="Facebook">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.07C24 5.41 18.63 0 12 0S0 5.41 0 12.07C0 18.1 4.39 23.1 10.13 24v-8.44H7.08v-3.49h3.04V9.41c0-3.02 1.8-4.7 4.54-4.7 1.31 0 2.68.24 2.68.24v2.97h-1.5c-1.5 0-1.96.93-1.96 1.89v2.26h3.32l-.53 3.5h-2.8V24C19.62 23.1 24 18.1 24 12.07z"/></svg>
         <span>Facebook</span>
       </a>
-      <!-- X -->
       <a class="sns x" href="https://x.com/oisasiofficial" aria-label="X">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.24 2.25h3.31l-7.23 8.26 8.5 11.24h-6.66l-5.21-6.82-5.97 6.82H1.67l7.73-8.84L1.25 2.25h6.83l4.71 6.23 5.45-6.23zm-1.16 17.52h1.83L7.03 4.13H5.05l12.03 15.64z"/></svg>
         <span>X</span>
       </a>
-      <!-- TikTok -->
       <a class="sns tk" href="https://www.tiktok.com/@oisasiofficial" aria-label="TikTok">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .56.04.83.11v-3.5a6.37 6.37 0 0 0-.83-.05A6.34 6.34 0 0 0 3.15 15.3a6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.34-6.34V8.73a8.18 8.18 0 0 0 4.76 1.52V6.79a4.84 4.84 0 0 1-1-.1z"/></svg>
         <span>TikTok</span>
@@ -555,12 +599,110 @@ footer {
 
   <footer>
     <div class="footer-pill">
-      <span>⚡</span>
-      超軽量 × 超最強デザイン — 1ファイル完結
+      <span>✦</span>
+      OisasiOfficial — 設定からテーマ・フォント・カーソルを変更できます
     </div>
   </footer>
-
 </div>
 
+<script>
+(function () {
+  const html = document.documentElement;
+  const header = document.getElementById('header');
+  const hamburger = document.getElementById('hamburger');
+  const navMobile = document.getElementById('navMobile');
+  const settingsBtn = document.getElementById('settingsBtn');
+  const settingsPanel = document.getElementById('settingsPanel');
+  const settingsClose = document.getElementById('settingsClose');
+
+  const saved = {
+    theme: localStorage.getItem('oisasi-theme') || 'dark',
+    font: localStorage.getItem('oisasi-font') || 'system',
+    cursor: localStorage.getItem('oisasi-cursor') || 'default'
+  };
+
+  function applyTheme(theme) {
+    html.setAttribute('data-theme', theme);
+    localStorage.setItem('oisasi-theme', theme);
+    document.querySelectorAll('#themeOptions button').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.value === theme);
+    });
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.content = theme === 'light' ? '#f4f2f8' : '#0a0a12';
+  }
+  function applyFont(font) {
+    html.setAttribute('data-font', font);
+    localStorage.setItem('oisasi-font', font);
+    document.querySelectorAll('#fontOptions button').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.value === font);
+    });
+  }
+  function applyCursor(cursor) {
+    html.setAttribute('data-cursor', cursor);
+    localStorage.setItem('oisasi-cursor', cursor);
+    document.querySelectorAll('#cursorOptions button').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.value === cursor);
+    });
+  }
+
+  applyTheme(saved.theme);
+  applyFont(saved.font);
+  applyCursor(saved.cursor);
+
+  function openSettings() { settingsPanel.classList.add('open'); closeMenu(); }
+  function closeSettings() { settingsPanel.classList.remove('open'); }
+  function toggleSettings() {
+    if (settingsPanel.classList.contains('open')) closeSettings();
+    else openSettings();
+  }
+
+  settingsBtn.addEventListener('click', e => { e.stopPropagation(); toggleSettings(); });
+  settingsClose.addEventListener('click', closeSettings);
+
+  document.getElementById('themeOptions').addEventListener('click', e => {
+    const btn = e.target.closest('button');
+    if (btn) applyTheme(btn.dataset.value);
+  });
+  document.getElementById('fontOptions').addEventListener('click', e => {
+    const btn = e.target.closest('button');
+    if (btn) applyFont(btn.dataset.value);
+  });
+  document.getElementById('cursorOptions').addEventListener('click', e => {
+    const btn = e.target.closest('button');
+    if (btn) applyCursor(btn.dataset.value);
+  });
+
+  function toggleMenu() {
+    const isOpen = navMobile.classList.toggle('open');
+    hamburger.classList.toggle('active', isOpen);
+    hamburger.setAttribute('aria-expanded', isOpen);
+    document.body.style.overflow = isOpen ? 'hidden' : '';
+    if (isOpen) closeSettings();
+  }
+  function closeMenu() {
+    navMobile.classList.remove('open');
+    hamburger.classList.remove('active');
+    hamburger.setAttribute('aria-expanded', 'false');
+    document.body.style.overflow = '';
+  }
+  function closeAll() { closeMenu(); closeSettings(); }
+
+  hamburger.addEventListener('click', toggleMenu);
+
+  document.addEventListener('click', e => {
+    if (settingsPanel.classList.contains('open') && !settingsPanel.contains(e.target) && !settingsBtn.contains(e.target)) {
+      closeSettings();
+    }
+  });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAll(); });
+
+  window.addEventListener('scroll', () => {
+    header.classList.toggle('scrolled', window.scrollY > 20);
+  }, { passive: true });
+
+  window.closeAll = closeAll;
+  window.closeMenu = closeMenu;
+})();
+</script>
 </body>
 </html>
