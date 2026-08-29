@@ -56,7 +56,6 @@
         border-bottom-left-radius: 2px;
         font-weight: bold;
     }
-    /* リンクの装飾 */
     .majo-msg a {
         color: #0000ee;
         text-decoration: underline;
@@ -125,7 +124,6 @@
     </div>
 
     <script>
-        // 作成したCloudflare WorkerのURL
         const API_SERVER_URL = "https://oijii-majo-api.oisasioisasi.workers.dev";
 
         let conversationMessages = [
@@ -211,11 +209,9 @@ https://www.tiktok.com/@oisasiofficial(TikTok)
             }
         }
 
-        // テキスト内のURLを検出してリンク化する関数
         function linkify(text) {
             const urlRegex = /(https?:\/\/[^\s\(\)\<\>]+)/g;
             return text.replace(urlRegex, function(url) {
-                // 文末のピリオドなどを除外
                 let cleanUrl = url.replace(/[\.\,\;\:]$/, '');
                 return `<a href="${cleanUrl}" target="_blank" rel="noopener noreferrer">${cleanUrl}</a>`;
             });
@@ -226,7 +222,6 @@ https://www.tiktok.com/@oisasiofficial(TikTok)
             const msgDiv = document.createElement("div");
             msgDiv.className = "message " + className;
             
-            // URLが含まれる場合はリンク化してHTMLとして挿入、それ以外は通常テキスト
             if (className.includes("majo-msg")) {
                 msgDiv.innerHTML = linkify(escapeHTML(text));
             } else {
@@ -238,7 +233,6 @@ https://www.tiktok.com/@oisasiofficial(TikTok)
             chatBox.scrollTop = chatBox.scrollHeight;
         }
 
-        // エスケープ処理（セキュリティ対策）
         function escapeHTML(str) {
             return str
                 .replace(/&/g, '&amp;')
