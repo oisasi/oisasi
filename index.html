@@ -2,60 +2,565 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>おいさし公式ホームページ</title>
-<meta name="description" content="おいさし公式ホームページ OisasiOfficial">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>おいさし公式ホームページ | OisasiOfficial</title>
+<meta name="description" content="おいさし公式ホームページ OisasiOfficial - 超最強デザイン">
+<meta name="theme-color" content="#0a0a12">
 <link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <style>
-body{font:15px/1.65 system-ui,sans-serif;max-width:520px;margin:auto;padding:20px;color:#222;background:#fff}
-h1{font-size:22px;margin:0 0 8px;line-height:1.3}
-h2{font-size:16px;margin:28px 0 10px;padding-bottom:4px;border-bottom:1px solid #eee}
-p{margin:0 0 12px}
-a{color:#06c}
-.btn{display:block;margin:8px 0;padding:12px 10px;border:1px solid #ccc;border-radius:8px;text-align:center;text-decoration:none;color:#333;background:#fafafa}
-.btn:hover{background:#f0f0f0}
-.links{line-height:2}
-.links a{margin-right:12px;white-space:nowrap}
-footer{margin-top:36px;font-size:12px;color:#888;text-align:center}
+:root {
+  --bg: #07070f;
+  --surface: rgba(255,255,255,0.045);
+  --surface-hover: rgba(255,255,255,0.09);
+  --border: rgba(255,255,255,0.1);
+  --text: #f4f4fc;
+  --muted: #9b9bb8;
+  --pink: #ff6bcb;
+  --purple: #8b6cff;
+  --cyan: #00e5ff;
+  --gold: #ffd166;
+  --radius: 18px;
+  --shadow: 0 20px 50px rgba(0,0,0,0.45);
+  --glow-pink: 0 0 28px rgba(255,107,203,0.35);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font: 15px/1.65 system-ui, -apple-system, "Segoe UI", Roboto, "Hiragino Sans", sans-serif;
+  color: var(--text);
+  background: var(--bg);
+  min-height: 100dvh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ===== Background ===== */
+.bg {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background:
+    radial-gradient(ellipse 90% 60% at 15% -10%, rgba(139,108,255,0.38), transparent 55%),
+    radial-gradient(ellipse 70% 50% at 90% 5%, rgba(255,107,203,0.28), transparent 50%),
+    radial-gradient(ellipse 60% 40% at 50% 110%, rgba(0,229,255,0.12), transparent 50%),
+    var(--bg);
+  animation: bgShift 18s ease-in-out infinite alternate;
+}
+@keyframes bgShift {
+  0% { filter: hue-rotate(0deg) brightness(1); }
+  100% { filter: hue-rotate(12deg) brightness(1.05); }
+}
+
+/* floating orbs */
+.orb {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.35;
+  pointer-events: none;
+  z-index: -1;
+  animation: orbFloat 22s ease-in-out infinite;
+}
+.orb-1 { width: 280px; height: 280px; background: var(--pink); top: -80px; left: -60px; animation-delay: 0s; }
+.orb-2 { width: 220px; height: 220px; background: var(--purple); bottom: 10%; right: -40px; animation-delay: -7s; }
+.orb-3 { width: 160px; height: 160px; background: var(--cyan); top: 45%; left: 60%; animation-delay: -14s; opacity: 0.2; }
+@keyframes orbFloat {
+  0%, 100% { transform: translate(0,0) scale(1); }
+  33% { transform: translate(30px,-40px) scale(1.08); }
+  66% { transform: translate(-20px,25px) scale(0.95); }
+}
+
+/* particles */
+.particles { position: fixed; inset: 0; pointer-events: none; z-index: -1; overflow: hidden; }
+.p {
+  position: absolute;
+  bottom: -10px;
+  width: 3px; height: 3px;
+  border-radius: 50%;
+  background: #fff;
+  opacity: 0;
+  animation: rise linear infinite;
+}
+@keyframes rise {
+  0% { transform: translateY(0) scale(0); opacity: 0; }
+  15% { opacity: 0.5; }
+  85% { opacity: 0.25; }
+  100% { transform: translateY(-105vh) scale(1); opacity: 0; }
+}
+
+/* ===== Layout ===== */
+.shell {
+  max-width: 540px;
+  margin: 0 auto;
+  padding: 32px 18px 80px;
+  position: relative;
+}
+
+/* ===== Hero ===== */
+.hero {
+  text-align: center;
+  padding: 12px 0 40px;
+  animation: fadeUp 0.9s cubic-bezier(0.22,1,0.36,1) both;
+}
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 14px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gold);
+  background: rgba(255,209,102,0.1);
+  border: 1px solid rgba(255,209,102,0.25);
+  margin-bottom: 18px;
+}
+.badge::before {
+  content: "";
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--gold);
+  box-shadow: 0 0 8px var(--gold);
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.85); }
+}
+
+h1 {
+  font-size: clamp(26px, 7vw, 32px);
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.03em;
+  margin-bottom: 8px;
+}
+h1 span {
+  background: linear-gradient(120deg, #fff 10%, var(--pink) 45%, var(--purple) 75%, var(--cyan) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.subtitle {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+  margin-bottom: 14px;
+}
+.lead {
+  font-size: 14.5px;
+  color: var(--muted);
+  max-width: 320px;
+  margin: 0 auto;
+}
+
+/* ===== Section ===== */
+.section {
+  margin-bottom: 36px;
+  animation: fadeUp 0.8s cubic-bezier(0.22,1,0.36,1) both;
+}
+.section:nth-child(2) { animation-delay: 0.08s; }
+.section:nth-child(3) { animation-delay: 0.16s; }
+.section:nth-child(4) { animation-delay: 0.24s; }
+.section:nth-child(5) { animation-delay: 0.32s; }
+
+.sec-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 14px;
+}
+.sec-title::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, var(--border), transparent);
+}
+
+/* ===== Main Cards (big actions) ===== */
+.card-grid {
+  display: grid;
+  gap: 12px;
+}
+.card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 18px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  text-decoration: none;
+  color: var(--text);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.22,1,0.36,1);
+}
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,107,203,0.12), rgba(139,108,255,0.1));
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+.card:hover {
+  transform: translateY(-5px);
+  background: var(--surface-hover);
+  border-color: rgba(255,107,203,0.4);
+  box-shadow: var(--glow-pink), var(--shadow);
+}
+.card:hover::before { opacity: 1; }
+.card:active { transform: translateY(-2px) scale(0.985); }
+
+.card-icon {
+  flex-shrink: 0;
+  width: 46px; height: 46px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  font-size: 22px;
+  background: linear-gradient(145deg, rgba(255,107,203,0.2), rgba(139,108,255,0.15));
+  border: 1px solid rgba(255,255,255,0.08);
+  transition: transform 0.4s cubic-bezier(0.22,1,0.36,1);
+}
+.card:hover .card-icon { transform: scale(1.1) rotate(-4deg); }
+
+.card-body { flex: 1; min-width: 0; }
+.card-title { font-size: 15.5px; font-weight: 700; margin-bottom: 2px; }
+.card-desc { font-size: 12.5px; color: var(--muted); }
+
+.card-arrow {
+  flex-shrink: 0;
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: rgba(255,255,255,0.06);
+  color: var(--muted);
+  transition: all 0.35s;
+}
+.card:hover .card-arrow {
+  background: var(--pink);
+  color: #fff;
+  transform: translateX(3px);
+}
+
+/* Witch special cards */
+.witch-card {
+  background: linear-gradient(135deg, rgba(139,108,255,0.12), rgba(255,107,203,0.08));
+  border-color: rgba(139,108,255,0.25);
+}
+.witch-card:hover {
+  border-color: rgba(139,108,255,0.55);
+  box-shadow: 0 0 32px rgba(139,108,255,0.3), var(--shadow);
+}
+.witch-card .card-icon {
+  background: linear-gradient(145deg, rgba(139,108,255,0.3), rgba(255,107,203,0.2));
+}
+
+/* ===== Content pills ===== */
+.pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 18px;
+  border-radius: 999px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.35s cubic-bezier(0.22,1,0.36,1);
+}
+.pill:hover {
+  transform: translateY(-4px);
+  background: linear-gradient(135deg, var(--pink), var(--purple));
+  border-color: transparent;
+  box-shadow: 0 10px 24px rgba(255,107,203,0.35);
+}
+.pill svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+/* ===== SNS ===== */
+.sns-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+}
+.sns {
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border-radius: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  text-decoration: none;
+  color: var(--text);
+  transition: all 0.35s cubic-bezier(0.22,1,0.36,1);
+  position: relative;
+  overflow: hidden;
+}
+.sns::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.35s;
+}
+.sns:hover {
+  transform: translateY(-6px) scale(1.04);
+  border-color: transparent;
+}
+.sns:hover::after { opacity: 1; }
+.sns svg { width: 24px; height: 24px; position: relative; z-index: 1; transition: transform 0.35s; }
+.sns:hover svg { transform: scale(1.15); }
+.sns span {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  position: relative;
+  z-index: 1;
+  opacity: 0.85;
+}
+
+/* brand hover colors */
+.sns.yt:hover { box-shadow: 0 12px 28px rgba(255,0,0,0.3); }
+.sns.yt:hover::after { background: linear-gradient(145deg, #ff0000, #cc0000); }
+.sns.ig:hover { box-shadow: 0 12px 28px rgba(225,48,108,0.35); }
+.sns.ig:hover::after { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
+.sns.fb:hover { box-shadow: 0 12px 28px rgba(24,119,242,0.35); }
+.sns.fb:hover::after { background: #1877f2; }
+.sns.x:hover { box-shadow: 0 12px 28px rgba(255,255,255,0.15); }
+.sns.x:hover::after { background: #111; }
+.sns.tk:hover { box-shadow: 0 12px 28px rgba(0,242,234,0.25); }
+.sns.tk:hover::after { background: linear-gradient(135deg, #25f4ee, #fe2c55, #000); }
+
+.sns-note {
+  margin-top: 18px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--muted);
+}
+.sns-note a {
+  color: var(--cyan);
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.sns-note a:hover { color: var(--pink); }
+
+/* ===== Footer ===== */
+footer {
+  margin-top: 48px;
+  text-align: center;
+  animation: fadeUp 0.9s 0.4s both;
+}
+.footer-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  color: #777;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.05);
+}
+
+/* ===== Animations ===== */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(28px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* small screens tweak */
+@media (max-width: 380px) {
+  .sns-grid { gap: 8px; }
+  .sns span { font-size: 9px; }
+  .card { padding: 15px; gap: 12px; }
+  .card-icon { width: 42px; height: 42px; font-size: 20px; }
+}
 </style>
 </head>
 <body>
 
-<h1>おいさし公式ホームページ<br><small style="font-size:14px;font-weight:normal;color:#555">OisasiOfficial Website</small></h1>
-<p>おいさし公式サイトです。</p>
+<div class="bg"></div>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
 
-<!-- メインメニュー -->
-<a class="btn" href="https://oisasi.f5.si/logo">おいさしロゴページ</a>
-<a class="btn" href="https://oisasi.f5.si/character">キャラクター紹介</a>
-<a class="btn" href="faq.html">FAQ・よくある質問</a>
+<div class="particles" aria-hidden="true">
+  <div class="p" style="left:8%;animation-duration:13s;animation-delay:0s;background:var(--pink)"></div>
+  <div class="p" style="left:22%;animation-duration:17s;animation-delay:2.2s;background:var(--purple)"></div>
+  <div class="p" style="left:38%;animation-duration:11s;animation-delay:4s;background:#fff"></div>
+  <div class="p" style="left:55%;animation-duration:15s;animation-delay:1s;background:var(--cyan)"></div>
+  <div class="p" style="left:72%;animation-duration:19s;animation-delay:3.5s;background:var(--pink)"></div>
+  <div class="p" style="left:88%;animation-duration:14s;animation-delay:0.8s;background:var(--gold)"></div>
+</div>
 
-<!-- おいじぃ魔女関連 -->
-<h2>おいじぃ魔女</h2>
-<a class="btn" href="oijiiw.html">🧙‍♀️ おいじぃ魔女のホームページ</a>
-<a class="btn" href="oijiizatu.html">✦ おいじぃ魔女のヤバい雑学</a>
+<div class="shell">
 
-<!-- コンテンツリンク -->
-<h2>コンテンツ</h2>
-<p class="links">
-<a href="https://www.youtube.com/@oisasi_music">🎵 音楽</a>
-<a href="https://ojg.netlify.app">ゲーム</a>
-<a href="https://oisasi.hatenablog.com">📝 ブログ</a>
-</p>
+  <!-- HERO -->
+  <header class="hero">
+    <div class="badge">Official</div>
+    <h1><span>おいさし公式<br>ホームページ</span></h1>
+    <p class="subtitle">OisasiOfficial Website</p>
+    <p class="lead">おいさし公式サイトです。</p>
+  </header>
 
-<!-- SNS -->
-<h2>SNS（おいさし公式）</h2>
-<p class="links">
-<a href="https://www.youtube.com/@oisasiofficial">YouTube</a>
-<a href="https://www.instagram.com/oisasiofficial/">Instagram</a>
-<a href="https://www.facebook.com/oisasiofficial">Facebook</a>
-<a href="https://x.com/oisasiofficial">X</a>
-<a href="https://www.tiktok.com/@oisasiofficial">TikTok</a>
-</p>
+  <!-- MAIN -->
+  <section class="section">
+    <div class="sec-title">メインメニュー</div>
+    <div class="card-grid">
+      <a class="card" href="https://oisasi.f5.si/logo">
+        <div class="card-icon">✨</div>
+        <div class="card-body">
+          <div class="card-title">おいさしロゴページ</div>
+          <div class="card-desc">公式ロゴ・ビジュアル</div>
+        </div>
+        <div class="card-arrow">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </div>
+      </a>
+      <a class="card" href="https://oisasi.f5.si/character">
+        <div class="card-icon">👤</div>
+        <div class="card-body">
+          <div class="card-title">キャラクター紹介</div>
+          <div class="card-desc">メンバー・キャラ一覧</div>
+        </div>
+        <div class="card-arrow">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </div>
+      </a>
+      <a class="card" href="faq.html">
+        <div class="card-icon">💬</div>
+        <div class="card-body">
+          <div class="card-title">FAQ・よくある質問</div>
+          <div class="card-desc">疑問をサクッと解決</div>
+        </div>
+        <div class="card-arrow">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </div>
+      </a>
+    </div>
+  </section>
 
-<p>おいじぃ魔女・雑学のSNSはこちら → <a href="https://lit.link/oisasi">lit.link/oisasi</a></p>
+  <!-- WITCH -->
+  <section class="section">
+    <div class="sec-title">おいじぃ魔女</div>
+    <div class="card-grid">
+      <a class="card witch-card" href="oijiiw.html">
+        <div class="card-icon">🧙‍♀️</div>
+        <div class="card-body">
+          <div class="card-title">おいじぃ魔女のホームページ</div>
+          <div class="card-desc">魔女の世界へようこそ</div>
+        </div>
+        <div class="card-arrow">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </div>
+      </a>
+      <a class="card witch-card" href="oijiizatu.html">
+        <div class="card-icon">✦</div>
+        <div class="card-body">
+          <div class="card-title">おいじぃ魔女のヤバい雑学</div>
+          <div class="card-desc">衝撃の知識が満載</div>
+        </div>
+        <div class="card-arrow">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </div>
+      </a>
+    </div>
+  </section>
 
-<footer>超軽量設計（128kbpsの通信制限下でも爆速表示）</footer>
+  <!-- CONTENTS -->
+  <section class="section">
+    <div class="sec-title">コンテンツ</div>
+    <div class="pills">
+      <a class="pill" href="https://www.youtube.com/@oisasi_music">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+        音楽
+      </a>
+      <a class="pill" href="https://ojg.netlify.app">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 12h4M14 10v4M18 12h.01"/></svg>
+        ゲーム
+      </a>
+      <a class="pill" href="https://oisasi.hatenablog.com">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        ブログ
+      </a>
+    </div>
+  </section>
+
+  <!-- SNS -->
+  <section class="section">
+    <div class="sec-title">SNS（おいさし公式）</div>
+    <div class="sns-grid">
+      <!-- YouTube -->
+      <a class="sns yt" href="https://www.youtube.com/@oisasiofficial" aria-label="YouTube">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.5 31.5 0 0 0 0 12a31.5 31.5 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.5 31.5 0 0 0 24 12a31.5 31.5 0 0 0-.5-5.8zM9.75 15.5v-7l6.5 3.5-6.5 3.5z"/></svg>
+        <span>YouTube</span>
+      </a>
+      <!-- Instagram -->
+      <a class="sns ig" href="https://www.instagram.com/oisasiofficial/" aria-label="Instagram">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.2c3.2 0 3.6 0 4.9.1 3.3.1 4.8 1.7 4.9 4.9.1 1.3.1 1.7.1 4.9s0 3.6-.1 4.9c-.1 3.2-1.7 4.8-4.9 4.9-1.3.1-1.7.1-4.9.1s-3.6 0-4.9-.1c-3.3-.1-4.8-1.7-4.9-4.9-.1-1.3-.1-1.7-.1-4.9s0-3.6.1-4.9c.1-3.2 1.7-4.8 4.9-4.9 1.3-.1 1.7-.1 4.9-.1zM12 0C8.7 0 8.3 0 7 .1 2.7.3.3 2.7.1 7 0 8.3 0 8.7 0 12s0 3.7.1 5c.2 4.3 2.6 6.7 6.9 6.9 1.3.1 1.7.1 5 .1s3.7 0 5-.1c4.3-.2 6.7-2.6 6.9-6.9.1-1.3.1-1.7.1-5s0-3.7-.1-5c-.2-4.3-2.6-6.7-6.9-6.9C15.7 0 15.3 0 12 0zm0 5.8a6.2 6.2 0 1 0 0 12.4 6.2 6.2 0 0 0 0-12.4zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.4-10.5a1.4 1.4 0 1 1-2.9 0 1.4 1.4 0 0 1 2.9 0z"/></svg>
+        <span>Instagram</span>
+      </a>
+      <!-- Facebook -->
+      <a class="sns fb" href="https://www.facebook.com/oisasiofficial" aria-label="Facebook">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.07C24 5.41 18.63 0 12 0S0 5.41 0 12.07C0 18.1 4.39 23.1 10.13 24v-8.44H7.08v-3.49h3.04V9.41c0-3.02 1.8-4.7 4.54-4.7 1.31 0 2.68.24 2.68.24v2.97h-1.5c-1.5 0-1.96.93-1.96 1.89v2.26h3.32l-.53 3.5h-2.8V24C19.62 23.1 24 18.1 24 12.07z"/></svg>
+        <span>Facebook</span>
+      </a>
+      <!-- X -->
+      <a class="sns x" href="https://x.com/oisasiofficial" aria-label="X">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.24 2.25h3.31l-7.23 8.26 8.5 11.24h-6.66l-5.21-6.82-5.97 6.82H1.67l7.73-8.84L1.25 2.25h6.83l4.71 6.23 5.45-6.23zm-1.16 17.52h1.83L7.03 4.13H5.05l12.03 15.64z"/></svg>
+        <span>X</span>
+      </a>
+      <!-- TikTok -->
+      <a class="sns tk" href="https://www.tiktok.com/@oisasiofficial" aria-label="TikTok">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .56.04.83.11v-3.5a6.37 6.37 0 0 0-.83-.05A6.34 6.34 0 0 0 3.15 15.3a6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.34-6.34V8.73a8.18 8.18 0 0 0 4.76 1.52V6.79a4.84 4.84 0 0 1-1-.1z"/></svg>
+        <span>TikTok</span>
+      </a>
+    </div>
+    <p class="sns-note">おいじぃ魔女・雑学のSNSはこちら → <a href="https://lit.link/oisasi">lit.link/oisasi</a></p>
+  </section>
+
+  <footer>
+    <div class="footer-pill">
+      <span>⚡</span>
+      超軽量 × 超最強デザイン — 1ファイル完結
+    </div>
+  </footer>
+
+</div>
 
 </body>
 </html>
