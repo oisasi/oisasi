@@ -20,7 +20,7 @@
     }
     #key-config {
         background-color: #2c003e;
-        padding: 12px;
+        padding: 15px;
         border-radius: 10px;
         max-width: 600px;
         margin: 0 auto 15px auto;
@@ -28,18 +28,25 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 8px;
+        gap: 10px;
     }
-    .key-input-container {
+    .input-row {
         display: flex;
         gap: 8px;
         width: 100%;
         max-width: 500px;
+        align-items: center;
+    }
+    .input-row label {
+        font-size: 13px;
+        font-weight: bold;
+        color: #f1c40f;
+        white-space: nowrap;
     }
     #chat-box {
         width: 90%;
         max-width: 600px;
-        height: 450px;
+        height: 420px;
         background-color: #3b1059;
         margin: 0 auto;
         border-radius: 15px;
@@ -90,7 +97,7 @@
         margin-left: auto;
         margin-right: auto;
     }
-    input[type="text"], input[type="password"] {
+    input[type="text"], input[type="password"], select {
         padding: 10px;
         border-radius: 8px;
         border: 2px solid #9b59b6;
@@ -98,7 +105,7 @@
         background-color: #1a0033;
         color: #fff;
     }
-    #api-key-input {
+    #api-key-input, #model-select {
         flex-grow: 1;
     }
     #user-input {
@@ -130,11 +137,22 @@
     <h1>🔮 オンラインおいじぃ魔女会話AI 🔮</h1>
     
     <div id="key-config">
-        <div class="key-input-container">
+        <div class="input-row">
+            <label>APIキー:</label>
             <input type="password" id="api-key-input" placeholder="OpenRouter APIキー (sk-or-v1-...)">
-            <button onclick="saveApiKey()">保存するぞぃ</button>
+            <button onclick="saveApiKey()">保存</button>
         </div>
-        <p id="key-status" style="font-size: 12px; margin: 0; color: #bbb;">※OpenRouterの無料APIキー（sk-or-v1-から始まる文字列）を入れるのじゃ！</p>
+        <div class="input-row">
+            <label>召喚するAI:</label>
+            <select id="model-select">
+                <option value="openrouter/auto">自動選択（おまかせ）</option>
+                <option value="deepseek/deepseek-chat:free">DeepSeek V3（爆速＆賢い！）</option>
+                <option value="qwen/qwen-2.5-72b-instruct:free">Qwen 2.5 72B（日本語が得意）</option>
+                <option value="meta-llama/llama-3.3-70b-instruct:free">Llama 3.3 70B（表現力が豊か）</option>
+                <option value="google/gemma-2-27b-it:free">Gemma 2 27B（Google製AI）</option>
+            </select>
+        </div>
+        <p id="key-status" style="font-size: 12px; margin: 0; color: #bbb;">※AIメニューを切り替えれば、いつでも別のAIの頭脳で会話できるぞぃ！</p>
     </div>
     
     <div id="chat-box">
@@ -160,49 +178,41 @@
             }
         ];
 
-        // APIキーから余計な全角文字やスペースを除去する関数
-        function cleanApiKey(key) {
-            if (!key) return "";
-            // 非ASCII文字（全角文字や特殊記号）とスペースを全て除去
-            return key.replace(/[^\x00-\x7F]/g, "").replace(/\s+/g, "").trim();
+        function cleanKey(str) {
+            return str ? str.trim() : "";
         }
 
         window.onload = function() {
             const savedKey = localStorage.getItem("majo_openrouter_key");
             if (savedKey) {
-                document.getElementById("api-key-input").value = cleanApiKey(savedKey);
-                document.getElementById("key-status").textContent = "✨ 保存されたOpenRouterキーがセットされたぞぃ！すぐに会話できるぞい！";
+                document.getElementById("api-key-input").value = cleanKey(savedKey);
+                document.getElementById("key-status").textContent = "✨ 保存されたOpenRouterキーがセットされたぞぃ！";
                 document.getElementById("key-status").style.color = "#2ecc71";
             }
         };
 
         function saveApiKey() {
-            let rawKey = document.getElementById("api-key-input").value;
-            let key = cleanApiKey(rawKey);
-            
-            document.getElementById("api-key-input").value = key; // 画面の表示もキレイな半角に更新
-
+            const key = cleanKey(document.getElementById("api-key-input").value);
             if (key) {
                 localStorage.setItem("majo_openrouter_key", key);
-                document.getElementById("key-status").textContent = "✨ APIキーをブラウザに記憶させたぞぃ！次回からは入力不要じゃ！";
+                document.getElementById("key-status").textContent = "✨ APIキーを保存したぞぃ！すぐに会話できるぞい！";
                 document.getElementById("key-status").style.color = "#2ecc71";
             } else {
                 localStorage.removeItem("majo_openrouter_key");
-                document.getElementById("key-status").textContent = "⚠️ 有効なキーが空欄ぞぃ！(半角のsk-or-v1-から始まるキーを入れるのじゃ)";
+                document.getElementById("key-status").textContent = "⚠️ キーが空欄ぞぃ！";
                 document.getElementById("key-status").style.color = "#e74c3c";
             }
         }
 
         async function sendMessage() {
-            let rawKey = document.getElementById("api-key-input").value;
-            let apiKey = cleanApiKey(rawKey);
-            
+            const apiKey = cleanKey(document.getElementById("api-key-input").value);
+            const selectedModel = document.getElementById("model-select").value;
             const inputField = document.getElementById("user-input");
             const sendBtn = document.getElementById("send-btn");
             const text = inputField.value.trim();
             
             if (!apiKey) {
-                alert("🔑 一番上の枠にOpenRouter APIキー（sk-or-v1-から始まるもの）を入れて「保存するぞぃ」を押すのじゃ！");
+                alert("🔑 一番上の枠にOpenRouter APIキー（sk-or-v1-から始まるもの）を入れて「保存」を押すのじゃ！");
                 return;
             }
             if (text === "") return;
@@ -225,7 +235,7 @@
                         "Authorization": `Bearer ${apiKey}`
                     },
                     body: JSON.stringify({
-                        model: "openrouter/auto",
+                        model: selectedModel,
                         messages: conversationMessages
                     })
                 });
