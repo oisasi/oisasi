@@ -435,6 +435,11 @@ h1 span {
   background: linear-gradient(145deg, color-mix(in srgb, var(--pink) 22%, transparent), color-mix(in srgb, var(--purple) 16%, transparent));
   border: 1px solid color-mix(in srgb, var(--text) 8%, transparent);
   transition: all 0.45s cubic-bezier(0.22,1,0.36,1);
+  overflow: hidden;
+}
+.card-icon img {
+  width: 100%; height: 100%; object-fit: cover; border-radius: 12px;
+  display: block;
 }
 .card:hover .card-icon { transform: scale(1.12) rotate(-6deg); }
 .card-body { flex: 1; min-width: 0; }
@@ -643,7 +648,7 @@ footer { margin-top: 52px; text-align: center; }
     <div class="sec-title">メインメニュー</div>
     <div class="card-grid">
       <a class="card" href="https://oisasi.f5.si/logo">
-        <div class="card-icon">✨</div>
+        <div class="card-icon"><img src="おいさしロゴ.png" alt="おいさしロゴ"></div>
         <div class="card-body">
           <div class="card-title">おいさしロゴページ</div>
           <div class="card-desc">公式ロゴ・ビジュアル</div>
@@ -651,7 +656,7 @@ footer { margin-top: 52px; text-align: center; }
         <div class="card-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
       </a>
       <a class="card" href="https://oisasi.f5.si/character">
-        <div class="card-icon">👤</div>
+        <div class="card-icon"><img src="おいさし写真.png" alt="キャラクター"></div>
         <div class="card-body">
           <div class="card-title">キャラクター紹介</div>
           <div class="card-desc">メンバー・キャラ一覧</div>
@@ -673,7 +678,7 @@ footer { margin-top: 52px; text-align: center; }
     <div class="sec-title">おいじぃ魔女</div>
     <div class="card-grid">
       <a class="card witch-card" href="oijiiw.html">
-        <div class="card-icon">🧙‍♀️</div>
+        <div class="card-icon"><img src="おいじぃ魔女.png" alt="おいじぃ魔女"></div>
         <div class="card-body">
           <div class="card-title">おいじぃ魔女のホームページ</div>
           <div class="card-desc">魔女の世界へようこそ</div>
@@ -681,7 +686,7 @@ footer { margin-top: 52px; text-align: center; }
         <div class="card-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
       </a>
       <a class="card witch-card" href="oijiizatu.html">
-        <div class="card-icon">✦</div>
+        <div class="card-icon"><img src="おいじぃ魔女.png" alt="おいじぃ魔女"></div>
         <div class="card-body">
           <div class="card-title">おいじぃ魔女のヤバい雑学</div>
           <div class="card-desc">衝撃の知識が満載</div>
