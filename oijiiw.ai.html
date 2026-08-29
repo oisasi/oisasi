@@ -17,20 +17,12 @@
         color: #f1c40f;
         text-shadow: 2px 2px 4px #000000;
     }
-    #key-config {
-        background-color: #2c003e;
-        padding: 10px;
-        border-radius: 8px;
-        max-width: 600px;
-        margin: 0 auto 15px auto;
-        border: 1px solid #9b59b6;
-    }
     #chat-box {
         width: 90%;
         max-width: 600px;
-        height: 450px;
+        height: 500px;
         background-color: #3b1059;
-        margin: 0 auto;
+        margin: 20px auto;
         border-radius: 15px;
         padding: 15px;
         overflow-y: auto;
@@ -64,28 +56,30 @@
     #input-area {
         margin-top: 15px;
     }
-    input[type="text"], input[type="password"] {
-        padding: 10px;
-        border-radius: 8px;
-        border: 2px solid #9b59b6;
-        font-size: 14px;
-        background-color: #1a0033;
-        color: #fff;
-    }
-    #user-input {
+    input[type="text"] {
         width: 60%;
         max-width: 400px;
+        padding: 12px;
+        border-radius: 8px;
+        border: 2px solid #9b59b6;
         font-size: 16px;
+        background-color: #2c003e;
+        color: #fff;
+    }
+    input[type="text"]:focus {
+        outline: none;
+        border-color: #f1c40f;
     }
     button {
-        padding: 10px 20px;
-        font-size: 14px;
+        padding: 12px 24px;
+        font-size: 16px;
         background-color: #9b59b6;
         border: none;
         border-radius: 8px;
         cursor: pointer;
         color: #fff;
         font-weight: bold;
+        transition: 0.3s;
     }
     button:hover {
         background-color: #f1c40f;
@@ -99,16 +93,11 @@
 </head>
 <body>
     <h1>🔮 オンラインおいじぃ魔女会話AI 🔮</h1>
-    
-    <!-- APIキー入力エリア -->
-    <div id="key-config">
-        <label for="api-key-input">🔑 Gemini APIキー: </label>
-        <input type="password" id="api-key-input" placeholder="AIzaSy...">
-        <p style="font-size: 12px; margin: 5px 0 0 0; color: #bbb;">※入力したキーはお主のブラウザ内にのみ保存され、安全ぞぃ！</p>
-    </div>
+    <p>フォッフォッフォ！わたくしに何でも話しかけるがよいぞい！<br>
+    <small style="color: #ccc;">（※YOUR_GEMINI_API_KEYを自分のキーに書き換えてから使うのぞぃ）</small></p>
     
     <div id="chat-box">
-        <div class="message majo-msg">フォッフォッフォ！よく来たのぞぃ、オイサシ！上にAPIキーを入れて話しかけるのぞぃ！</div>
+        <div class="message majo-msg">フォッフォッフォ！よく来たのぞぃ、オイサシ！さあ、始めるのぞぃ！</div>
     </div>
     
     <div id="input-area">
@@ -117,23 +106,24 @@
     </div>
 
     <script>
+        // 【重要】ここにGoogle AI Studioで取得した無料のGemini APIキーを入れるのぞぃ！
+        const API_KEY = "AQ.Ab8RN6Iowbcs12jBFdOxX7LxkDFrT28f_9hpHZYvMshsU_KRmQ"; 
+        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${AQ.Ab8RN6Iowbcs12jBFdOxX7LxkDFrT28f_9hpHZYvMshsU_KRmQ}`;
+
+        // 過去の会話履歴を保存する配列
         let chatHistory = [];
 
         async function sendMessage() {
-            const apiKey = document.getElementById("api-key-input").value.trim();
             const inputField = document.getElementById("user-input");
             const sendBtn = document.getElementById("send-btn");
             const text = inputField.value.trim();
             
-            if (!apiKey) {
-                alert("🔑 APIキーを入力するのぞぃ！");
-                return;
-            }
             if (text === "") return;
 
-            const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
-
+            // ユーザーの入力を画面に追加
             addMessage(text, "user-msg");
+            
+            // 履歴にユーザーの発言を追加
             chatHistory.push({ role: "user", parts: [{ text: text }] });
             
             inputField.value = "";
@@ -159,7 +149,11 @@
                                 ・性格：少し偉そうですが、親しみやすくユーモアのある老魔女です。` 
                             }]
                         },
-                        contents: chatHistory
+                        contents: chatHistory,
+                        generationConfig: {
+                            temperature: 0.7,
+                            maxOutputTokens: 500
+                        }
                     })
                 });
 
@@ -168,6 +162,7 @@
                 const data = await response.json();
                 const majoReply = data.candidates[0].content.parts[0].text;
 
+                // 履歴に魔女の返答を追加
                 chatHistory.push({ role: "model", parts: [{ text: majoReply }] });
 
                 removeMessage(thinkingId);
@@ -175,8 +170,9 @@
 
             } catch (error) {
                 removeMessage(thinkingId);
-                addMessage("ぐあっ！APIキーが間違っているか、通信に失敗したぞい！キーを確認するのぞぃ！", "majo-msg");
+                addMessage("ぐあっ！魔力（APIキー）が足りないか、通信に失敗したぞい！設定を見直すのぞぃ！", "majo-msg");
                 console.error(error);
+                // エラー時は最後のユーザー発言を履歴から消す
                 chatHistory.pop();
             } finally {
                 inputField.disabled = false;
@@ -191,17 +187,22 @@
             msgDiv.className = "message " + className;
             msgDiv.textContent = text;
             if (id) msgDiv.id = id;
+            
             chatBox.appendChild(msgDiv);
             chatBox.scrollTop = chatBox.scrollHeight;
         }
 
         function removeMessage(id) {
             const msgElement = document.getElementById(id);
-            if (msgElement) msgElement.remove();
+            if (msgElement) {
+                msgElement.remove();
+            }
         }
 
         document.getElementById('user-input').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') sendMessage();
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
         });
     </script>
 </body>
