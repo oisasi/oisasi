@@ -518,7 +518,7 @@ footer { margin-top: 48px; text-align: center; }
 
 <header class="header" id="header">
   <div class="header-inner">
-    <a href="oijiiw.html" class="logo">
+    <a href="/oijiiwai" class="logo">
       <img class="logo-img" src="おいじぃ魔女.png" alt="おいじぃ魔女" width="38" height="38">
       <div class="logo-text"><span data-i18n="logo">おいじぃ魔女</span></div>
     </a>
@@ -587,7 +587,10 @@ footer { margin-top: 48px; text-align: center; }
   </header>
 
   <section class="section">
-    <a class="highlight-card" href="oijiizatu.html">
+    <a class="highlight-card" href="/oijiiw.ai">
+      🔮 <span data-i18n="highlight_ai">おいじぃ魔女とAIでお話しするのぞぃ</span>
+    </a>
+    <a class="highlight-card" href="oijiizatu.html" style="margin-top:8px;background:linear-gradient(135deg, var(--violet), var(--purple));">
       ✦ <span data-i18n="highlight">おいじぃ魔女のヤバい雑学はこちらから</span>
     </a>
   </section>
@@ -707,6 +710,7 @@ footer { margin-top: 48px; text-align: center; }
       hero_title: 'おいじぃ魔女 🧙‍♀️<br>Oijii Witch Official',
       hero_lead: '顔に疑問符をまとう謎のAI魔女。おいじぃ魔女のヤバい雑学で動画発信中。',
       highlight: 'おいじぃ魔女のヤバい雑学はこちらから',
+      highlight_ai: 'おいじぃ魔女とAIでお話しするのぞぃ',
       sec_profile: 'プロフィール', sec_links: 'リンク', sec_sns: '公式SNS @oijiiw',
       profile_name: 'おいじぃ魔女',
       profile_like: '<strong>好き：</strong>サラダ',
@@ -727,6 +731,7 @@ footer { margin-top: 48px; text-align: center; }
       hero_title: 'Oijii Witch 🧙‍♀️<br>Official',
       hero_lead: 'A mysterious AI witch with a question mark on her face. Sharing wild trivia videos.',
       highlight: 'Check out Oijii Witch Trivia',
+      highlight_ai: 'Chat with Oijii Witch (AI)',
       sec_profile: 'Profile', sec_links: 'Links', sec_sns: 'Official SNS @oijiiw',
       profile_name: 'Oijii Witch',
       profile_like: '<strong>Likes:</strong> Salad',
@@ -763,6 +768,11 @@ footer { margin-top: 48px; text-align: center; }
       const key = el.getAttribute('data-i18n-html');
       if (t[key] != null) el.innerHTML = t[key];
     });
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+      const key = el.getAttribute('data-i18n-placeholder');
+      if (t[key] != null) el.placeholder = t[key];
+    });
+    window.__oijiiChatI18n = t;
   }
 
   function applyTheme(theme) {
