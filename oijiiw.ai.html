@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>オンラインおいじぃ魔女会話AI (Groq快適版)</title>
+<title>オンラインおいじぃ魔女会話AI (OpenAIモデル限定版)</title>
 <style>
     body {
         font-family: 'Hiragino Maru Gothic ProN', 'Rounded M+ 1c', sans-serif;
@@ -134,7 +134,7 @@
 </style>
 </head>
 <body>
-    <h1>🔮 オンラインおいじぃ魔女会話AI (Groq快適版) 🔮</h1>
+    <h1>🔮 オンラインおいじぃ魔女会話AI (OpenAI限定) 🔮</h1>
     
     <div id="key-config">
         <div class="input-row">
@@ -145,14 +145,14 @@
         <div class="input-row">
             <label>召喚するAI:</label>
             <select id="model-select">
-                <option value="">APIキーを入力すると会話可能モデルを取得するぞぃ</option>
+                <option value="">APIキーを入力するとOpenAIモデルを取得するぞぃ</option>
             </select>
         </div>
-        <p id="key-status" style="font-size: 12px; margin: 0; color: #bbb;">※会話に使えるモデルだけを自動で厳選表示するぞぃ！</p>
+        <p id="key-status" style="font-size: 12px; margin: 0; color: #bbb;">※OpenAI系モデル（openai/〜）だけを表示中じゃ！</p>
     </div>
     
     <div id="chat-box">
-        <div class="message majo-msg">フォッフォッフォ！よく来たのぞぃ、オイサシ！動作確認ありがとうなのじゃ！</div>
+        <div class="message majo-msg">フォッフォッフォ！よく来たのぞぃ、オイサシ！OpenAIの魔力を召喚して会話するぞぃ！</div>
     </div>
     
     <div id="input-area">
@@ -201,7 +201,7 @@
         async function fetchGroqModels(apiKey) {
             const statusEl = document.getElementById("key-status");
             const selectEl = document.getElementById("model-select");
-            statusEl.textContent = "🔄 会話可能なAIモデルを探索中ぞぃ...";
+            statusEl.textContent = "🔄 OpenAIモデルを検索中ぞぃ...";
             statusEl.style.color = "#f1c40f";
 
             try {
@@ -213,26 +213,28 @@
 
                 const data = await res.json();
                 
-                // 会話不能・特殊目的のモデルを弾くフィルター条件
-                const activeModels = data.data.filter(m => {
+                // openai/ から始まるモデルだけを抽出（whisperなどは除外）
+                const openAiModels = data.data.filter(m => {
                     const id = m.id.toLowerCase();
-                    return m.active && 
-                           !id.includes("whisper") && 
-                           !id.includes("safetensors") &&
-                           !id.includes("prompt-guard") && 
-                           !id.includes("orpheus") &&
-                           !id.includes("allam");
+                    return m.active && id.startsWith("openai/") && !id.includes("whisper");
                 });
 
                 selectEl.innerHTML = "";
-                activeModels.forEach(m => {
+                
+                if (openAiModels.length === 0) {
                     const opt = document.createElement("option");
-                    opt.value = m.id;
-                    opt.textContent = m.id;
+                    opt.textContent = "OpenAI系モデルが見つからなかったぞぃ";
                     selectEl.appendChild(opt);
-                });
+                } else {
+                    openAiModels.forEach(m => {
+                        const opt = document.createElement("option");
+                        opt.value = m.id;
+                        opt.textContent = m.id;
+                        selectEl.appendChild(opt);
+                    });
+                }
 
-                statusEl.textContent = "✨ 会話可能なAIモデルの準備が完了したぞぃ！";
+                statusEl.textContent = "✨ OpenAI系モデルのセットが完了したぞぃ！";
                 statusEl.style.color = "#2ecc71";
             } catch (err) {
                 statusEl.textContent = `⚠️ モデル取得失敗: ${err.message}`;
@@ -265,7 +267,7 @@
             sendBtn.disabled = true;
 
             const thinkingId = "thinking-" + Date.now();
-            addMessage("むむっ…爆速で魔力を練っているのぞぃ…", "majo-msg thinking", thinkingId);
+            addMessage("むむっ…OpenAIの魔力を練っているのぞぃ…", "majo-msg thinking", thinkingId);
 
             try {
                 const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
