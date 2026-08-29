@@ -177,7 +177,7 @@
                 document.getElementById("key-status").style.color = "#2ecc71";
             } else {
                 localStorage.removeItem("majo_openrouter_key");
-                document.getElementById("key-status").textContent = " キーが空欄ぞぃ！";
+                document.getElementById("key-status").textContent = "⚠️ キーが空欄ぞぃ！";
                 document.getElementById("key-status").style.color = "#e74c3c";
             }
         }
@@ -212,7 +212,7 @@
                         "Authorization": `Bearer ${apiKey}`
                     },
                     body: JSON.stringify({
-                        model: "google/gemma-2-9b-it:free",
+                        model: "meta-llama/llama-3.1-8b-instruct:free",
                         messages: conversationMessages
                     })
                 });
