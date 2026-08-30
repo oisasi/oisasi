@@ -6,10 +6,8 @@
 <title>おいさしAI | おいさし公式</title>
 <meta name="description" content="おいさし公式AIチャット。SNSやホームページのことを気軽に聞けます。">
 <meta name="theme-color" content="#0a0a12">
-<link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
-<link rel="icon" type="image/png" sizes="512x512" href="favicon-512.png">
-<link rel="apple-touch-icon" sizes="180x180" href="favicon-180.png">
+<link rel="icon" href="名称未設定のデザイン (9) (1).jpg">
+<link rel="apple-touch-icon" href="名称未設定のデザイン (9) (1).jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700;900&display=swap" rel="stylesheet">
@@ -772,6 +770,14 @@ body {
   min-width: 0;
   flex: 1;
   margin-left: 4px;
+  padding: 6px 8px 6px 14px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.chat-title-wrap:hover {
+  border-color: color-mix(in srgb, var(--pink) 35%, var(--border));
 }
 .chat-title-text {
   font-size: 14px;
@@ -781,19 +787,20 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
   min-width: 0;
+  flex: 1;
 }
 .chat-title-edit {
   flex-shrink: 0;
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
   border: none;
-  border-radius: 8px;
+  border-radius: 50%;
   background: transparent;
   cursor: pointer;
   font-size: 14px;
   display: grid;
   place-items: center;
-  opacity: 0.7;
+  opacity: 0.75;
   transition: all 0.2s;
 }
 .chat-title-edit:hover {
@@ -825,8 +832,8 @@ body {
 <header class="header" id="header">
   <div class="header-inner">
     <a href="index.html" class="logo" onclick="closeAll()">
-      <img class="logo-img" src="おいさしロゴ.png" alt="おいさし" width="38" height="38">
-      <div class="logo-text"><span>おいさし</span></div>
+      <img class="logo-img" src="名称未設定のデザイン (9) (1).jpg" alt="おいさしAI" width="38" height="38">
+      <div class="logo-text"><span>おいさしAI</span></div>
     </a>
     <nav class="nav-desktop" aria-label="メインナビゲーション">
       <a href="https://oisasi.f5.si/oijiiw" data-i18n="nav_oijiiw">おいじぃ魔女のホームページ</a>
@@ -1545,7 +1552,7 @@ body {
         body: JSON.stringify({ messages: conversationMessages })
       });
       const data = await response.json();
-      if (!response.ok) throw new Error(`[HTTP ${response.status}] ${data.error || response.statusText}`);
+      if (!response.ok) throw new Error(\`[HTTP \${response.status}] \${data.error || response.statusText}\`);
       const reply = data.choices[0].message.content;
       conversationMessages.push({ role: "assistant", content: reply });
       addMessage(reply, "ai", true);
@@ -1553,7 +1560,7 @@ body {
       archiveCurrentToHistory();
       updateChatTitleUI();
     } catch (error) {
-      addMessage(`${t('chat_error', '通信エラーが発生しました。')}\n${error.message}`, "error", true);
+      addMessage(\`\${t('chat_error', '通信エラーが発生しました。')}\n\${error.message}\`, "error", true);
       conversationMessages.pop();
       saveCurrent();
     } finally {
@@ -1566,7 +1573,7 @@ body {
   function linkify(text) {
     return text.replace(/(https?:\/\/[^\s\(\)\<\>]+)/g, function (url) {
       const clean = url.replace(/[\.\,\;\:]$/, '');
-      return `<a href="${clean}" target="_blank" rel="noopener noreferrer">${clean}</a>`;
+      return \`<a href="\${clean}" target="_blank" rel="noopener noreferrer">\${clean}</a>\`;
     });
   }
   function escapeHTML(str) {
@@ -1578,7 +1585,7 @@ body {
     btn.type = "button";
     btn.title = title;
     btn.setAttribute("aria-label", title);
-    btn.innerHTML = `<svg viewBox="0 0 24 24">${svgPath}</svg>`;
+    btn.innerHTML = \`<svg viewBox="0 0 24 24">\${svgPath}</svg>\`;
     btn.addEventListener("click", onClick);
     return btn;
   }
