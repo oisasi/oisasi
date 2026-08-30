@@ -322,10 +322,11 @@ body {
 .msg-row { display: flex; gap: 12px; align-items: flex-start; }
 .chat-avatar {
   width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
-  display: grid; place-items: center; font-size: 15px;
+  display: grid; place-items: center; font-size: 15px; overflow: hidden;
   background: linear-gradient(145deg, color-mix(in srgb, var(--pink) 35%, transparent), color-mix(in srgb, var(--purple) 25%, transparent));
   margin-top: 2px;
 }
+.chat-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .chat-bubble {
   padding: 12px 18px; border-radius: 22px; font-size: 15.5px;
   line-height: 1.7; white-space: pre-wrap; word-break: break-word;
@@ -879,6 +880,13 @@ body {
       <button data-value="en">English</button>
     </div>
   </div>
+  <div class="settings-group">
+    <span class="settings-label" data-i18n="pronunciation">発音（読み上げ）</span>
+    <div class="settings-options" id="speechOptions">
+      <button data-value="on" data-i18n="speech_on">オン</button>
+      <button data-value="off" class="active" data-i18n="speech_off">オフ</button>
+    </div>
+  </div>
 </div>
 
 <nav class="nav-mobile" id="navMobile" aria-label="モバイルメニュー">
@@ -987,6 +995,7 @@ body {
     ja: {
       settings: '設定', theme: 'テーマ', language: '言語',
       auto: '自動', dark: 'ダーク', light: 'ライト',
+      pronunciation: '発音（読み上げ）', speech_on: 'オン', speech_off: 'オフ',
       nav_oijiiw: 'おいじぃ魔女のホームページ', nav_logo: 'おいさしのロゴページ',
       nav_ai: 'おいさしAIページ', nav_character: 'キャラクターページ', nav_faq: 'FAQページ',
       start_help: '何かお手伝いできることはありますか？',
@@ -1000,6 +1009,7 @@ body {
     en: {
       settings: 'Settings', theme: 'Theme', language: 'Language',
       auto: 'Auto', dark: 'Dark', light: 'Light',
+      pronunciation: 'Read Aloud', speech_on: 'On', speech_off: 'Off',
       nav_oijiiw: 'Oijii Witch Homepage', nav_logo: 'Oisasi Logo Page',
       nav_ai: 'Oisasi AI Page', nav_character: 'Character Page', nav_faq: 'FAQ Page',
       start_help: 'How can I help you today?',
@@ -1057,8 +1067,32 @@ body {
     }
   }
 
+  function applySpeech(pref) {
+    localStorage.setItem('oisasi-speech', pref);
+    document.querySelectorAll('#speechOptions button').forEach(btn => btn.classList.toggle('active', btn.dataset.value === pref));
+    window.__oisasiSpeechOn = pref === 'on';
+    if (pref !== 'on' && window.speechSynthesis) window.speechSynthesis.cancel();
+  }
+  function speakNow(text) {
+    if (!text || !('speechSynthesis' in window)) return;
+    try {
+      window.speechSynthesis.cancel();
+      const clean = text.replace(/https?:\/\/[^\s\(\)\<\>]+/g, '').replace(/[#*_`>~]/g, '');
+      if (!clean.trim()) return;
+      const utter = new SpeechSynthesisUtterance(clean);
+      utter.lang = resolveLang(localStorage.getItem('oisasi-lang') || 'auto') === 'ja' ? 'ja-JP' : 'en-US';
+      window.speechSynthesis.speak(utter);
+    } catch (e) { /* speech synthesis unavailable */ }
+  }
+  window.speakText = function (text) {
+    if (!window.__oisasiSpeechOn) return;
+    speakNow(text);
+  };
+  window.speakTextForce = function (text) { speakNow(text); };
+
   applyTheme(localStorage.getItem('oisasi-theme') || 'auto');
   applyLang(localStorage.getItem('oisasi-lang') || 'auto');
+  applySpeech(localStorage.getItem('oisasi-speech') || 'off');
   updateGreeting();
 
 
@@ -1075,6 +1109,7 @@ body {
   settingsClose.addEventListener('click', closeSettings);
   document.getElementById('themeOptions').addEventListener('click', e => { const b = e.target.closest('button'); if (b) applyTheme(b.dataset.value); });
   document.getElementById('langOptions').addEventListener('click', e => { const b = e.target.closest('button'); if (b) applyLang(b.dataset.value); });
+  document.getElementById('speechOptions').addEventListener('click', e => { const b = e.target.closest('button'); if (b) applySpeech(b.dataset.value); });
   hamburger.addEventListener('click', () => {
     const isOpen = navMobile.classList.toggle('open');
     hamburger.classList.toggle('active', isOpen);
@@ -1110,11 +1145,10 @@ body {
   https://x.com/oijiizatu （X）
   https://www.tiktok.com/@oijiizatu （TikTok）
   雑学ホームページ： https://oisasi.f5.si/oijiizatu
-・おいさしのSNS
-  https://www.youtube.com/@oisasiofficial （YouTube）
-  https://www.facebook.com/oisasiofficial （Facebook）
-  https://x.com/oisasiofficial （X）
-  https://www.tiktok.com/@oisasiofficial （TikTok）
+・おいさしのSNS（@oisasiai）
+  https://www.youtube.com/@oisasiai （YouTube）
+  https://www.instagram.com/oisasiai （Instagram）
+  https://www.facebook.com/oisasiai （Facebook）
 ・おいさし公式ホームページ： https://oisasi.f5.si`;
 
   const STORAGE_CURRENT = 'oisasi-ai-current';
@@ -1558,6 +1592,7 @@ body {
       const reply = data.choices[0].message.content;
       conversationMessages.push({ role: "assistant", content: reply });
       addMessage(reply, "ai", true);
+      if (typeof window.speakText === 'function') window.speakText(reply);
       saveCurrent();
       archiveCurrentToHistory();
       updateChatTitleUI();
@@ -1610,7 +1645,8 @@ body {
       row.className = "msg-row";
       const avatar = document.createElement("div");
       avatar.className = "chat-avatar";
-      avatar.textContent = isError ? "⚠️" : "✨";
+      if (isError) avatar.textContent = "⚠️";
+      else avatar.innerHTML = '<img src="favicon-180AI.png" alt="おいさしAI" loading="lazy">';
       row.appendChild(avatar);
       row.appendChild(bubble);
       wrap.appendChild(row);
@@ -1635,6 +1671,11 @@ body {
           }
         );
         actions.appendChild(copyBtn);
+        actions.appendChild(createActionButton(
+          '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/>',
+          "読み上げ",
+          () => { if (typeof window.speakTextForce === 'function') window.speakTextForce(text); }
+        ));
         actions.appendChild(createActionButton(
           '<path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/>',
           "良い回答", function () { this.classList.toggle("copied"); }
