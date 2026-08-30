@@ -210,6 +210,23 @@ body {
 .start-view[hidden] {
   display: none !important;
 }
+.start-icon {
+  width: 88px; height: 88px; border-radius: 50%; object-fit: cover;
+  margin-bottom: 20px; box-shadow: 0 10px 30px color-mix(in srgb, var(--pink) 30%, transparent);
+}
+.start-sns {
+  display: flex; gap: 14px; margin-top: 22px;
+}
+.start-sns a {
+  width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center;
+  color: var(--muted); border: 1px solid var(--border); background: var(--surface);
+  transition: color 0.2s, border-color 0.2s, background 0.2s, transform 0.2s;
+}
+.start-sns a svg { width: 19px; height: 19px; }
+.start-sns a:hover {
+  color: #fff; border-color: transparent; transform: translateY(-2px);
+  background: linear-gradient(135deg, var(--pink), var(--purple));
+}
 .start-title {
   font-size: clamp(26px, 6.5vw, 38px);
   font-weight: 900;
@@ -909,6 +926,7 @@ body {
       履歴
     </button>
   </div>
+  <img class="start-icon" src="favicon-512AI.png" alt="おいさしAI" width="88" height="88" loading="lazy">
   <h1 class="start-title">
     <span id="greetingText">こんにちは、おいさしAIです</span><br>
     <span class="start-sub" data-i18n-html="start_help">何かお手伝いできることはありますか？</span>
@@ -918,6 +936,17 @@ body {
     <button class="ask-icon-btn send" id="startSendBtn" aria-label="送信">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/></svg>
     </button>
+  </div>
+  <div class="start-sns" aria-label="おいさしAIのSNS (@oisasiai)">
+    <a href="https://www.instagram.com/oisasiai" target="_blank" rel="noopener noreferrer" title="Instagram @oisasiai" aria-label="Instagram @oisasiai">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37a4 4 0 1 1-7.914 1.174A4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+    </a>
+    <a href="https://www.facebook.com/oisasiai" target="_blank" rel="noopener noreferrer" title="Facebook @oisasiai" aria-label="Facebook @oisasiai">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+    </a>
+    <a href="https://www.youtube.com/@oisasiai" target="_blank" rel="noopener noreferrer" title="YouTube @oisasiai" aria-label="YouTube @oisasiai">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"/><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"/></svg>
+    </a>
   </div>
 </div>
 
@@ -1145,10 +1174,16 @@ body {
   https://x.com/oijiizatu （X）
   https://www.tiktok.com/@oijiizatu （TikTok）
   雑学ホームページ： https://oisasi.f5.si/oijiizatu
-・おいさしのSNS（@oisasiai）
-  https://www.youtube.com/@oisasiai （YouTube）
+・おいさしのSNS
+  https://www.youtube.com/@oisasiofficial （YouTube）
+  https://www.facebook.com/oisasiofficial （Facebook）
+  https://x.com/oisasiofficial （X）
+  https://www.tiktok.com/@oisasiofficial （TikTok）
+・おいさしAI（このチャット自身）のSNSについて聞かれた場合、または「@oisasiai」と指定された場合のみ、以下を案内してください（それ以外では案内しない）。
+  おいさしAIのSNS（@oisasiai）
   https://www.instagram.com/oisasiai （Instagram）
   https://www.facebook.com/oisasiai （Facebook）
+  https://www.youtube.com/@oisasiai （YouTube）
 ・おいさし公式ホームページ： https://oisasi.f5.si`;
 
   const STORAGE_CURRENT = 'oisasi-ai-current';
