@@ -434,6 +434,7 @@ body {
   max-width: 720px;
   width: 100%;
   margin: 0 auto;
+  min-height: 44px;
 }
 .back-start-btn {
   display: inline-flex;
@@ -682,6 +683,137 @@ body {
   /* ensure absolute children position correctly */
 }
 
+
+.history-section-label {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: var(--pink);
+  padding: 8px 4px 6px;
+  margin-top: 4px;
+}
+.history-section-label:first-child { margin-top: 0; }
+.history-section-label.other {
+  color: var(--muted);
+  margin-top: 12px;
+}
+
+
+/* Confirm modal */
+.confirm-overlay {
+  position: fixed; inset: 0; z-index: 2000;
+  background: rgba(0,0,0,0.45);
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+  opacity: 0; visibility: hidden;
+  transition: all 0.25s;
+}
+.confirm-overlay.open { opacity: 1; visibility: visible; }
+.confirm-modal {
+  width: min(340px, 100%);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  box-shadow: var(--shadow);
+  padding: 22px 20px 16px;
+  transform: translateY(10px) scale(0.96);
+  transition: transform 0.25s;
+}
+.confirm-overlay.open .confirm-modal { transform: translateY(0) scale(1); }
+.confirm-modal h3 {
+  font-size: 16px; font-weight: 900; color: var(--text);
+  margin: 0 0 10px; line-height: 1.4;
+}
+.confirm-modal p {
+  font-size: 13.5px; color: var(--muted); margin: 0 0 18px; line-height: 1.6;
+  white-space: pre-line;
+}
+.confirm-actions {
+  display: flex; gap: 10px; justify-content: flex-end;
+}
+.confirm-actions button {
+  border: none; border-radius: 12px; padding: 11px 16px;
+  font-family: inherit; font-size: 13.5px; font-weight: 800;
+  cursor: pointer; transition: all 0.2s;
+}
+.confirm-cancel {
+  background: var(--surface); color: var(--text);
+  border: 1px solid var(--border) !important;
+}
+.confirm-cancel:hover { background: var(--surface-hover); }
+.confirm-ok {
+  background: linear-gradient(135deg, #e74c3c, #c0392b); color: #fff;
+}
+.confirm-ok:hover { filter: brightness(1.06); transform: translateY(-1px); }
+
+
+.history-menu-dropdown button.edit { color: var(--text); }
+.history-item-title.editing {
+  outline: none;
+}
+.history-rename-input {
+  width: 100%;
+  border: 1px solid color-mix(in srgb, var(--pink) 45%, var(--border));
+  background: var(--bg-elevated);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 700;
+  padding: 6px 8px;
+  border-radius: 8px;
+  outline: none;
+}
+
+
+.chat-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  flex: 1;
+  margin-left: 4px;
+}
+.chat-title-text {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+.chat-title-edit {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+  font-size: 14px;
+  display: grid;
+  place-items: center;
+  opacity: 0.7;
+  transition: all 0.2s;
+}
+.chat-title-edit:hover {
+  opacity: 1;
+  background: var(--surface-hover);
+}
+.chat-title-input {
+  flex: 1;
+  min-width: 0;
+  border: 1px solid color-mix(in srgb, var(--pink) 45%, var(--border));
+  background: var(--bg-elevated);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 800;
+  padding: 6px 10px;
+  border-radius: 10px;
+  outline: none;
+}
+
 </style>
 </head>
 <body>
@@ -786,6 +918,10 @@ body {
       </svg>
       履歴
     </button>
+    <div class="chat-title-wrap" id="chatTitleWrap">
+      <span class="chat-title-text" id="chatTitleText">新しい会話</span>
+      <button type="button" class="chat-title-edit" id="chatTitleEdit" title="タイトルを編集" aria-label="タイトルを編集">✏️</button>
+    </div>
   </div>
   <div class="chat-panel">
     <div class="chat-box" id="chat-box"></div>
@@ -802,6 +938,18 @@ body {
 
 
 
+
+
+<div class="confirm-overlay" id="confirmOverlay" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+  <div class="confirm-modal">
+    <h3 id="confirmTitle">履歴をすべて削除</h3>
+    <p id="confirmMessage">本当によろしいですか？</p>
+    <div class="confirm-actions">
+      <button type="button" class="confirm-cancel" id="confirmCancel">キャンセル</button>
+      <button type="button" class="confirm-ok" id="confirmOk">削除する</button>
+    </div>
+  </div>
+</div>
 
 <div class="history-backdrop" id="historyBackdrop"></div>
 <div class="history-panel" id="historyPanel">
@@ -1002,6 +1150,78 @@ body {
     const t = firstUser.content.trim().replace(/\s+/g, ' ');
     return t.length > 36 ? t.slice(0, 36) + '…' : t;
   }
+  function getCurrentTitle() {
+    // prefer saved custom title from history/current
+    try {
+      const cur = JSON.parse(localStorage.getItem(STORAGE_CURRENT) || 'null');
+      if (cur && cur.id === currentId && cur.title) return cur.title;
+      const hist = loadHistory().find(h => h.id === currentId);
+      if (hist && hist.title) return hist.title;
+    } catch (e) {}
+    return makeTitle(conversationMessages);
+  }
+  function updateChatTitleUI() {
+    const el = document.getElementById('chatTitleText');
+    if (el) el.textContent = getCurrentTitle();
+  }
+  function setCurrentTitle(newTitle) {
+    const title = (newTitle || '').trim() || makeTitle(conversationMessages);
+    // update history
+    const list = loadHistory();
+    const item = list.find(h => h.id === currentId);
+    if (item) {
+      item.title = title;
+      saveHistory(list);
+    }
+    // update current
+    try {
+      const cur = JSON.parse(localStorage.getItem(STORAGE_CURRENT) || 'null');
+      if (cur && cur.id === currentId) {
+        cur.title = title;
+        localStorage.setItem(STORAGE_CURRENT, JSON.stringify(cur));
+      } else {
+        saveCurrent();
+        const cur2 = JSON.parse(localStorage.getItem(STORAGE_CURRENT) || 'null');
+        if (cur2) {
+          cur2.title = title;
+          localStorage.setItem(STORAGE_CURRENT, JSON.stringify(cur2));
+        }
+      }
+    } catch (e) {}
+    updateChatTitleUI();
+  }
+  function beginEditChatTitle() {
+    const wrap = document.getElementById('chatTitleWrap');
+    const textEl = document.getElementById('chatTitleText');
+    const editBtn = document.getElementById('chatTitleEdit');
+    if (!wrap || !textEl) return;
+    if (wrap.querySelector('.chat-title-input')) return;
+
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'chat-title-input';
+    input.value = getCurrentTitle();
+    input.maxLength = 80;
+    textEl.style.display = 'none';
+    if (editBtn) editBtn.style.display = 'none';
+    wrap.insertBefore(input, editBtn || null);
+    input.focus();
+    input.select();
+
+    const finish = (save) => {
+      if (save) setCurrentTitle(input.value);
+      else updateChatTitleUI();
+      input.remove();
+      textEl.style.display = '';
+      if (editBtn) editBtn.style.display = '';
+      updateChatTitleUI();
+    };
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); finish(true); }
+      if (e.key === 'Escape') { e.preventDefault(); finish(false); }
+    });
+    input.addEventListener('blur', () => finish(true));
+  }
   function saveCurrent() {
     const visible = getUserMessages(conversationMessages);
     if (!visible.length) {
@@ -1063,17 +1283,157 @@ body {
     renderHistoryList();
   }
   function clearAllHistory() {
-    if (!loadHistory().length) return;
-    if (!confirm('会話履歴をすべて削除しますか？')) return;
-    saveHistory([]);
-    renderHistoryList();
+    const list = loadHistory();
+    if (!list.length) return;
+    const count = list.length;
+    openConfirm({
+      title: '履歴をすべて削除',
+      message: count + '件の履歴をすべて削除します。\n本当によろしいですか？',
+      okText: '削除する',
+      onOk: () => {
+        saveHistory([]);
+        renderHistoryList();
+      }
+    });
+  }
+  let confirmOnOk = null;
+  function openConfirm({ title, message, okText, onOk }) {
+    const overlay = document.getElementById('confirmOverlay');
+    const titleEl = document.getElementById('confirmTitle');
+    const msgEl = document.getElementById('confirmMessage');
+    const okBtn = document.getElementById('confirmOk');
+    if (!overlay) return;
+    if (titleEl) titleEl.textContent = title || '確認';
+    if (msgEl) msgEl.textContent = message || '';
+    if (okBtn) okBtn.textContent = okText || 'OK';
+    confirmOnOk = onOk || null;
+    overlay.classList.add('open');
+  }
+  function closeConfirm() {
+    const overlay = document.getElementById('confirmOverlay');
+    if (overlay) overlay.classList.remove('open');
+    confirmOnOk = null;
   }
   function closeAllHistoryMenus() {
     document.querySelectorAll('.history-menu-dropdown.open').forEach(el => el.classList.remove('open'));
   }
+  function renameHistoryItem(id, titleEl, row) {
+    const list = loadHistory();
+    const item = list.find(h => h.id === id);
+    if (!item || !titleEl) return;
+
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'history-rename-input';
+    input.value = item.title || '';
+    input.maxLength = 80;
+
+    const finish = (save) => {
+      if (save) {
+        const v = input.value.trim();
+        if (v) {
+          item.title = v;
+          saveHistory(list);
+          // update current storage title if same id
+          try {
+            const cur = JSON.parse(localStorage.getItem(STORAGE_CURRENT) || 'null');
+            if (cur && cur.id === id) {
+              cur.title = v;
+              localStorage.setItem(STORAGE_CURRENT, JSON.stringify(cur));
+            }
+          } catch (e) {}
+        }
+      }
+      renderHistoryList();
+    };
+
+    input.addEventListener('keydown', (e) => {
+      e.stopPropagation();
+      if (e.key === 'Enter') { e.preventDefault(); finish(true); }
+      if (e.key === 'Escape') { e.preventDefault(); finish(false); }
+    });
+    input.addEventListener('click', (e) => e.stopPropagation());
+    input.addEventListener('blur', () => finish(true));
+
+    titleEl.replaceWith(input);
+    input.focus();
+    input.select();
+  }
+  function createHistoryRow(item) {
+    const row = document.createElement('div');
+    row.className = 'history-item-row';
+
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'history-item' + (item.pinned ? ' pinned' : '');
+    btn.innerHTML = '<div class="history-item-title"></div><div class="history-item-meta"></div>';
+    const titleEl = btn.querySelector('.history-item-title');
+    titleEl.textContent = item.title || '会話';
+    btn.querySelector('.history-item-meta').textContent = formatMeta(item.updatedAt);
+    btn.addEventListener('click', () => { closeAllHistoryMenus(); loadChat(item); });
+
+    const menuWrap = document.createElement('div');
+    menuWrap.className = 'history-menu-wrap';
+
+    const menuBtn = document.createElement('button');
+    menuBtn.type = 'button';
+    menuBtn.className = 'history-menu-btn';
+    menuBtn.title = 'メニュー';
+    menuBtn.setAttribute('aria-label', 'メニュー');
+    menuBtn.innerHTML = '<span></span><span></span><span></span>';
+
+    const dropdown = document.createElement('div');
+    dropdown.className = 'history-menu-dropdown';
+
+    const editBtn = document.createElement('button');
+    editBtn.type = 'button';
+    editBtn.className = 'edit';
+    editBtn.textContent = '✏️ 名前を変更';
+    editBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      closeAllHistoryMenus();
+      renameHistoryItem(item.id, titleEl, row);
+    });
+
+    const pinBtn = document.createElement('button');
+    pinBtn.type = 'button';
+    pinBtn.textContent = item.pinned ? '📌 固定を解除' : '📌 固定する';
+    pinBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      closeAllHistoryMenus();
+      togglePinHistoryItem(item.id);
+    });
+
+    const delBtn = document.createElement('button');
+    delBtn.type = 'button';
+    delBtn.className = 'danger';
+    delBtn.textContent = '🗑 削除';
+    delBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      closeAllHistoryMenus();
+      deleteHistoryItem(item.id);
+    });
+
+    dropdown.appendChild(editBtn);
+    dropdown.appendChild(pinBtn);
+    dropdown.appendChild(delBtn);
+
+    menuBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const wasOpen = dropdown.classList.contains('open');
+      closeAllHistoryMenus();
+      if (!wasOpen) dropdown.classList.add('open');
+    });
+
+    menuWrap.appendChild(menuBtn);
+    menuWrap.appendChild(dropdown);
+    row.appendChild(btn);
+    row.appendChild(menuWrap);
+    return row;
+  }
   function renderHistoryList() {
     const list = loadHistory();
-    // keep pinned on top
     list.sort((a, b) => {
       const ap = a.pinned ? 1 : 0;
       const bp = b.pinned ? 1 : 0;
@@ -1085,73 +1445,25 @@ body {
       return;
     }
     historyList.innerHTML = '';
-    list.forEach(item => {
-      const row = document.createElement('div');
-      row.className = 'history-item-row';
+    const pinned = list.filter(i => i.pinned);
+    const others = list.filter(i => !i.pinned);
 
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'history-item' + (item.pinned ? ' pinned' : '');
-      btn.innerHTML = '<div class="history-item-title"></div><div class="history-item-meta"></div>';
-      const titleEl = btn.querySelector('.history-item-title');
-      if (item.pinned) {
-        titleEl.innerHTML = '<span class="history-pin-badge">📌</span>';
-        titleEl.appendChild(document.createTextNode(item.title || '会話'));
-      } else {
-        titleEl.textContent = item.title || '会話';
+    if (pinned.length) {
+      const label = document.createElement('div');
+      label.className = 'history-section-label';
+      label.textContent = '固定済み';
+      historyList.appendChild(label);
+      pinned.forEach(item => historyList.appendChild(createHistoryRow(item)));
+    }
+    if (others.length) {
+      if (pinned.length) {
+        const label = document.createElement('div');
+        label.className = 'history-section-label other';
+        label.textContent = '履歴';
+        historyList.appendChild(label);
       }
-      btn.querySelector('.history-item-meta').textContent = formatMeta(item.updatedAt);
-      btn.addEventListener('click', () => { closeAllHistoryMenus(); loadChat(item); });
-
-      const menuWrap = document.createElement('div');
-      menuWrap.className = 'history-menu-wrap';
-
-      const menuBtn = document.createElement('button');
-      menuBtn.type = 'button';
-      menuBtn.className = 'history-menu-btn';
-      menuBtn.title = 'メニュー';
-      menuBtn.setAttribute('aria-label', 'メニュー');
-      menuBtn.innerHTML = '<span></span><span></span><span></span>';
-
-      const dropdown = document.createElement('div');
-      dropdown.className = 'history-menu-dropdown';
-
-      const pinBtn = document.createElement('button');
-      pinBtn.type = 'button';
-      pinBtn.textContent = item.pinned ? '📌 固定を解除' : '📌 固定する';
-      pinBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        closeAllHistoryMenus();
-        togglePinHistoryItem(item.id);
-      });
-
-      const delBtn = document.createElement('button');
-      delBtn.type = 'button';
-      delBtn.className = 'danger';
-      delBtn.textContent = '🗑 削除';
-      delBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        closeAllHistoryMenus();
-        deleteHistoryItem(item.id);
-      });
-
-      dropdown.appendChild(pinBtn);
-      dropdown.appendChild(delBtn);
-
-      menuBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        const wasOpen = dropdown.classList.contains('open');
-        closeAllHistoryMenus();
-        if (!wasOpen) dropdown.classList.add('open');
-      });
-
-      menuWrap.appendChild(menuBtn);
-      menuWrap.appendChild(dropdown);
-      row.appendChild(btn);
-      row.appendChild(menuWrap);
-      historyList.appendChild(row);
-    });
+      others.forEach(item => historyList.appendChild(createHistoryRow(item)));
+    }
   }
   function openHistory() {
     renderHistoryList();
@@ -1169,6 +1481,7 @@ body {
     startView.hidden = true;
     chatView.hidden = false;
     document.body.style.overflow = 'hidden';
+    updateChatTitleUI();
   }
 
   function clearUI() {
@@ -1196,6 +1509,7 @@ body {
     showChatView();
     renderMessagesFromData(conversationMessages);
     saveCurrent();
+    updateChatTitleUI();
   }
 
   function resetChat() {
@@ -1236,8 +1550,8 @@ body {
       conversationMessages.push({ role: "assistant", content: reply });
       addMessage(reply, "ai", true);
       saveCurrent();
-      // also refresh history entry
       archiveCurrentToHistory();
+      updateChatTitleUI();
     } catch (error) {
       addMessage(`${t('chat_error', '通信エラーが発生しました。')}\n${error.message}`, "error", true);
       conversationMessages.pop();
@@ -1341,20 +1655,31 @@ body {
         currentId = data.id || null;
         showChatView();
         renderMessagesFromData(conversationMessages);
+        updateChatTitleUI();
       }
     }
   } catch (e) {}
 
+  function startNewProjectFromStart(text) {
+    if (!text) return;
+    // always new project when typing from start page
+    conversationMessages = [{ role: "system", content: SYSTEM_PROMPT }];
+    currentId = 'c_' + Date.now();
+    clearUI();
+    started = false;
+    localStorage.removeItem(STORAGE_CURRENT);
+    sendMessage(text);
+  }
   startSendBtn.addEventListener('click', () => {
     const text = startInput.value.trim();
     startInput.value = '';
-    sendMessage(text);
+    startNewProjectFromStart(text);
   });
   startInput.addEventListener('keypress', e => {
     if (e.key === 'Enter') {
       const text = startInput.value.trim();
       startInput.value = '';
-      sendMessage(text);
+      startNewProjectFromStart(text);
     }
   });
   if (chatNewBtn) chatNewBtn.addEventListener('click', resetChat);
@@ -1365,19 +1690,38 @@ body {
   if (startHistoryBtn) startHistoryBtn.addEventListener('click', openHistory);
   const chatHistoryBtn = document.getElementById('chatHistoryBtn');
   if (chatHistoryBtn) chatHistoryBtn.addEventListener('click', openHistory);
+  const chatTitleEdit = document.getElementById('chatTitleEdit');
+  if (chatTitleEdit) chatTitleEdit.addEventListener('click', beginEditChatTitle);
   const backStartBtn = document.getElementById('backStartBtn');
   if (backStartBtn) backStartBtn.addEventListener('click', () => {
     archiveCurrentToHistory();
-    saveCurrent();
+    // clear current so next input becomes a new project
+    conversationMessages = [{ role: "system", content: SYSTEM_PROMPT }];
+    currentId = null;
     started = false;
+    clearUI();
+    localStorage.removeItem(STORAGE_CURRENT);
     chatView.hidden = true;
     startView.hidden = false;
     document.body.style.overflow = '';
     closeHistory();
+    startInput.value = '';
     startInput.focus();
   });
   const panelClearAll = document.getElementById('panelClearAll');
   if (panelClearAll) panelClearAll.addEventListener('click', clearAllHistory);
+  const confirmCancel = document.getElementById('confirmCancel');
+  const confirmOk = document.getElementById('confirmOk');
+  const confirmOverlay = document.getElementById('confirmOverlay');
+  if (confirmCancel) confirmCancel.addEventListener('click', closeConfirm);
+  if (confirmOk) confirmOk.addEventListener('click', () => {
+    const fn = confirmOnOk;
+    closeConfirm();
+    if (typeof fn === 'function') fn();
+  });
+  if (confirmOverlay) confirmOverlay.addEventListener('click', (e) => {
+    if (e.target === confirmOverlay) closeConfirm();
+  });
 
   sendBtn.addEventListener('click', () => {
     const text = inputField.value.trim();
