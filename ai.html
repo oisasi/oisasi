@@ -401,7 +401,7 @@ body {
 }
 .history-close:hover { background: var(--surface-hover); color: var(--text); }
 .history-list {
-  flex: 1; overflow-y: auto; padding: 10px;
+  flex: 1; overflow-y: auto; overflow-x: hidden; padding: 10px 12px;
 }
 .history-item {
   width: 100%; text-align: left; border: 1px solid var(--border); background: var(--surface);
@@ -523,37 +523,97 @@ body {
   margin-bottom: 2px;
 }
 .start-history-meta { font-size: 11px; color: var(--muted); }
-.history-del-btn {
+.history-menu-wrap {
+  position: relative;
   flex-shrink: 0;
-  width: 32px;
-  height: 32px;
-  border: none;
-  border-radius: 8px;
-  background: transparent;
+}
+.history-menu-btn {
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
   color: var(--muted);
   cursor: pointer;
-  font-size: 16px;
   display: grid;
   place-items: center;
+  gap: 3px;
+  padding: 0;
   transition: all 0.2s;
 }
-.history-del-btn:hover {
-  background: color-mix(in srgb, #e74c3c 14%, transparent);
-  color: #e74c3c;
+.history-menu-btn:hover {
+  background: var(--surface-hover);
+  color: var(--text);
 }
-.start-history-empty {
-  text-align: center;
-  color: var(--muted);
-  font-size: 12.5px;
-  padding: 12px 8px;
+.history-menu-btn span {
+  display: block;
+  width: 14px;
+  height: 2px;
+  background: currentColor;
+  border-radius: 1px;
+}
+.history-menu-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 4px;
+  min-width: 140px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  z-index: 50;
+  padding: 6px;
+  display: none;
+}
+.history-menu-dropdown.open { display: block; }
+.history-menu-dropdown button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  text-align: left;
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.history-menu-dropdown button:hover { background: var(--surface-hover); }
+.history-menu-dropdown button.danger { color: #e74c3c; }
+.history-menu-dropdown button.danger:hover {
+  background: color-mix(in srgb, #e74c3c 12%, transparent);
 }
 .history-item-row {
   display: flex;
-  align-items: stretch;
-  gap: 6px;
+  align-items: center;
+  gap: 8px;
   margin-bottom: 8px;
+  width: 100%;
+  position: relative;
 }
-.history-item-row .history-item { flex: 1; margin-bottom: 0; }
+.history-item-row .history-item {
+  flex: 1;
+  min-width: 0;
+  margin-bottom: 0;
+}
+.history-item.pinned {
+  border-color: color-mix(in srgb, var(--pink) 45%, var(--border));
+  background: color-mix(in srgb, var(--pink) 8%, var(--surface));
+}
+.history-pin-badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--pink);
+  margin-right: 4px;
+}
+
 .history-panel-actions {
   padding: 10px 12px 14px;
   border-top: 1px solid var(--border);
@@ -567,6 +627,59 @@ body {
 }
 .history-panel-actions .history-clear-all:hover {
   background: color-mix(in srgb, #e74c3c 12%, transparent);
+}
+
+
+/* Top-left history button (start + chat) */
+.top-history-btn {
+  position: fixed;
+  top: calc(var(--header-h) + 12px);
+  left: 14px;
+  z-index: 40;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 10px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+  transition: all 0.2s;
+}
+.top-history-btn:hover {
+  background: var(--surface-hover);
+  border-color: color-mix(in srgb, var(--pink) 40%, var(--border));
+  transform: translateY(-1px);
+}
+.top-history-btn svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+.top-history-btn span { white-space: nowrap; }
+@media (max-width: 480px) {
+  .top-history-btn span { display: none; }
+  .top-history-btn { padding: 10px; }
+}
+
+
+/* Start page top bar (same style as chat) */
+.start-topbar {
+  position: absolute;
+  top: 12px;
+  left: 14px;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.start-view {
+  /* ensure absolute children position correctly */
 }
 
 </style>
@@ -638,6 +751,15 @@ body {
 
 <!-- START: title + input dead center -->
 <div class="start-view" id="startView">
+  <div class="start-topbar">
+    <button type="button" class="back-start-btn" id="startHistoryBtn" title="チャット履歴">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/>
+        <path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/>
+      </svg>
+      履歴
+    </button>
+  </div>
   <h1 class="start-title">
     <span id="greetingText">こんにちは、おいさしAIです</span><br>
     <span class="start-sub" data-i18n-html="start_help">何かお手伝いできることはありますか？</span>
@@ -648,15 +770,6 @@ body {
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/></svg>
     </button>
   </div>
-  <div class="start-history" id="startHistory">
-    <div class="start-history-head">
-      <h3>会話履歴</h3>
-      <button type="button" class="history-clear-all" id="startClearAll">全削除</button>
-    </div>
-    <div class="start-history-list" id="startHistoryList">
-      <div class="start-history-empty">まだ履歴がありません</div>
-    </div>
-  </div>
 </div>
 
 <!-- CHAT -->
@@ -666,12 +779,18 @@ body {
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
       スタートへ
     </button>
+    <button type="button" class="back-start-btn" id="chatHistoryBtn" title="チャット履歴">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/>
+        <path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/>
+      </svg>
+      履歴
+    </button>
   </div>
   <div class="chat-panel">
     <div class="chat-box" id="chat-box"></div>
     <div class="ask-bar" id="chatAskBar">
       <button class="ask-icon-btn" id="chatNewBtn" aria-label="新しい会話" title="新しい会話">＋</button>
-      <button class="history-btn" id="historyBtn" aria-label="履歴" title="チャット履歴">☰</button>
       <input type="text" id="user-input" data-i18n-placeholder="ask_placeholder" placeholder="おいさしAI に相談">
       <button class="ask-icon-btn send" id="send-btn" aria-label="送信">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/></svg>
@@ -680,6 +799,8 @@ body {
   </div>
   <p class="chat-hint" data-i18n="ask_hint">※ AIによる自動応答です。内容は誤りを含む場合があります。</p>
 </div>
+
+
 
 
 <div class="history-backdrop" id="historyBackdrop"></div>
@@ -857,7 +978,6 @@ body {
   const startInput = document.getElementById('start-input');
   const startSendBtn = document.getElementById('startSendBtn');
   const chatNewBtn = document.getElementById('chatNewBtn');
-  const historyBtn = document.getElementById('historyBtn');
   const historyPanel = document.getElementById('historyPanel');
   const historyBackdrop = document.getElementById('historyBackdrop');
   const historyClose = document.getElementById('historyClose');
@@ -900,14 +1020,23 @@ body {
   function archiveCurrentToHistory() {
     const visible = getUserMessages(conversationMessages);
     if (!visible.length) return;
+    const id = currentId || ('c_' + Date.now());
+    const prev = loadHistory().find(h => h.id === id);
     const item = {
-      id: currentId || ('c_' + Date.now()),
+      id: id,
       title: makeTitle(conversationMessages),
       updatedAt: Date.now(),
-      messages: conversationMessages
+      messages: conversationMessages,
+      pinned: prev ? !!prev.pinned : false
     };
     let list = loadHistory().filter(h => h.id !== item.id);
     list.unshift(item);
+    list.sort((a, b) => {
+      const ap = a.pinned ? 1 : 0;
+      const bp = b.pinned ? 1 : 0;
+      if (ap !== bp) return bp - ap;
+      return (b.updatedAt || 0) - (a.updatedAt || 0);
+    });
     saveHistory(list);
   }
   function formatMeta(ts) {
@@ -916,25 +1045,41 @@ body {
   function deleteHistoryItem(id) {
     const list = loadHistory().filter(h => h.id !== id);
     saveHistory(list);
-    // if deleting current session archive only
-    try {
-      const cur = JSON.parse(localStorage.getItem(STORAGE_CURRENT) || 'null');
-      if (cur && cur.id === id) {
-        /* keep current live chat; only remove from history list */
-      }
-    } catch (e) {}
     renderHistoryList();
-    renderStartHistory();
+  }
+  function togglePinHistoryItem(id) {
+    const list = loadHistory();
+    const item = list.find(h => h.id === id);
+    if (!item) return;
+    item.pinned = !item.pinned;
+    // pinned first, then by updatedAt desc
+    list.sort((a, b) => {
+      const ap = a.pinned ? 1 : 0;
+      const bp = b.pinned ? 1 : 0;
+      if (ap !== bp) return bp - ap;
+      return (b.updatedAt || 0) - (a.updatedAt || 0);
+    });
+    saveHistory(list);
+    renderHistoryList();
   }
   function clearAllHistory() {
     if (!loadHistory().length) return;
     if (!confirm('会話履歴をすべて削除しますか？')) return;
     saveHistory([]);
     renderHistoryList();
-    renderStartHistory();
+  }
+  function closeAllHistoryMenus() {
+    document.querySelectorAll('.history-menu-dropdown.open').forEach(el => el.classList.remove('open'));
   }
   function renderHistoryList() {
     const list = loadHistory();
+    // keep pinned on top
+    list.sort((a, b) => {
+      const ap = a.pinned ? 1 : 0;
+      const bp = b.pinned ? 1 : 0;
+      if (ap !== bp) return bp - ap;
+      return (b.updatedAt || 0) - (a.updatedAt || 0);
+    });
     if (!list.length) {
       historyList.innerHTML = '<div class="history-empty">まだ履歴がありません</div>';
       return;
@@ -943,54 +1088,69 @@ body {
     list.forEach(item => {
       const row = document.createElement('div');
       row.className = 'history-item-row';
+
       const btn = document.createElement('button');
       btn.type = 'button';
-      btn.className = 'history-item';
+      btn.className = 'history-item' + (item.pinned ? ' pinned' : '');
       btn.innerHTML = '<div class="history-item-title"></div><div class="history-item-meta"></div>';
-      btn.querySelector('.history-item-title').textContent = item.title || '会話';
+      const titleEl = btn.querySelector('.history-item-title');
+      if (item.pinned) {
+        titleEl.innerHTML = '<span class="history-pin-badge">📌</span>';
+        titleEl.appendChild(document.createTextNode(item.title || '会話'));
+      } else {
+        titleEl.textContent = item.title || '会話';
+      }
       btn.querySelector('.history-item-meta').textContent = formatMeta(item.updatedAt);
-      btn.addEventListener('click', () => loadChat(item));
-      const del = document.createElement('button');
-      del.type = 'button';
-      del.className = 'history-del-btn';
-      del.title = '削除';
-      del.setAttribute('aria-label', '削除');
-      del.textContent = '×';
-      del.addEventListener('click', (e) => { e.stopPropagation(); deleteHistoryItem(item.id); });
+      btn.addEventListener('click', () => { closeAllHistoryMenus(); loadChat(item); });
+
+      const menuWrap = document.createElement('div');
+      menuWrap.className = 'history-menu-wrap';
+
+      const menuBtn = document.createElement('button');
+      menuBtn.type = 'button';
+      menuBtn.className = 'history-menu-btn';
+      menuBtn.title = 'メニュー';
+      menuBtn.setAttribute('aria-label', 'メニュー');
+      menuBtn.innerHTML = '<span></span><span></span><span></span>';
+
+      const dropdown = document.createElement('div');
+      dropdown.className = 'history-menu-dropdown';
+
+      const pinBtn = document.createElement('button');
+      pinBtn.type = 'button';
+      pinBtn.textContent = item.pinned ? '📌 固定を解除' : '📌 固定する';
+      pinBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        closeAllHistoryMenus();
+        togglePinHistoryItem(item.id);
+      });
+
+      const delBtn = document.createElement('button');
+      delBtn.type = 'button';
+      delBtn.className = 'danger';
+      delBtn.textContent = '🗑 削除';
+      delBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        closeAllHistoryMenus();
+        deleteHistoryItem(item.id);
+      });
+
+      dropdown.appendChild(pinBtn);
+      dropdown.appendChild(delBtn);
+
+      menuBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const wasOpen = dropdown.classList.contains('open');
+        closeAllHistoryMenus();
+        if (!wasOpen) dropdown.classList.add('open');
+      });
+
+      menuWrap.appendChild(menuBtn);
+      menuWrap.appendChild(dropdown);
       row.appendChild(btn);
-      row.appendChild(del);
+      row.appendChild(menuWrap);
       historyList.appendChild(row);
-    });
-  }
-  function renderStartHistory() {
-    const box = document.getElementById('startHistoryList');
-    if (!box) return;
-    const list = loadHistory();
-    if (!list.length) {
-      box.innerHTML = '<div class="start-history-empty">まだ履歴がありません</div>';
-      return;
-    }
-    box.innerHTML = '';
-    list.forEach(item => {
-      const row = document.createElement('div');
-      row.className = 'start-history-item';
-      const main = document.createElement('button');
-      main.type = 'button';
-      main.className = 'start-history-main';
-      main.innerHTML = '<div class="start-history-title"></div><div class="start-history-meta"></div>';
-      main.querySelector('.start-history-title').textContent = item.title || '会話';
-      main.querySelector('.start-history-meta').textContent = formatMeta(item.updatedAt);
-      main.addEventListener('click', () => loadChat(item));
-      const del = document.createElement('button');
-      del.type = 'button';
-      del.className = 'history-del-btn';
-      del.title = '削除';
-      del.setAttribute('aria-label', '削除');
-      del.textContent = '×';
-      del.addEventListener('click', (e) => { e.stopPropagation(); deleteHistoryItem(item.id); });
-      row.appendChild(main);
-      row.appendChild(del);
-      box.appendChild(row);
     });
   }
   function openHistory() {
@@ -1052,7 +1212,6 @@ body {
     startInput.value = '';
     startInput.focus();
     closeHistory();
-    renderStartHistory();
   }
 
   async function sendMessage(text) {
@@ -1199,12 +1358,15 @@ body {
     }
   });
   if (chatNewBtn) chatNewBtn.addEventListener('click', resetChat);
-  if (historyBtn) historyBtn.addEventListener('click', openHistory);
   if (historyClose) historyClose.addEventListener('click', closeHistory);
   if (historyBackdrop) historyBackdrop.addEventListener('click', closeHistory);
+  document.addEventListener('click', () => closeAllHistoryMenus());
+  const startHistoryBtn = document.getElementById('startHistoryBtn');
+  if (startHistoryBtn) startHistoryBtn.addEventListener('click', openHistory);
+  const chatHistoryBtn = document.getElementById('chatHistoryBtn');
+  if (chatHistoryBtn) chatHistoryBtn.addEventListener('click', openHistory);
   const backStartBtn = document.getElementById('backStartBtn');
   if (backStartBtn) backStartBtn.addEventListener('click', () => {
-    // go to start without wiping current; archive so it appears in history
     archiveCurrentToHistory();
     saveCurrent();
     started = false;
@@ -1212,14 +1374,10 @@ body {
     startView.hidden = false;
     document.body.style.overflow = '';
     closeHistory();
-    renderStartHistory();
     startInput.focus();
   });
-  const startClearAll = document.getElementById('startClearAll');
-  if (startClearAll) startClearAll.addEventListener('click', clearAllHistory);
   const panelClearAll = document.getElementById('panelClearAll');
   if (panelClearAll) panelClearAll.addEventListener('click', clearAllHistory);
-  renderStartHistory();
 
   sendBtn.addEventListener('click', () => {
     const text = inputField.value.trim();
