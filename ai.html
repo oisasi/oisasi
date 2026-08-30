@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="ja" data-theme="auto">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>おいさしAI | おいさし公式</title>
+<meta name="description" content="おいさし公式AIチャット。SNSやホームページのことを気軽に聞けます。">
+<meta name="theme-color" content="#0a0a12">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="icon" type="image/png" sizes="512x512" href="favicon-512.png">
+<link rel="apple-touch-icon" sizes="180x180" href="favicon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root, [data-theme="dark"] {
+  --bg: #07070f;
+  --bg-elevated: #0e0e1a;
+  --surface: rgba(255,255,255,0.055);
+  --surface-hover: rgba(255,255,255,0.11);
+  --border: rgba(255,255,255,0.12);
+  --text: #f4f4fc;
+  --muted: #9b9bb8;
+  --pink: #ff6bcb;
+  --purple: #8b6cff;
+  --cyan: #00e5ff;
+  --gold: #ffd166;
+  --header-bg: rgba(7,7,15,0.78);
+  --header-bg-scrolled: rgba(7,7,15,0.94);
+  --menu-bg: rgba(7,7,15,0.97);
+  --card-glow: 0 0 32px rgba(255,107,203,0.4);
+  --shadow: 0 22px 55px rgba(0,0,0,0.5);
+  --radius: 18px;
+  --header-h: 64px;
+  --nav-max: 1100px;
+}
+[data-theme="light"] {
+  --bg: #f3f0f8;
+  --bg-elevated: #ffffff;
+  --surface: rgba(0,0,0,0.04);
+  --surface-hover: rgba(0,0,0,0.075);
+  --border: rgba(0,0,0,0.09);
+  --text: #1a1a2e;
+  --muted: #5c5c78;
+  --pink: #e84a9a;
+  --purple: #6b4ce0;
+  --cyan: #0099b8;
+  --gold: #c99200;
+  --header-bg: rgba(255,255,255,0.82);
+  --header-bg-scrolled: rgba(255,255,255,0.96);
+  --menu-bg: rgba(255,255,255,0.97);
+  --card-glow: 0 0 28px rgba(232,74,154,0.28);
+  --shadow: 0 18px 45px rgba(0,0,0,0.13);
+}
+@media (prefers-color-scheme: light) {
+  [data-theme="auto"] {
+    --bg: #f3f0f8;
+    --bg-elevated: #ffffff;
+    --surface: rgba(0,0,0,0.04);
+    --surface-hover: rgba(0,0,0,0.075);
+    --border: rgba(0,0,0,0.09);
+    --text: #1a1a2e;
+    --muted: #5c5c78;
+    --pink: #e84a9a;
+    --purple: #6b4ce0;
+    --cyan: #0099b8;
+    --gold: #c99200;
+    --header-bg: rgba(255,255,255,0.82);
+    --header-bg-scrolled: rgba(255,255,255,0.96);
+    --menu-bg: rgba(255,255,255,0.97);
+    --card-glow: 0 0 28px rgba(232,74,154,0.28);
+    --shadow: 0 18px 45px rgba(0,0,0,0.13);
+  }
+}
+@media (prefers-color-scheme: dark) {
+  [data-theme="auto"] {
+    --bg: #07070f;
+    --bg-elevated: #0e0e1a;
+    --surface: rgba(255,255,255,0.055);
+    --surface-hover: rgba(255,255,255,0.11);
+    --border: rgba(255,255,255,0.12);
+    --text: #f4f4fc;
+    --muted: #9b9bb8;
+    --pink: #ff6bcb;
+    --purple: #8b6cff;
+    --cyan: #00e5ff;
+    --gold: #ffd166;
+    --header-bg: rgba(7,7,15,0.78);
+    --header-bg-scrolled: rgba(7,7,15,0.94);
+    --menu-bg: rgba(7,7,15,0.97);
+    --card-glow: 0 0 32px rgba(255,107,203,0.4);
+    --shadow: 0 22px 55px rgba(0,0,0,0.5);
+  }
+}
+
+:root {
+  --cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 28 28'%3E%3Cpath fill='%23ff6bcb' stroke='%23ffffff' stroke-width='1.8' stroke-linejoin='round' d='M4 2 L4 22 L10 16 L14 25 L17.5 23.5 L13.5 14.5 L21 14.5 Z'/%3E%3C/svg%3E") 4 2, auto;
+  --cursor-hover: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 28 28'%3E%3Cpath fill='%238b6cff' stroke='%23ffffff' stroke-width='1.8' stroke-linejoin='round' d='M4 2 L4 22 L10 16 L14 25 L17.5 23.5 L13.5 14.5 L21 14.5 Z'/%3E%3C/svg%3E") 4 2, pointer;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: "Zen Maru Gothic", "Hiragino Maru Gothic ProN", "Yu Gothic", system-ui, sans-serif;
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--text);
+  background: var(--bg);
+  min-height: 100dvh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  padding-top: var(--header-h);
+  cursor: var(--cursor);
+  transition: background 0.45s, color 0.35s;
+}
+a, button, .card, .pill, .sns, .icon-btn, .hamburger, .settings-options button, .ask-icon-btn, .ask-bar input, .chat-input-row input, .back-btn {
+  cursor: var(--cursor-hover);
+}
+
+/* Background */
+.bg {
+  position: fixed; inset: 0; z-index: -2;
+  background:
+    radial-gradient(ellipse 90% 60% at 15% -10%, color-mix(in srgb, var(--purple) 40%, transparent), transparent 55%),
+    radial-gradient(ellipse 70% 50% at 90% 5%, color-mix(in srgb, var(--pink) 30%, transparent), transparent 50%),
+    radial-gradient(ellipse 60% 40% at 50% 110%, color-mix(in srgb, var(--cyan) 14%, transparent), transparent 50%),
+    var(--bg);
+  transition: background 0.5s;
+  animation: bgShift 16s ease-in-out infinite alternate;
+}
+@keyframes bgShift {
+  0% { filter: hue-rotate(0deg) brightness(1); }
+  100% { filter: hue-rotate(14deg) brightness(1.06); }
+}
+.orb {
+  position: fixed; border-radius: 50%; filter: blur(70px); opacity: 0.32;
+  pointer-events: none; z-index: -1; animation: orbFloat 20s ease-in-out infinite; transition: opacity 0.4s;
+}
+[data-theme="light"] .orb, [data-theme="auto"] .orb { opacity: 0.16; }
+@media (prefers-color-scheme: dark) {
+  [data-theme="auto"] .orb { opacity: 0.32; }
+}
+.orb-1 { width: 300px; height: 300px; background: var(--pink); top: -90px; left: -70px; }
+.orb-2 { width: 240px; height: 240px; background: var(--purple); bottom: 8%; right: -50px; animation-delay: -6s; }
+.orb-3 { width: 180px; height: 180px; background: var(--cyan); top: 42%; left: 58%; animation-delay: -12s; opacity: 0.2; }
+@keyframes orbFloat {
+  0%, 100% { transform: translate(0,0) scale(1); }
+  33% { transform: translate(40px,-50px) scale(1.1); }
+  66% { transform: translate(-30px,30px) scale(0.92); }
+}
+
+/* Particles */
+.particles { position: fixed; inset: 0; pointer-events: none; z-index: -1; overflow: hidden; }
+.p {
+  position: absolute; bottom: -12px; width: 4px; height: 4px; border-radius: 50%;
+  background: #fff; opacity: 0; animation: rise linear infinite;
+}
+[data-theme="light"] .p { background: var(--purple); }
+@keyframes rise {
+  0% { transform: translateY(0) scale(0) rotate(0deg); opacity: 0; }
+  12% { opacity: 0.55; }
+  80% { opacity: 0.2; }
+  100% { transform: translateY(-110vh) scale(1.2) rotate(180deg); opacity: 0; }
+}
+
+/* Sparkles */
+.sparkle {
+  position: fixed; pointer-events: none; z-index: -1;
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--gold);
+  box-shadow: 0 0 10px var(--gold);
+  animation: sparkle 3.5s ease-in-out infinite;
+  opacity: 0;
+}
+@keyframes sparkle {
+  0%, 100% { opacity: 0; transform: scale(0.3); }
+  50% { opacity: 0.8; transform: scale(1.2); }
+}
+
+/* HEADER */
+.header {
+  position: fixed; top: 0; left: 0; right: 0; height: var(--header-h); z-index: 1000;
+  background: var(--header-bg);
+  backdrop-filter: blur(20px) saturate(1.6);
+  -webkit-backdrop-filter: blur(20px) saturate(1.6);
+  border-bottom: 1px solid var(--border);
+  transition: background 0.35s, box-shadow 0.35s, transform 0.4s;
+}
+.header.scrolled {
+  background: var(--header-bg-scrolled);
+  box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+}
+.header-inner {
+  max-width: var(--nav-max); height: 100%; margin: 0 auto;
+  padding: 0 16px 0 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+}
+.logo {
+  display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text);
+  font-weight: 900; font-size: 17px; letter-spacing: -0.02em; flex-shrink: 0; z-index: 1001;
+  transition: transform 0.3s;
+}
+.logo:hover { transform: scale(1.03); }
+.logo-img {
+  width: 38px; height: 38px; border-radius: 11px; object-fit: contain;
+  background: var(--surface);
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--pink) 35%, transparent);
+  transition: transform 0.4s, box-shadow 0.4s;
+}
+.logo:hover .logo-img {
+  transform: rotate(-8deg) scale(1.08);
+  box-shadow: 0 6px 22px color-mix(in srgb, var(--pink) 50%, transparent);
+}
+.logo-text span {
+  background: linear-gradient(120deg, var(--text), var(--pink) 60%, var(--purple));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  background-size: 200% auto;
+  animation: textShine 6s linear infinite;
+}
+@keyframes textShine {
+  0% { background-position: 0% center; }
+  100% { background-position: 200% center; }
+}
+
+.nav-desktop { display: none; align-items: center; gap: 4px; }
+.nav-desktop a {
+  padding: 8px 14px; border-radius: 11px; color: var(--muted); text-decoration: none;
+  font-size: 14px; font-weight: 700; transition: all 0.3s cubic-bezier(0.22,1,0.36,1); white-space: nowrap;
+  position: relative;
+}
+.nav-desktop a::after {
+  content: ""; position: absolute; left: 14px; right: 14px; bottom: 5px; height: 2px;
+  background: linear-gradient(90deg, var(--pink), var(--purple));
+  border-radius: 2px; transform: scaleX(0); transition: transform 0.3s cubic-bezier(0.22,1,0.36,1);
+}
+.nav-desktop a:hover { color: var(--text); background: var(--surface); }
+.nav-desktop a:hover::after { transform: scaleX(1); }
+.nav-desktop a.accent {
+  background: linear-gradient(135deg, var(--pink), var(--purple)); color: #fff;
+  box-shadow: 0 4px 18px color-mix(in srgb, var(--pink) 35%, transparent);
+}
+.nav-desktop a.accent::after { display: none; }
+.nav-desktop a.accent:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--pink) 50%, transparent);
+}
+
+.header-actions { display: flex; align-items: center; gap: 8px; z-index: 1001; }
+.icon-btn {
+  width: 40px; height: 40px; border: none; border-radius: 12px; background: var(--surface);
+  color: var(--text); display: grid; place-items: center; cursor: var(--cursor);
+  transition: all 0.3s cubic-bezier(0.22,1,0.36,1);
+}
+.icon-btn:hover {
+  background: var(--surface-hover);
+  transform: rotate(30deg) scale(1.08);
+}
+.icon-btn:active { transform: scale(0.92); }
+.icon-btn svg { width: 20px; height: 20px; transition: transform 0.4s; }
+
+.hamburger {
+  display: flex; flex-direction: column; justify-content: center; gap: 5px;
+  width: 40px; height: 40px; padding: 10px; border: none; background: var(--surface);
+  border-radius: 12px; cursor: var(--cursor); transition: background 0.25s;
+}
+.hamburger:hover { background: var(--surface-hover); }
+.hamburger span {
+  display: block; height: 2px; width: 100%; background: var(--text); border-radius: 2px;
+  transition: all 0.4s cubic-bezier(0.22,1,0.36,1); transform-origin: center;
+}
+.hamburger.active span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.hamburger.active span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+.hamburger.active span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* SETTINGS */
+.settings-panel {
+  position: fixed; top: calc(var(--header-h) + 12px); right: 16px;
+  width: min(300px, calc(100vw - 32px));
+  background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 20px;
+  box-shadow: var(--shadow); z-index: 1100; padding: 20px;
+  opacity: 0; visibility: hidden; transform: translateY(-16px) scale(0.94);
+  transition: all 0.35s cubic-bezier(0.22,1,0.36,1); pointer-events: none;
+}
+.settings-panel.open {
+  opacity: 1; visibility: visible; transform: translateY(0) scale(1); pointer-events: auto;
+}
+.settings-title {
+  font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between;
+}
+.settings-close {
+  width: 28px; height: 28px; border: none; border-radius: 8px; background: var(--surface);
+  color: var(--muted); display: grid; place-items: center; cursor: var(--cursor); font-size: 16px; line-height: 1;
+  transition: all 0.25s;
+}
+.settings-close:hover { background: var(--surface-hover); color: var(--text); transform: rotate(90deg); }
+.settings-group { margin-bottom: 18px; }
+.settings-group:last-child { margin-bottom: 0; }
+.settings-label { font-size: 12px; font-weight: 700; color: var(--muted); margin-bottom: 8px; display: block; }
+.settings-options { display: flex; flex-wrap: wrap; gap: 8px; }
+.settings-options button {
+  flex: 1; min-width: 72px; padding: 11px 8px; border-radius: 12px; border: 1px solid var(--border);
+  background: var(--surface); color: var(--text); font-size: 13px; font-weight: 700;
+  font-family: inherit; cursor: var(--cursor); transition: all 0.3s cubic-bezier(0.22,1,0.36,1);
+}
+.settings-options button:hover {
+  background: var(--surface-hover); border-color: color-mix(in srgb, var(--pink) 45%, var(--border));
+  transform: translateY(-2px);
+}
+.settings-options button.active {
+  background: linear-gradient(135deg, var(--pink), var(--purple)); border-color: transparent; color: #fff;
+  box-shadow: 0 6px 18px color-mix(in srgb, var(--pink) 40%, transparent);
+}
+
+/* MOBILE MENU */
+.nav-mobile {
+  position: fixed; inset: 0; z-index: 999; background: var(--menu-bg);
+  backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+  opacity: 0; visibility: hidden; pointer-events: none;
+  transition: all 0.45s cubic-bezier(0.22,1,0.36,1);
+}
+.nav-mobile.open { opacity: 1; visibility: visible; pointer-events: auto; }
+.nav-mobile a {
+  display: flex; align-items: center; gap: 14px; padding: 17px 28px; min-width: 270px;
+  border-radius: 16px; color: var(--text); text-decoration: none; font-size: 18px; font-weight: 700;
+  background: var(--surface); border: 1px solid var(--border);
+  transform: translateY(28px) scale(0.96); opacity: 0;
+  transition: all 0.45s cubic-bezier(0.22,1,0.36,1);
+}
+.nav-mobile.open a { transform: translateY(0) scale(1); opacity: 1; }
+.nav-mobile.open a:nth-child(1) { transition-delay: 0.06s; }
+.nav-mobile.open a:nth-child(2) { transition-delay: 0.11s; }
+.nav-mobile.open a:nth-child(3) { transition-delay: 0.16s; }
+.nav-mobile.open a:nth-child(4) { transition-delay: 0.21s; }
+.nav-mobile.open a:nth-child(5) { transition-delay: 0.26s; }
+.nav-mobile.open a:nth-child(6) { transition-delay: 0.31s; }
+.nav-mobile a:hover, .nav-mobile a:active {
+  background: linear-gradient(135deg, color-mix(in srgb, var(--pink) 22%, transparent), color-mix(in srgb, var(--purple) 16%, transparent));
+  border-color: color-mix(in srgb, var(--pink) 45%, transparent);
+  transform: scale(1.04);
+}
+.nav-mobile .icon {
+  width: 38px; height: 38px; border-radius: 11px; display: grid; place-items: center; font-size: 19px;
+  background: linear-gradient(145deg, color-mix(in srgb, var(--pink) 28%, transparent), color-mix(in srgb, var(--purple) 22%, transparent));
+  transition: transform 0.35s;
+}
+.nav-mobile a:hover .icon { transform: rotate(-10deg) scale(1.1); }
+.nav-mobile-footer { margin-top: 36px; font-size: 13px; color: var(--muted); opacity: 0; transition: opacity 0.4s 0.4s; }
+.nav-mobile.open .nav-mobile-footer { opacity: 1; }
+
+/* CONTENT */
+.shell { max-width: 540px; margin: 0 auto; padding: 28px 18px 90px; position: relative; }
+
+.hero {
+  text-align: center; padding: 24px 0 36px;
+  animation: heroIn 1s cubic-bezier(0.22,1,0.36,1) both;
+}
+@keyframes heroIn {
+  from { opacity: 0; transform: translateY(40px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.badge {
+  display: inline-flex; align-items: center; gap: 7px; padding: 6px 16px; border-radius: 999px;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold);
+  background: color-mix(in srgb, var(--gold) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--gold) 30%, transparent); margin-bottom: 20px;
+  animation: badgePulse 3s ease-in-out infinite;
+}
+@keyframes badgePulse {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--gold) 30%, transparent); }
+  50% { box-shadow: 0 0 0 8px transparent; }
+}
+.badge::before {
+  content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--gold);
+  box-shadow: 0 0 10px var(--gold); animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.45; transform: scale(0.8); }
+}
+h1 {
+  font-size: clamp(28px, 7.5vw, 36px); font-weight: 900; line-height: 1.2;
+  letter-spacing: -0.03em; margin-bottom: 10px;
+}
+h1 span {
+  background: linear-gradient(120deg, var(--text) 8%, var(--pink) 40%, var(--purple) 70%, var(--cyan) 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  background-size: 200% auto;
+  animation: textShine 7s linear infinite;
+}
+.lead { font-size: 15px; color: var(--muted); max-width: 340px; margin: 0 auto; }
+
+.section {
+  margin-bottom: 44px;
+  opacity: 0; transform: translateY(36px);
+  transition: opacity 0.7s cubic-bezier(0.22,1,0.36,1), transform 0.7s cubic-bezier(0.22,1,0.36,1);
+}
+.section.visible { opacity: 1; transform: translateY(0); }
+.sec-title {
+  display: flex; align-items: center; gap: 12px; font-size: 12px; font-weight: 700;
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin-bottom: 16px;
+}
+.sec-title::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, var(--border), transparent); }
+
+/* Gemini-style start screen */
+.start-view {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  min-height: calc(100dvh - var(--header-h) - 120px);
+  text-align: center;
+  animation: heroIn 1s cubic-bezier(0.22,1,0.36,1) both;
+}
+.start-title {
+  font-size: clamp(24px, 6.5vw, 34px);
+  font-weight: 900;
+  line-height: 1.4;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  margin-bottom: 32px;
+  max-width: 480px;
+}
+.start-title span {
+  background: linear-gradient(120deg, var(--text) 5%, var(--pink) 45%, var(--purple) 85%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  background-size: 200% auto; animation: textShine 7s linear infinite;
+}
+
+.ask-bar {
+  display: flex; align-items: center; gap: 8px;
+  width: 100%; max-width: 560px;
+  padding: 8px 8px 8px 18px;
+  border-radius: 999px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  transition: all 0.35s cubic-bezier(0.22,1,0.36,1);
+}
+.ask-bar:focus-within {
+  border-color: color-mix(in srgb, var(--pink) 50%, var(--border));
+  box-shadow: var(--card-glow), var(--shadow);
+}
+.ask-bar input {
+  flex: 1; min-width: 0; border: none; outline: none; background: transparent;
+  color: var(--text); font-size: 15px; font-family: inherit; padding: 10px 4px;
+}
+.ask-bar input::placeholder { color: var(--muted); }
+.ask-icon-btn {
+  flex-shrink: 0; width: 40px; height: 40px; border: none; border-radius: 50%;
+  background: transparent; color: var(--muted); display: grid; place-items: center;
+  font-size: 20px; font-weight: 400; transition: all 0.3s;
+}
+.ask-icon-btn:hover { background: var(--surface-hover); color: var(--text); }
+.ask-icon-btn svg { width: 20px; height: 20px; }
+.ask-icon-btn.send {
+  background: linear-gradient(135deg, var(--pink), var(--purple)); color: #fff;
+}
+.ask-icon-btn.send:hover { transform: scale(1.06); box-shadow: 0 6px 18px color-mix(in srgb, var(--pink) 40%, transparent); }
+.ask-hint { margin-top: 18px; font-size: 12px; color: var(--muted); }
+
+/* Chat */
+.chat-view { animation: heroIn 0.6s cubic-bezier(0.22,1,0.36,1) both; }
+.chat-panel {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 14px; display: flex; flex-direction: column; gap: 14px;
+  box-shadow: var(--card-glow), var(--shadow);
+}
+.chat-box {
+  height: 62vh; min-height: 340px; max-height: 560px; overflow-y: auto;
+  display: flex; flex-direction: column; gap: 12px; padding: 4px 6px 4px 2px;
+  scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+}
+.chat-box::-webkit-scrollbar { width: 6px; }
+.chat-box::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+.chat-msg { display: flex; gap: 9px; align-items: flex-end; max-width: 86%; animation: msgIn 0.35s cubic-bezier(0.22,1,0.36,1) both; }
+@keyframes msgIn { from { opacity: 0; transform: translateY(10px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
+.chat-msg.user { align-self: flex-end; flex-direction: row-reverse; }
+.chat-msg.ai { align-self: flex-start; }
+.chat-avatar {
+  width: 30px; height: 30px; border-radius: 10px; flex-shrink: 0; display: grid; place-items: center;
+  font-size: 15px; background: linear-gradient(145deg, color-mix(in srgb, var(--pink) 28%, transparent), color-mix(in srgb, var(--purple) 18%, transparent));
+  border: 1px solid var(--border);
+}
+.chat-msg.user .chat-avatar {
+  background: linear-gradient(145deg, var(--purple), var(--pink)); border-color: transparent; color: #fff;
+}
+.chat-bubble {
+  padding: 12px 16px; border-radius: 18px; font-size: 14.5px; line-height: 1.65;
+  white-space: pre-wrap; word-break: break-word; box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+}
+.chat-msg.ai .chat-bubble {
+  background: var(--bg-elevated); border: 1px solid var(--border); border-bottom-left-radius: 5px; color: var(--text);
+}
+.chat-msg.user .chat-bubble {
+  background: linear-gradient(135deg, var(--pink), var(--purple)); color: #fff; border-bottom-right-radius: 5px;
+}
+.chat-msg.ai .chat-bubble a { color: var(--cyan); font-weight: 700; text-decoration: underline; word-break: break-all; }
+.chat-msg.ai .chat-bubble a:hover { color: var(--pink); }
+.chat-msg.error .chat-bubble {
+  background: color-mix(in srgb, #e74c3c 16%, transparent); border: 1px solid rgba(231,76,60,0.4);
+  color: color-mix(in srgb, #e74c3c 55%, var(--text)); font-size: 12.5px;
+}
+.chat-msg.thinking .chat-bubble { opacity: 0.65; font-style: italic; }
+.dot-flow { display: inline-flex; gap: 4px; align-items: center; }
+.dot-flow span {
+  width: 6px; height: 6px; border-radius: 50%; background: currentColor; opacity: 0.5;
+  animation: dotPulse 1.1s ease-in-out infinite;
+}
+.dot-flow span:nth-child(2) { animation-delay: 0.15s; }
+.dot-flow span:nth-child(3) { animation-delay: 0.3s; }
+@keyframes dotPulse { 0%, 100% { transform: scale(0.7); opacity: 0.35; } 50% { transform: scale(1); opacity: 0.9; } }
+.chat-hint { text-align: center; font-size: 11.5px; color: var(--muted); margin-top: 12px; }
+
+.back-btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  margin-top: 8px; padding: 14px 24px; border-radius: 999px;
+  background: var(--surface); border: 1px solid var(--border);
+  color: var(--text); text-decoration: none; font-size: 14px; font-weight: 700;
+  transition: all 0.4s cubic-bezier(0.22,1,0.36,1);
+}
+.back-btn:hover {
+  transform: translateY(-4px) scale(1.03);
+  border-color: transparent;
+  background: linear-gradient(135deg, var(--pink), var(--purple));
+  color: #fff;
+  box-shadow: 0 12px 28px color-mix(in srgb, var(--pink) 40%, transparent);
+}
+.back-btn svg { width: 16px; height: 16px; transition: transform 0.3s; }
+.back-btn:hover svg { transform: translateX(-3px); }
+
+footer { margin-top: 52px; text-align: center; }
+.footer-pill {
+  display: inline-flex; align-items: center; gap: 8px; padding: 9px 18px; border-radius: 999px;
+  font-size: 12px; color: var(--muted); background: var(--surface); border: 1px solid var(--border);
+  transition: all 0.3s;
+}
+.footer-pill:hover {
+  border-color: color-mix(in srgb, var(--pink) 30%, transparent);
+  transform: translateY(-2px);
+}
+
+/* ===== PC Layout ===== */
+@media (min-width: 768px) {
+  .hamburger { display: none; }
+  .nav-desktop { display: flex; }
+  .nav-mobile { display: none !important; }
+
+  .shell {
+    max-width: 700px;
+    padding: 40px 28px 100px;
+  }
+
+  .hero { padding: 36px 0 44px; }
+  h1 { font-size: 40px; }
+  .lead { font-size: 16px; max-width: 420px; }
+
+  .start-title { font-size: 40px; }
+  .ask-bar { padding: 8px 8px 8px 22px; }
+  .ask-bar input { font-size: 16px; padding: 12px 4px; }
+  .chat-box { height: 520px; max-height: 520px; }
+  .chat-panel { padding: 20px; }
+}
+
+@media (min-width: 1024px) {
+  .shell {
+    max-width: 760px;
+    padding: 48px 32px 110px;
+  }
+  .header-inner { padding: 0 28px; }
+  .nav-desktop { gap: 6px; }
+  .nav-desktop a { padding: 9px 16px; font-size: 14.5px; }
+  h1 { font-size: 44px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .section { opacity: 1; transform: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="bg"></div>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+<div class="particles" aria-hidden="true">
+  <div class="p" style="left:6%;animation-duration:12s;animation-delay:0s;background:var(--pink)"></div>
+  <div class="p" style="left:18%;animation-duration:16s;animation-delay:1.5s;background:var(--purple)"></div>
+  <div class="p" style="left:32%;animation-duration:11s;animation-delay:3.2s;background:#fff"></div>
+  <div class="p" style="left:48%;animation-duration:15s;animation-delay:0.8s;background:var(--cyan)"></div>
+  <div class="p" style="left:63%;animation-duration:18s;animation-delay:2.8s;background:var(--pink)"></div>
+  <div class="p" style="left:78%;animation-duration:13s;animation-delay:4.1s;background:var(--gold)"></div>
+  <div class="p" style="left:90%;animation-duration:14s;animation-delay:1.2s;background:var(--purple)"></div>
+</div>
+<div class="sparkle" style="top:18%;left:12%;animation-delay:0s"></div>
+<div class="sparkle" style="top:35%;left:85%;animation-delay:1.2s"></div>
+<div class="sparkle" style="top:62%;left:8%;animation-delay:2.1s"></div>
+<div class="sparkle" style="top:78%;left:72%;animation-delay:0.6s"></div>
+
+<header class="header" id="header">
+  <div class="header-inner">
+    <a href="index.html" class="logo" onclick="closeAll()">
+      <img class="logo-img" src="おいさしロゴ.png" alt="おいさし" width="38" height="38">
+      <div class="logo-text"><span>おいさし</span></div>
+    </a>
+    <nav class="nav-desktop" aria-label="メインナビゲーション">
+      <a href="https://oisasi.f5.si/oijiiw" data-i18n="nav_oijiiw">おいじぃ魔女のホームページ</a>
+      <a href="https://oisasi.f5.si/logo" data-i18n="nav_logo">おいさしのロゴページ</a>
+      <a href="faq.html" data-i18n="nav_faq">FAQページ</a>
+      <a href="https://oisasi.f5.si/character" data-i18n="nav_character">キャラクターページ</a>
+      <a class="accent" href="https://oisasi.f5.si/ai" data-i18n="nav_ai">おいさしAIページ</a>
+    </nav>
+    <div class="header-actions">
+      <button class="icon-btn" id="settingsBtn" aria-label="設定" title="設定">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+      </button>
+      <button class="hamburger" id="hamburger" aria-label="メニューを開く" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="settings-panel" id="settingsPanel" role="dialog" aria-label="設定">
+  <div class="settings-title">
+    <span data-i18n="settings">設定</span>
+    <button class="settings-close" id="settingsClose" aria-label="閉じる">×</button>
+  </div>
+  <div class="settings-group">
+    <span class="settings-label" data-i18n="theme">テーマ</span>
+    <div class="settings-options" id="themeOptions">
+      <button data-value="auto" class="active" data-i18n="auto">自動</button>
+      <button data-value="dark" data-i18n="dark">ダーク</button>
+      <button data-value="light" data-i18n="light">ライト</button>
+    </div>
+  </div>
+  <div class="settings-group">
+    <span class="settings-label" data-i18n="language">言語</span>
+    <div class="settings-options" id="langOptions">
+      <button data-value="auto" class="active" data-i18n="auto">自動</button>
+      <button data-value="ja">日本語</button>
+      <button data-value="en">English</button>
+    </div>
+  </div>
+</div>
+
+<nav class="nav-mobile" id="navMobile" aria-label="モバイルメニュー">
+  <a href="https://oisasi.f5.si/oijiiw" onclick="closeAll()"><span class="icon">🔮</span> <span data-i18n="nav_oijiiw">おいじぃ魔女のホームページ</span></a>
+  <a href="https://oisasi.f5.si/logo" onclick="closeAll()"><span class="icon">🎀</span> <span data-i18n="nav_logo">おいさしのロゴページ</span></a>
+  <a href="faq.html" onclick="closeAll()"><span class="icon">💬</span> <span data-i18n="nav_faq">FAQページ</span></a>
+  <a href="https://oisasi.f5.si/character" onclick="closeAll()"><span class="icon">👤</span> <span data-i18n="nav_character">キャラクターページ</span></a>
+  <a href="https://oisasi.f5.si/ai" onclick="closeAll()"><span class="icon">🤖</span> <span data-i18n="nav_ai">おいさしAIページ</span></a>
+  <div class="nav-mobile-footer">OisasiOfficial</div>
+</nav>
+
+<div class="shell">
+  <div class="start-view" id="startView">
+    <h1 class="start-title"><span data-i18n-html="start_title">おいさしAI、<br>何かお手伝いできることはありますか？</span></h1>
+    <div class="ask-bar" id="startAskBar">
+      <button class="ask-icon-btn" id="startNewBtn" aria-label="新しい会話" title="新しい会話">＋</button>
+      <input type="text" id="start-input" data-i18n-placeholder="ask_placeholder" placeholder="おいさしAI に相談">
+      <button class="ask-icon-btn" id="startSendBtn" aria-label="送信">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/></svg>
+      </button>
+    </div>
+    <p class="ask-hint" data-i18n="ask_hint">※ AIによる自動応答です。内容は誤りを含む場合があります。</p>
+  </div>
+
+  <div class="chat-view" id="chatView" hidden>
+    <section class="section visible">
+      <div class="chat-panel">
+        <div class="chat-box" id="chat-box"></div>
+        <div class="ask-bar" id="chatAskBar">
+          <button class="ask-icon-btn" id="chatNewBtn" aria-label="新しい会話" title="新しい会話">＋</button>
+          <input type="text" id="user-input" data-i18n-placeholder="ask_placeholder" placeholder="おいさしAI に相談">
+          <button class="ask-icon-btn" id="send-btn" aria-label="送信">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/></svg>
+          </button>
+        </div>
+      </div>
+      <p class="chat-hint" data-i18n="ask_hint">※ AIによる自動応答です。内容は誤りを含む場合があります。</p>
+    </section>
+  </div>
+
+  <footer>
+    <div class="footer-pill">
+      <span>✦</span>
+      <span data-i18n="footer">OisasiOfficial — 設定からテーマ・言語を変更できます</span>
+    </div>
+  </footer>
+</div>
+
+<script>
+(function () {
+  const html = document.documentElement;
+  const header = document.getElementById('header');
+  const hamburger = document.getElementById('hamburger');
+  const navMobile = document.getElementById('navMobile');
+  const settingsBtn = document.getElementById('settingsBtn');
+  const settingsPanel = document.getElementById('settingsPanel');
+  const settingsClose = document.getElementById('settingsClose');
+
+  const i18n = {
+    ja: {
+      settings: '設定', theme: 'テーマ', language: '言語',
+      auto: '自動', dark: 'ダーク', light: 'ライト',
+      nav_oijiiw: 'おいじぃ魔女のホームページ', nav_logo: 'おいさしのロゴページ',
+      nav_ai: 'おいさしAIページ', nav_character: 'キャラクターページ', nav_faq: 'FAQページ',
+      start_title: 'おいさしAI、<br>何かお手伝いできることはありますか？',
+      ask_placeholder: 'おいさしAI に相談',
+      ask_hint: '※ AIによる自動応答です。内容は誤りを含む場合があります。',
+      chat_greeting: 'こんにちは！おいさしAIです。SNSやホームページのことでも、他愛のない話でも、何でも聞いてください。',
+      chat_thinking: '考え中です…',
+      chat_error: '通信エラーが発生しました。',
+      footer: 'OisasiOfficial — 設定からテーマ・言語を変更できます'
+    },
+    en: {
+      settings: 'Settings', theme: 'Theme', language: 'Language',
+      auto: 'Auto', dark: 'Dark', light: 'Light',
+      nav_oijiiw: 'Oijii Witch Homepage', nav_logo: 'Oisasi Logo Page',
+      nav_ai: 'Oisasi AI Page', nav_character: 'Character Page', nav_faq: 'FAQ Page',
+      start_title: 'Hi, I\'m OisasiAI.<br>How can I help you today?',
+      ask_placeholder: 'Ask OisasiAI',
+      ask_hint: '※ This is an automated AI response and may contain errors.',
+      chat_greeting: 'Hello! I\'m OisasiAI. Ask me anything about our SNS, websites, or just for a chat.',
+      chat_thinking: 'Thinking…',
+      chat_error: 'A connection error occurred.',
+      footer: 'OisasiOfficial — Change theme & language in Settings'
+    }
+  };
+
+  function resolveLang(pref) {
+    if (pref === 'ja' || pref === 'en') return pref;
+    const nav = (navigator.language || 'ja').toLowerCase();
+    return nav.startsWith('ja') ? 'ja' : 'en';
+  }
+
+  function applyLang(pref) {
+    localStorage.setItem('oisasi-lang', pref);
+    const lang = resolveLang(pref);
+    html.setAttribute('lang', lang);
+    document.querySelectorAll('#langOptions button').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.value === pref);
+    });
+    const t = i18n[lang];
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      if (t[key] != null) el.textContent = t[key];
+    });
+    document.querySelectorAll('[data-i18n-html]').forEach(el => {
+      const key = el.getAttribute('data-i18n-html');
+      if (t[key] != null) el.innerHTML = t[key];
+    });
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+      const key = el.getAttribute('data-i18n-placeholder');
+      if (t[key] != null) el.placeholder = t[key];
+    });
+    window.__oisasiChatI18n = t;
+  }
+
+  const savedTheme = localStorage.getItem('oisasi-theme') || 'auto';
+  const savedLang = localStorage.getItem('oisasi-lang') || 'auto';
+
+  function applyTheme(theme) {
+    html.setAttribute('data-theme', theme);
+    localStorage.setItem('oisasi-theme', theme);
+    document.querySelectorAll('#themeOptions button').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.value === theme);
+    });
+    updateThemeColor(theme);
+  }
+
+  function updateThemeColor(theme) {
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (!meta) return;
+    if (theme === 'light') meta.content = '#f3f0f8';
+    else if (theme === 'dark') meta.content = '#0a0a12';
+    else {
+      meta.content = window.matchMedia('(prefers-color-scheme: light)').matches ? '#f3f0f8' : '#0a0a12';
+    }
+  }
+
+  applyTheme(savedTheme);
+  applyLang(savedLang);
+
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    if (html.getAttribute('data-theme') === 'auto') updateThemeColor('auto');
+  });
+
+  function openSettings() { settingsPanel.classList.add('open'); closeMenu(); }
+  function closeSettings() { settingsPanel.classList.remove('open'); }
+  function toggleSettings() {
+    if (settingsPanel.classList.contains('open')) closeSettings();
+    else openSettings();
+  }
+
+  settingsBtn.addEventListener('click', e => { e.stopPropagation(); toggleSettings(); });
+  settingsClose.addEventListener('click', closeSettings);
+
+  document.getElementById('themeOptions').addEventListener('click', e => {
+    const btn = e.target.closest('button');
+    if (btn) applyTheme(btn.dataset.value);
+  });
+  document.getElementById('langOptions').addEventListener('click', e => {
+    const btn = e.target.closest('button');
+    if (btn) applyLang(btn.dataset.value);
+  });
+
+  function toggleMenu() {
+    const isOpen = navMobile.classList.toggle('open');
+    hamburger.classList.toggle('active', isOpen);
+    hamburger.setAttribute('aria-expanded', isOpen);
+    document.body.style.overflow = isOpen ? 'hidden' : '';
+    if (isOpen) closeSettings();
+  }
+  function closeMenu() {
+    navMobile.classList.remove('open');
+    hamburger.classList.remove('active');
+    hamburger.setAttribute('aria-expanded', 'false');
+    document.body.style.overflow = '';
+  }
+  function closeAll() { closeMenu(); closeSettings(); }
+
+  hamburger.addEventListener('click', toggleMenu);
+
+  document.addEventListener('click', e => {
+    if (settingsPanel.classList.contains('open') && !settingsPanel.contains(e.target) && !settingsBtn.contains(e.target)) {
+      closeSettings();
+    }
+  });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAll(); });
+
+  window.addEventListener('scroll', () => {
+    header.classList.toggle('scrolled', window.scrollY > 20);
+  }, { passive: true });
+
+  const sections = document.querySelectorAll('.section');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) entry.target.classList.add('visible');
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+  sections.forEach(s => observer.observe(s));
+
+  window.closeAll = closeAll;
+  window.closeMenu = closeMenu;
+})();
+</script>
+
+<script>
+(function () {
+  const API_SERVER_URL = "https://oijii-majo-api.oisasioisasi.workers.dev";
+
+  const SYSTEM_PROMPT = `あなたは「おいさしAI」という、おいさし公式サイトのAIアシスタントです。
+・丁寧で親しみやすい、自然な日本語（敬体）で簡潔に答えてください。特定のキャラクター口調や方言は使わないでください。
+・おいさし関連のSNSやサイトについて聞かれたら、以下の情報をもとに正確に案内してください。
+・おいじぃ魔女のSNS
+  https://www.instagram.com/oijiiw （Instagram）
+  https://www.youtube.com/@oijiiw （YouTube）
+  https://www.facebook.com/oijiiw （Facebook）
+  https://x.com/oijiiw （X）
+  https://www.tiktok.com/@oijiiw （TikTok）
+  おいじぃ魔女のホームページ： https://oisasi.f5.si/oijiiw
+・おいじぃ魔女雑学のSNS
+  https://www.instagram.com/oijiizatu （Instagram）
+  https://www.youtube.com/@oijiizatu （YouTube）
+  https://www.facebook.com/oijiizatu （Facebook）
+  https://x.com/oijiizatu （X）
+  https://www.tiktok.com/@oijiizatu （TikTok）
+  雑学ホームページ： https://oisasi.f5.si/oijiizatu
+・おいさしのSNS
+  https://www.youtube.com/@oisasiofficial （YouTube）
+  https://www.facebook.com/oisasiofficial （Facebook）
+  https://x.com/oisasiofficial （X）
+  https://www.tiktok.com/@oisasiofficial （TikTok）
+・おいさし公式ホームページ： https://oisasi.f5.si`;
+
+  let conversationMessages = [{ role: "system", content: SYSTEM_PROMPT }];
+  let started = false;
+
+  function t(key, fallback) {
+    const dict = window.__oisasiChatI18n;
+    return (dict && dict[key] != null) ? dict[key] : fallback;
+  }
+
+  const startView = document.getElementById('startView');
+  const chatView = document.getElementById('chatView');
+  const startInput = document.getElementById('start-input');
+  const startSendBtn = document.getElementById('startSendBtn');
+  const startNewBtn = document.getElementById('startNewBtn');
+  const chatNewBtn = document.getElementById('chatNewBtn');
+  const inputField = document.getElementById('user-input');
+  const sendBtn = document.getElementById('send-btn');
+  const chatBox = document.getElementById('chat-box');
+
+  function showChatView() {
+    if (started) return;
+    started = true;
+    startView.hidden = true;
+    chatView.hidden = false;
+    addMessage(t('chat_greeting', 'こんにちは！おいさしAIです。SNSやホームページのことでも、他愛のない話でも、何でも聞いてください。'), 'ai');
+  }
+
+  function resetChat() {
+    conversationMessages = [{ role: "system", content: SYSTEM_PROMPT }];
+    chatBox.innerHTML = '';
+    started = false;
+    chatView.hidden = true;
+    startView.hidden = false;
+    startInput.value = '';
+    startInput.focus();
+  }
+
+  async function sendMessage(text) {
+    if (!text) return;
+
+    if (!started) showChatView();
+
+    addMessage(text, "user");
+    conversationMessages.push({ role: "user", content: text });
+
+    inputField.disabled = true;
+    sendBtn.disabled = true;
+
+    const thinkingId = "thinking-" + Date.now();
+    addMessage(t('chat_thinking', '考え中です…'), "ai thinking", thinkingId, true);
+
+    try {
+      const response = await fetch(API_SERVER_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages: conversationMessages })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        const errorDetail = data.error ? data.error : response.statusText;
+        throw new Error(`[HTTP ${response.status}] ${errorDetail}`);
+      }
+
+      const reply = data.choices[0].message.content;
+      conversationMessages.push({ role: "assistant", content: reply });
+
+      removeMessage(thinkingId);
+      addMessage(reply, "ai");
+
+    } catch (error) {
+      removeMessage(thinkingId);
+      addMessage(`${t('chat_error', '通信エラーが発生しました。')}\n${error.message}`, "error");
+      console.error(error);
+      conversationMessages.pop();
+    } finally {
+      inputField.disabled = false;
+      sendBtn.disabled = false;
+      inputField.focus();
+    }
+  }
+
+  function linkify(text) {
+    const urlRegex = /(https?:\/\/[^\s\(\)\<\>]+)/g;
+    return text.replace(urlRegex, function (url) {
+      let cleanUrl = url.replace(/[\.\,\;\:]$/, '');
+      return `<a href="${cleanUrl}" target="_blank" rel="noopener noreferrer">${cleanUrl}</a>`;
+    });
+  }
+
+  function escapeHTML(str) {
+    return str
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
+  function addMessage(text, type, id, isThinking) {
+    const wrap = document.createElement("div");
+    wrap.className = "chat-msg " + type;
+    if (id) wrap.id = id;
+
+    const avatar = document.createElement("div");
+    avatar.className = "chat-avatar";
+    avatar.textContent = type.indexOf("user") === 0 ? "🧑" : (type.indexOf("error") === 0 ? "⚠️" : "✨");
+
+    const bubble = document.createElement("div");
+    bubble.className = "chat-bubble";
+
+    if (isThinking) {
+      bubble.innerHTML = escapeHTML(text) + ' <span class="dot-flow"><span></span><span></span><span></span></span>';
+    } else if (type.indexOf("ai") === 0) {
+      bubble.innerHTML = linkify(escapeHTML(text));
+    } else {
+      bubble.textContent = text;
+    }
+
+    if (type.indexOf("user") === 0) {
+      wrap.appendChild(bubble);
+      wrap.appendChild(avatar);
+    } else {
+      wrap.appendChild(avatar);
+      wrap.appendChild(bubble);
+    }
+
+    chatBox.appendChild(wrap);
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }
+
+  function removeMessage(id) {
+    const el = document.getElementById(id);
+    if (el) el.remove();
+  }
+
+  startSendBtn.addEventListener('click', () => {
+    const text = startInput.value.trim();
+    startInput.value = '';
+    sendMessage(text);
+  });
+  startInput.addEventListener('keypress', e => {
+    if (e.key === 'Enter') {
+      const text = startInput.value.trim();
+      startInput.value = '';
+      sendMessage(text);
+    }
+  });
+  startNewBtn.addEventListener('click', resetChat);
+  chatNewBtn.addEventListener('click', resetChat);
+
+  sendBtn.addEventListener('click', () => {
+    const text = inputField.value.trim();
+    inputField.value = '';
+    sendMessage(text);
+  });
+  inputField.addEventListener('keypress', e => {
+    if (e.key === 'Enter') {
+      const text = inputField.value.trim();
+      inputField.value = '';
+      sendMessage(text);
+    }
+  });
+})();
+</script>
+</body>
+</html>
