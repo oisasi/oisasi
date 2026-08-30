@@ -374,6 +374,201 @@ body {
   .start-title { font-size: 40px; }
   .ask-bar { max-width: 560px; }
 }
+
+/* History panel */
+.history-btn {
+  flex-shrink: 0; width: 42px; height: 42px; border: none; border-radius: 50%;
+  background: transparent; color: var(--muted); display: grid; place-items: center;
+  cursor: pointer; transition: all 0.2s; font-size: 18px;
+}
+.history-btn:hover { background: var(--surface-hover); color: var(--text); }
+.history-panel {
+  position: fixed; top: var(--header-h); left: 0; bottom: 0; width: min(320px, 86vw);
+  background: var(--bg-elevated); border-right: 1px solid var(--border);
+  box-shadow: var(--shadow); z-index: 30;
+  transform: translateX(-105%); transition: transform 0.3s cubic-bezier(0.22,1,0.36,1);
+  display: flex; flex-direction: column;
+}
+.history-panel.open { transform: translateX(0); }
+.history-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 16px 12px; border-bottom: 1px solid var(--border);
+}
+.history-head h3 { font-size: 15px; font-weight: 800; color: var(--text); }
+.history-close {
+  width: 32px; height: 32px; border: none; border-radius: 8px; background: var(--surface);
+  color: var(--muted); font-size: 18px; cursor: pointer; display: grid; place-items: center;
+}
+.history-close:hover { background: var(--surface-hover); color: var(--text); }
+.history-list {
+  flex: 1; overflow-y: auto; padding: 10px;
+}
+.history-item {
+  width: 100%; text-align: left; border: 1px solid var(--border); background: var(--surface);
+  border-radius: 12px; padding: 12px 14px; margin-bottom: 8px; cursor: pointer;
+  color: var(--text); font-family: inherit; transition: all 0.2s;
+}
+.history-item:hover { background: var(--surface-hover); border-color: color-mix(in srgb, var(--pink) 35%, var(--border)); }
+.history-item-title {
+  font-size: 13.5px; font-weight: 700; margin-bottom: 4px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.history-item-meta { font-size: 11px; color: var(--muted); }
+.history-empty {
+  text-align: center; color: var(--muted); font-size: 13px; padding: 40px 16px;
+}
+.history-backdrop {
+  position: fixed; inset: 0; top: var(--header-h); background: rgba(0,0,0,0.35);
+  z-index: 25; opacity: 0; visibility: hidden; transition: all 0.25s;
+}
+.history-backdrop.open { opacity: 1; visibility: visible; }
+
+
+/* Back to start button in chat */
+.chat-topbar {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px 0;
+  max-width: 720px;
+  width: 100%;
+  margin: 0 auto;
+}
+.back-start-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 8px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.back-start-btn:hover {
+  background: var(--surface-hover);
+  border-color: color-mix(in srgb, var(--pink) 40%, var(--border));
+}
+.back-start-btn svg { width: 16px; height: 16px; }
+
+/* Start page history */
+.start-history {
+  width: 100%;
+  max-width: 520px;
+  margin-top: 28px;
+  text-align: left;
+}
+.start-history-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  padding: 0 4px;
+}
+.start-history-head h3 {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+}
+.history-clear-all {
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 8px;
+}
+.history-clear-all:hover { color: #e74c3c; background: color-mix(in srgb, #e74c3c 10%, transparent); }
+.start-history-list { display: flex; flex-direction: column; gap: 8px; }
+.start-history-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--bg-elevated) 90%, transparent);
+  border-radius: 14px;
+  padding: 10px 10px 10px 14px;
+  transition: all 0.2s;
+}
+.start-history-item:hover {
+  border-color: color-mix(in srgb, var(--pink) 35%, var(--border));
+  background: var(--surface-hover);
+}
+.start-history-main {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  font-family: inherit;
+  color: var(--text);
+  padding: 0;
+}
+.start-history-title {
+  font-size: 13.5px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 2px;
+}
+.start-history-meta { font-size: 11px; color: var(--muted); }
+.history-del-btn {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 16px;
+  display: grid;
+  place-items: center;
+  transition: all 0.2s;
+}
+.history-del-btn:hover {
+  background: color-mix(in srgb, #e74c3c 14%, transparent);
+  color: #e74c3c;
+}
+.start-history-empty {
+  text-align: center;
+  color: var(--muted);
+  font-size: 12.5px;
+  padding: 12px 8px;
+}
+.history-item-row {
+  display: flex;
+  align-items: stretch;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.history-item-row .history-item { flex: 1; margin-bottom: 0; }
+.history-panel-actions {
+  padding: 10px 12px 14px;
+  border-top: 1px solid var(--border);
+}
+.history-panel-actions .history-clear-all {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid color-mix(in srgb, #e74c3c 30%, var(--border));
+  border-radius: 10px;
+  color: #e74c3c;
+}
+.history-panel-actions .history-clear-all:hover {
+  background: color-mix(in srgb, #e74c3c 12%, transparent);
+}
+
 </style>
 </head>
 <body>
@@ -453,14 +648,30 @@ body {
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/></svg>
     </button>
   </div>
+  <div class="start-history" id="startHistory">
+    <div class="start-history-head">
+      <h3>会話履歴</h3>
+      <button type="button" class="history-clear-all" id="startClearAll">全削除</button>
+    </div>
+    <div class="start-history-list" id="startHistoryList">
+      <div class="start-history-empty">まだ履歴がありません</div>
+    </div>
+  </div>
 </div>
 
 <!-- CHAT -->
 <div class="chat-view" id="chatView" hidden>
+  <div class="chat-topbar">
+    <button type="button" class="back-start-btn" id="backStartBtn" title="スタートに戻る">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+      スタートへ
+    </button>
+  </div>
   <div class="chat-panel">
     <div class="chat-box" id="chat-box"></div>
     <div class="ask-bar" id="chatAskBar">
       <button class="ask-icon-btn" id="chatNewBtn" aria-label="新しい会話" title="新しい会話">＋</button>
+      <button class="history-btn" id="historyBtn" aria-label="履歴" title="チャット履歴">☰</button>
       <input type="text" id="user-input" data-i18n-placeholder="ask_placeholder" placeholder="おいさしAI に相談">
       <button class="ask-icon-btn send" id="send-btn" aria-label="送信">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/></svg>
@@ -468,6 +679,21 @@ body {
     </div>
   </div>
   <p class="chat-hint" data-i18n="ask_hint">※ AIによる自動応答です。内容は誤りを含む場合があります。</p>
+</div>
+
+
+<div class="history-backdrop" id="historyBackdrop"></div>
+<div class="history-panel" id="historyPanel">
+  <div class="history-head">
+    <h3>チャット履歴</h3>
+    <button class="history-close" id="historyClose" aria-label="閉じる">×</button>
+  </div>
+  <div class="history-list" id="historyList">
+    <div class="history-empty">まだ履歴がありません</div>
+  </div>
+  <div class="history-panel-actions">
+    <button type="button" class="history-clear-all" id="panelClearAll">履歴を全削除</button>
+  </div>
 </div>
 
 <script>
@@ -613,8 +839,13 @@ body {
   https://www.tiktok.com/@oisasiofficial （TikTok）
 ・おいさし公式ホームページ： https://oisasi.f5.si`;
 
+  const STORAGE_CURRENT = 'oisasi-ai-current';
+  const STORAGE_HISTORY = 'oisasi-ai-history';
+  const MAX_HISTORY = 30;
+
   let conversationMessages = [{ role: "system", content: SYSTEM_PROMPT }];
   let started = false;
+  let currentId = null;
 
   function t(key, fallback) {
     const dict = window.__oisasiChatI18n;
@@ -626,9 +857,151 @@ body {
   const startInput = document.getElementById('start-input');
   const startSendBtn = document.getElementById('startSendBtn');
   const chatNewBtn = document.getElementById('chatNewBtn');
+  const historyBtn = document.getElementById('historyBtn');
+  const historyPanel = document.getElementById('historyPanel');
+  const historyBackdrop = document.getElementById('historyBackdrop');
+  const historyClose = document.getElementById('historyClose');
+  const historyList = document.getElementById('historyList');
   const inputField = document.getElementById('user-input');
   const sendBtn = document.getElementById('send-btn');
   const chatBox = document.getElementById('chat-box');
+
+  function loadHistory() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_HISTORY) || '[]'); }
+    catch (e) { return []; }
+  }
+  function saveHistory(list) {
+    localStorage.setItem(STORAGE_HISTORY, JSON.stringify(list.slice(0, MAX_HISTORY)));
+  }
+  function getUserMessages(msgs) {
+    return (msgs || []).filter(m => m.role === 'user' || m.role === 'assistant');
+  }
+  function makeTitle(msgs) {
+    const firstUser = (msgs || []).find(m => m.role === 'user');
+    if (!firstUser) return '新しい会話';
+    const t = firstUser.content.trim().replace(/\s+/g, ' ');
+    return t.length > 36 ? t.slice(0, 36) + '…' : t;
+  }
+  function saveCurrent() {
+    const visible = getUserMessages(conversationMessages);
+    if (!visible.length) {
+      localStorage.removeItem(STORAGE_CURRENT);
+      return;
+    }
+    const data = {
+      id: currentId || ('c_' + Date.now()),
+      title: makeTitle(conversationMessages),
+      updatedAt: Date.now(),
+      messages: conversationMessages
+    };
+    currentId = data.id;
+    localStorage.setItem(STORAGE_CURRENT, JSON.stringify(data));
+  }
+  function archiveCurrentToHistory() {
+    const visible = getUserMessages(conversationMessages);
+    if (!visible.length) return;
+    const item = {
+      id: currentId || ('c_' + Date.now()),
+      title: makeTitle(conversationMessages),
+      updatedAt: Date.now(),
+      messages: conversationMessages
+    };
+    let list = loadHistory().filter(h => h.id !== item.id);
+    list.unshift(item);
+    saveHistory(list);
+  }
+  function formatMeta(ts) {
+    return new Date(ts).toLocaleString('ja-JP', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+  }
+  function deleteHistoryItem(id) {
+    const list = loadHistory().filter(h => h.id !== id);
+    saveHistory(list);
+    // if deleting current session archive only
+    try {
+      const cur = JSON.parse(localStorage.getItem(STORAGE_CURRENT) || 'null');
+      if (cur && cur.id === id) {
+        /* keep current live chat; only remove from history list */
+      }
+    } catch (e) {}
+    renderHistoryList();
+    renderStartHistory();
+  }
+  function clearAllHistory() {
+    if (!loadHistory().length) return;
+    if (!confirm('会話履歴をすべて削除しますか？')) return;
+    saveHistory([]);
+    renderHistoryList();
+    renderStartHistory();
+  }
+  function renderHistoryList() {
+    const list = loadHistory();
+    if (!list.length) {
+      historyList.innerHTML = '<div class="history-empty">まだ履歴がありません</div>';
+      return;
+    }
+    historyList.innerHTML = '';
+    list.forEach(item => {
+      const row = document.createElement('div');
+      row.className = 'history-item-row';
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'history-item';
+      btn.innerHTML = '<div class="history-item-title"></div><div class="history-item-meta"></div>';
+      btn.querySelector('.history-item-title').textContent = item.title || '会話';
+      btn.querySelector('.history-item-meta').textContent = formatMeta(item.updatedAt);
+      btn.addEventListener('click', () => loadChat(item));
+      const del = document.createElement('button');
+      del.type = 'button';
+      del.className = 'history-del-btn';
+      del.title = '削除';
+      del.setAttribute('aria-label', '削除');
+      del.textContent = '×';
+      del.addEventListener('click', (e) => { e.stopPropagation(); deleteHistoryItem(item.id); });
+      row.appendChild(btn);
+      row.appendChild(del);
+      historyList.appendChild(row);
+    });
+  }
+  function renderStartHistory() {
+    const box = document.getElementById('startHistoryList');
+    if (!box) return;
+    const list = loadHistory();
+    if (!list.length) {
+      box.innerHTML = '<div class="start-history-empty">まだ履歴がありません</div>';
+      return;
+    }
+    box.innerHTML = '';
+    list.forEach(item => {
+      const row = document.createElement('div');
+      row.className = 'start-history-item';
+      const main = document.createElement('button');
+      main.type = 'button';
+      main.className = 'start-history-main';
+      main.innerHTML = '<div class="start-history-title"></div><div class="start-history-meta"></div>';
+      main.querySelector('.start-history-title').textContent = item.title || '会話';
+      main.querySelector('.start-history-meta').textContent = formatMeta(item.updatedAt);
+      main.addEventListener('click', () => loadChat(item));
+      const del = document.createElement('button');
+      del.type = 'button';
+      del.className = 'history-del-btn';
+      del.title = '削除';
+      del.setAttribute('aria-label', '削除');
+      del.textContent = '×';
+      del.addEventListener('click', (e) => { e.stopPropagation(); deleteHistoryItem(item.id); });
+      row.appendChild(main);
+      row.appendChild(del);
+      box.appendChild(row);
+    });
+  }
+  function openHistory() {
+    renderHistoryList();
+    historyPanel.classList.add('open');
+    historyBackdrop.classList.add('open');
+  }
+  function closeHistory() {
+    historyPanel.classList.remove('open');
+    historyBackdrop.classList.remove('open');
+  }
 
   function showChatView() {
     if (started) return;
@@ -637,22 +1010,59 @@ body {
     chatView.hidden = false;
     document.body.style.overflow = 'hidden';
   }
-  function resetChat() {
-    conversationMessages = [{ role: "system", content: SYSTEM_PROMPT }];
+
+  function clearUI() {
     chatBox.innerHTML = '';
+  }
+
+  function renderMessagesFromData(msgs) {
+    clearUI();
+    (msgs || []).forEach(m => {
+      if (m.role === 'user') addMessage(m.content, 'user', false);
+      else if (m.role === 'assistant') addMessage(m.content, 'ai', false);
+    });
+  }
+
+  function loadChat(item) {
+    closeHistory();
+    conversationMessages = item.messages && item.messages.length
+      ? item.messages
+      : [{ role: 'system', content: SYSTEM_PROMPT }];
+    currentId = item.id;
+    // ensure system prompt exists
+    if (!conversationMessages.length || conversationMessages[0].role !== 'system') {
+      conversationMessages = [{ role: 'system', content: SYSTEM_PROMPT }, ...conversationMessages];
+    }
+    showChatView();
+    renderMessagesFromData(conversationMessages);
+    saveCurrent();
+  }
+
+  function resetChat() {
+    // archive current before clearing
+    archiveCurrentToHistory();
+    conversationMessages = [{ role: "system", content: SYSTEM_PROMPT }];
+    currentId = null;
+    clearUI();
     started = false;
     chatView.hidden = true;
     startView.hidden = false;
     document.body.style.overflow = '';
+    localStorage.removeItem(STORAGE_CURRENT);
     startInput.value = '';
     startInput.focus();
+    closeHistory();
+    renderStartHistory();
   }
 
   async function sendMessage(text) {
     if (!text) return;
     if (!started) showChatView();
-    addMessage(text, "user");
+    addMessage(text, "user", true);
     conversationMessages.push({ role: "user", content: text });
+    if (!currentId) currentId = 'c_' + Date.now();
+    saveCurrent();
+
     inputField.disabled = true;
     sendBtn.disabled = true;
     try {
@@ -665,10 +1075,14 @@ body {
       if (!response.ok) throw new Error(`[HTTP ${response.status}] ${data.error || response.statusText}`);
       const reply = data.choices[0].message.content;
       conversationMessages.push({ role: "assistant", content: reply });
-      addMessage(reply, "ai");
+      addMessage(reply, "ai", true);
+      saveCurrent();
+      // also refresh history entry
+      archiveCurrentToHistory();
     } catch (error) {
-      addMessage(`${t('chat_error', '通信エラーが発生しました。')}\n${error.message}`, "error");
+      addMessage(`${t('chat_error', '通信エラーが発生しました。')}\n${error.message}`, "error", true);
       conversationMessages.pop();
+      saveCurrent();
     } finally {
       inputField.disabled = false;
       sendBtn.disabled = false;
@@ -696,7 +1110,7 @@ body {
     return btn;
   }
 
-  function addMessage(text, type) {
+  function addMessage(text, type, scroll) {
     const wrap = document.createElement("div");
     wrap.className = "chat-msg " + type;
     const isUser = type.indexOf("user") === 0;
@@ -755,8 +1169,22 @@ body {
       }
     }
     chatBox.appendChild(wrap);
-    chatBox.scrollTop = chatBox.scrollHeight;
+    if (scroll !== false) chatBox.scrollTop = chatBox.scrollHeight;
   }
+
+  // Restore last session on load
+  try {
+    const raw = localStorage.getItem(STORAGE_CURRENT);
+    if (raw) {
+      const data = JSON.parse(raw);
+      if (data && data.messages && getUserMessages(data.messages).length) {
+        conversationMessages = data.messages;
+        currentId = data.id || null;
+        showChatView();
+        renderMessagesFromData(conversationMessages);
+      }
+    }
+  } catch (e) {}
 
   startSendBtn.addEventListener('click', () => {
     const text = startInput.value.trim();
@@ -771,6 +1199,28 @@ body {
     }
   });
   if (chatNewBtn) chatNewBtn.addEventListener('click', resetChat);
+  if (historyBtn) historyBtn.addEventListener('click', openHistory);
+  if (historyClose) historyClose.addEventListener('click', closeHistory);
+  if (historyBackdrop) historyBackdrop.addEventListener('click', closeHistory);
+  const backStartBtn = document.getElementById('backStartBtn');
+  if (backStartBtn) backStartBtn.addEventListener('click', () => {
+    // go to start without wiping current; archive so it appears in history
+    archiveCurrentToHistory();
+    saveCurrent();
+    started = false;
+    chatView.hidden = true;
+    startView.hidden = false;
+    document.body.style.overflow = '';
+    closeHistory();
+    renderStartHistory();
+    startInput.focus();
+  });
+  const startClearAll = document.getElementById('startClearAll');
+  if (startClearAll) startClearAll.addEventListener('click', clearAllHistory);
+  const panelClearAll = document.getElementById('panelClearAll');
+  if (panelClearAll) panelClearAll.addEventListener('click', clearAllHistory);
+  renderStartHistory();
+
   sendBtn.addEventListener('click', () => {
     const text = inputField.value.trim();
     inputField.value = '';
