@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>おいさしAI | おいさし公式</title>
 <meta name="description" content="おいさし公式AIチャット。SNSやホームページのことを気軽に聞けます。">
-<meta name="theme-color" content="#0a0a12">
+<meta name="theme-color" content="#0c0f14">
 <link rel="icon" type="image/png" sizes="16x16" href="favicon-16AI.png">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32AI.png">
 <link rel="icon" type="image/png" sizes="512x512" href="favicon-512AI.png">
@@ -15,58 +15,58 @@
 <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
 :root, [data-theme="dark"] {
-  --bg: #07070f;
-  --bg-elevated: #0e0e1a;
+  --bg: #0c0f14;
+  --bg-elevated: #141a20;
   --surface: rgba(255,255,255,0.055);
   --surface-hover: rgba(255,255,255,0.11);
   --border: rgba(255,255,255,0.12);
-  --text: #f4f4fc;
-  --muted: #9b9bb8;
-  --pink: #ff6bcb;
-  --purple: #8b6cff;
-  --cyan: #00e5ff;
-  --gold: #ffd166;
-  --header-bg: rgba(7,7,15,0.78);
-  --header-bg-scrolled: rgba(7,7,15,0.94);
-  --menu-bg: rgba(7,7,15,0.97);
+  --text: #f6f3ec;
+  --muted: #a8ab9e;
+  --pink: #ff9152;
+  --purple: #1f9e94;
+  --cyan: #3fb8c9;
+  --gold: #f2b84b;
+  --header-bg: rgba(12,15,20,0.78);
+  --header-bg-scrolled: rgba(12,15,20,0.94);
+  --menu-bg: rgba(12,15,20,0.97);
   --shadow: 0 22px 55px rgba(0,0,0,0.5);
   --header-h: 64px;
   --nav-max: 1100px;
 }
 [data-theme="light"] {
-  --bg: #f3f0f8;
+  --bg: #fbf5e8;
   --bg-elevated: #ffffff;
   --surface: rgba(0,0,0,0.04);
   --surface-hover: rgba(0,0,0,0.075);
   --border: rgba(0,0,0,0.09);
-  --text: #1a1a2e;
-  --muted: #5c5c78;
-  --pink: #e84a9a;
-  --purple: #6b4ce0;
-  --cyan: #0099b8;
-  --gold: #c99200;
-  --header-bg: rgba(255,255,255,0.82);
-  --header-bg-scrolled: rgba(255,255,255,0.96);
+  --text: #1c2420;
+  --muted: #6a6f63;
+  --pink: #e0632a;
+  --purple: #157b73;
+  --cyan: #1a8f9c;
+  --gold: #c9910c;
+  --header-bg: rgba(251,245,232,0.82);
+  --header-bg-scrolled: rgba(251,245,232,0.96);
   --menu-bg: rgba(255,255,255,0.97);
   --shadow: 0 18px 45px rgba(0,0,0,0.13);
 }
 @media (prefers-color-scheme: light) {
   [data-theme="auto"] {
-    --bg: #f3f0f8; --bg-elevated: #ffffff; --surface: rgba(0,0,0,0.04);
+    --bg: #fbf5e8; --bg-elevated: #ffffff; --surface: rgba(0,0,0,0.04);
     --surface-hover: rgba(0,0,0,0.075); --border: rgba(0,0,0,0.09);
-    --text: #1a1a2e; --muted: #5c5c78; --pink: #e84a9a; --purple: #6b4ce0;
-    --cyan: #0099b8; --gold: #c99200; --header-bg: rgba(255,255,255,0.82);
-    --header-bg-scrolled: rgba(255,255,255,0.96); --menu-bg: rgba(255,255,255,0.97);
+    --text: #1c2420; --muted: #6a6f63; --pink: #e0632a; --purple: #157b73;
+    --cyan: #1a8f9c; --gold: #c9910c; --header-bg: rgba(251,245,232,0.82);
+    --header-bg-scrolled: rgba(251,245,232,0.96); --menu-bg: rgba(255,255,255,0.97);
     --shadow: 0 18px 45px rgba(0,0,0,0.13);
   }
 }
 @media (prefers-color-scheme: dark) {
   [data-theme="auto"] {
-    --bg: #07070f; --bg-elevated: #0e0e1a; --surface: rgba(255,255,255,0.055);
+    --bg: #0c0f14; --bg-elevated: #141a20; --surface: rgba(255,255,255,0.055);
     --surface-hover: rgba(255,255,255,0.11); --border: rgba(255,255,255,0.12);
-    --text: #f4f4fc; --muted: #9b9bb8; --pink: #ff6bcb; --purple: #8b6cff;
-    --cyan: #00e5ff; --gold: #ffd166; --header-bg: rgba(7,7,15,0.78);
-    --header-bg-scrolled: rgba(7,7,15,0.94); --menu-bg: rgba(7,7,15,0.97);
+    --text: #f6f3ec; --muted: #a8ab9e; --pink: #ff9152; --purple: #1f9e94;
+    --cyan: #3fb8c9; --gold: #f2b84b; --header-bg: rgba(12,15,20,0.78);
+    --header-bg-scrolled: rgba(12,15,20,0.94); --menu-bg: rgba(12,15,20,0.97);
     --shadow: 0 22px 55px rgba(0,0,0,0.5);
   }
 }
@@ -1034,9 +1034,9 @@ body {
     document.querySelectorAll('#themeOptions button').forEach(btn => btn.classList.toggle('active', btn.dataset.value === theme));
     const meta = document.querySelector('meta[name="theme-color"]');
     if (meta) {
-      if (theme === 'light') meta.content = '#f3f0f8';
-      else if (theme === 'dark') meta.content = '#0a0a12';
-      else meta.content = window.matchMedia('(prefers-color-scheme: light)').matches ? '#f3f0f8' : '#0a0a12';
+      if (theme === 'light') meta.content = '#fbf5e8';
+      else if (theme === 'dark') meta.content = '#0c0f14';
+      else meta.content = window.matchMedia('(prefers-color-scheme: light)').matches ? '#fbf5e8' : '#0c0f14';
     }
   }
 
