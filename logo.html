@@ -416,7 +416,7 @@ h1 span {
   border-color: color-mix(in srgb, var(--pink) 40%, transparent);
   box-shadow: var(--card-glow), var(--shadow);
 }
-.logo-img {
+.brand-img {
   width: min(60vw, 260px);
   height: auto;
   margin: 0 auto 8px;
@@ -424,7 +424,7 @@ h1 span {
   filter: drop-shadow(0 10px 30px color-mix(in srgb, var(--pink) 25%, transparent));
   transition: transform 0.5s cubic-bezier(0.22,1,0.36,1);
 }
-.logo-card:hover .logo-img { transform: scale(1.03) rotate(-1deg); }
+.logo-card:hover .brand-img { transform: scale(1.03) rotate(-1deg); }
 
 .logo-desc { display: flex; flex-direction: column; gap: 14px; margin-top: 8px; }
 .logo-desc p {
@@ -517,7 +517,7 @@ footer { margin-top: 52px; text-align: center; }
   .lead { font-size: 16px; max-width: 420px; }
 
   .logo-card { padding: 44px 40px; }
-  .logo-img { width: 220px; }
+  .brand-img { width: 220px; }
   .logo-desc p { font-size: 15px; }
 }
 
@@ -631,7 +631,7 @@ footer { margin-top: 52px; text-align: center; }
   <section class="section visible" id="logo">
     <div class="sec-title" data-i18n="sec_logo">BRAND MARK</div>
     <div class="logo-card">
-      <img class="logo-img" id="logoImg" src="おいさしロゴ.png" alt="おいさしロゴ">
+      <img class="brand-img" id="logoImg" src="おいさしロゴ.png" alt="おいさしロゴ">
       <div class="logo-desc">
         <p data-i18n="d1">円の中に、キーボードのキーと流れるような曲線が融合したデザイン。</p>
         <p data-i18n="d2">左側のキー配列は「入力・創造」を表し、右側のS字のうねりは「流れ・進化・自由」をイメージしています。</p>
