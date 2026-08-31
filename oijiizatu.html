@@ -466,9 +466,44 @@ footer { margin-top: 48px; text-align: center; }
   }
   .section { opacity: 1; transform: none; }
 }
+
+/* Offline / Online top popup */
+.network-toast {
+  position: fixed; top: calc(var(--header-h, 64px) + 12px); left: 50%; z-index: 2000;
+  transform: translate(-50%, -14px); opacity: 0; visibility: hidden;
+  display: flex; align-items: center; gap: 8px; padding: 11px 20px; border-radius: 999px;
+  font-size: 13px; font-weight: 700; box-shadow: 0 10px 28px rgba(0,0,0,0.3);
+  transition: all 0.4s cubic-bezier(0.22,1,0.36,1);
+  pointer-events: none;
+}
+.network-toast.show {
+  transform: translate(-50%, 0); opacity: 1; visibility: visible;
+}
+.network-toast.offline {
+  background: linear-gradient(135deg, #ff5a7a, #e84a9a); color: #fff;
+}
+.network-toast.online {
+  background: linear-gradient(135deg, #21c98a, #00b4d8); color: #fff;
+}
+.network-toast svg { width: 15px; height: 15px; flex-shrink: 0; }
+
 </style>
 </head>
 <body>
+
+<div class="network-toast" id="networkToast" role="status" aria-live="polite">
+  <svg id="networkToastIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="1" y1="1" x2="23" y2="23"/>
+    <path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/>
+    <path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/>
+    <path d="M10.71 5.05A16 16 0 0 1 22.58 9"/>
+    <path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/>
+    <path d="M8.53 16.11a6 6 0 0 1 6.95 0"/>
+    <line x1="12" y1="20" x2="12.01" y2="20"/>
+  </svg>
+  <span id="networkToastText">オフラインぞぃ</span>
+</div>
+
 
 <div class="bg"></div>
 <div class="orb orb-1"></div>
@@ -817,6 +852,49 @@ footer { margin-top: 48px; text-align: center; }
 
   window.closeAll = closeAll;
 })();
+</script>
+<script>
+
+  /* Offline / Online top popup */
+  (function () {
+    const networkToast = document.getElementById('networkToast');
+    const networkToastText = document.getElementById('networkToastText');
+    const networkToastIcon = document.getElementById('networkToastIcon');
+    if (!networkToast) return;
+    let toastTimer = null;
+    let isOfflineShown = false;
+    const offlineIconSVG = '<line x1="1" y1="1" x2="23" y2="23"/><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/><path d="M10.71 5.05A16 16 0 0 1 22.58 9"/><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/>';
+    const onlineIconSVG = '<path d="M20 6L9 17l-5-5"/>';
+    const offlineText = (document.documentElement.lang || 'ja').startsWith('ja') ? 'オフラインです' : "You're offline";
+    const onlineText = (document.documentElement.lang || 'ja').startsWith('ja') ? 'インターネットに再接続しました' : 'Back online';
+
+    function showNetworkToast(type) {
+      clearTimeout(toastTimer);
+      networkToast.classList.remove('offline', 'online', 'show');
+      void networkToast.offsetWidth;
+      const isJa = (document.documentElement.lang || 'ja').startsWith('ja');
+      if (type === 'offline') {
+        isOfflineShown = true;
+        networkToast.classList.add('offline');
+        networkToastText.textContent = isJa ? 'オフラインぞぃ' : "You're offline";
+        networkToastIcon.innerHTML = offlineIconSVG;
+        networkToast.classList.add('show');
+      } else {
+        isOfflineShown = false;
+        networkToast.classList.add('online');
+        networkToastText.textContent = isJa ? 'またつながったのぞぃ！' : 'Back online';
+        networkToastIcon.innerHTML = onlineIconSVG;
+        networkToast.classList.add('show');
+        toastTimer = setTimeout(() => networkToast.classList.remove('show'), 3200);
+      }
+    }
+    function handleOffline() { showNetworkToast('offline'); }
+    function handleOnline() { if (isOfflineShown) showNetworkToast('online'); }
+    window.addEventListener('offline', handleOffline);
+    window.addEventListener('online', handleOnline);
+    if (!navigator.onLine) handleOffline();
+  })();
+
 </script>
 </body>
 </html>
