@@ -467,7 +467,11 @@ h1 span {
 .music-card .card-icon,
 .music-icon {
   background: linear-gradient(145deg, color-mix(in srgb, var(--cyan) 35%, transparent), color-mix(in srgb, #0a9aaa 25%, transparent));
-  color: var(--cyan);
+  padding: 0;
+  overflow: hidden;
+}
+.music-card .card-icon img {
+  border-radius: 12px;
 }
 .music-card:hover .card-arrow {
   background: var(--cyan);
@@ -902,7 +906,7 @@ footer { margin-top: 52px; text-align: center; }
     <div class="card-grid">
       <a class="card music-card" href="https://oisasi.f5.si/oisasi-music">
         <div class="card-icon music-icon">
-          <svg viewBox="0 0 24 24" fill="currentColor" width="26" height="26"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+          <img src="oisasi music.jpg" alt="oisasimusic">
         </div>
         <div class="card-body">
           <div class="card-title" data-i18n="card_music">おいさしミュージック</div>
@@ -911,7 +915,9 @@ footer { margin-top: 52px; text-align: center; }
         <div class="card-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
       </a>
       <a class="card" href="https://oisasi.f5.si/ai">
-        <div class="card-icon">🤖</div>
+        <div class="card-icon">
+          <img src="おいさしロゴ.png" alt="おいさしAI">
+        </div>
         <div class="card-body">
           <div class="card-title" data-i18n="card_ai">おいさしAI</div>
           <div class="card-desc" data-i18n="card_ai_desc">AIとおしゃべりしよう</div>
