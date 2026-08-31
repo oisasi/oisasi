@@ -893,10 +893,46 @@ body {
   position: absolute;
   top: 12px;
   left: 14px;
+  right: 14px;
   z-index: 5;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 10px;
+  pointer-events: none;
+}
+.start-topbar > * { pointer-events: auto; }
+.start-topbar .talk-btn.start-talk-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: auto;
+  height: auto;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.start-topbar .talk-btn.start-talk-label svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+.start-topbar .talk-btn.start-talk-label:hover {
+  background: var(--surface-hover);
+  border-color: color-mix(in srgb, var(--pink) 40%, var(--border));
+}
+.start-topbar .talk-btn.start-talk-label.active,
+.start-topbar .talk-btn.start-talk-label.listening {
+  color: #fff;
+  border-color: transparent;
+  background: linear-gradient(135deg, var(--pink), var(--purple));
 }
 .start-view {
   /* ensure absolute children position correctly */
@@ -1161,6 +1197,10 @@ body {
       </svg>
       履歴
     </button>
+    <button type="button" class="talk-btn start-talk-label" id="startTalkModeBtn" aria-label="会話モード" title="会話モード">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+      会話モード
+    </button>
   </div>
   <img class="start-icon" src="favicon-512AI.png" alt="おいさしAI" width="88" height="88" loading="lazy">
   <h1 class="start-title">
@@ -1170,9 +1210,6 @@ body {
   <div class="ask-bar" id="startAskBar">
     <input type="text" id="start-input" data-i18n-placeholder="ask_placeholder" placeholder="おいさしAI に相談">
     <button class="ask-icon-btn mic" id="startMicBtn" type="button" aria-label="音声入力" title="音声入力">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
-    </button>
-    <button class="ask-icon-btn talk-btn" id="startTalkModeBtn" type="button" aria-label="会話モード" title="会話モード">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
     </button>
     <button class="ask-icon-btn send" id="startSendBtn" aria-label="送信">
