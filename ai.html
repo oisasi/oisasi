@@ -378,37 +378,39 @@ body {
 .msg-action-btn.copied { color: var(--pink); }
 .msg-action-btn.copied svg { stroke: var(--pink); }
 
-/* Windows-style progress ring spinner */
+/* Windows-style 6-dot spinner — dots orbit around center */
 .win-spinner {
   display: inline-flex;
   align-items: center;
   gap: 12px;
   padding: 4px 0;
 }
-.win-spinner-ring {
-  width: 28px;
-  height: 28px;
+.win-dots {
+  width: 34px;
+  height: 34px;
   flex-shrink: 0;
   position: relative;
+  color: var(--cyan, #3fb8c9);
+  animation: winOrbit 1.05s linear infinite;
 }
-.win-spinner-ring svg {
-  width: 100%;
-  height: 100%;
-  animation: winSpin 1.2s linear infinite;
-}
-.win-spinner-ring circle {
-  fill: none;
-  stroke: var(--cyan, #3fb8c9);
-  stroke-width: 2.8;
-  stroke-linecap: round;
-  stroke-dasharray: 60 40;
-  transform-origin: center;
-}
-[data-theme="light"] .win-spinner-ring circle { stroke: #0078d4; }
+[data-theme="light"] .win-dots { color: #0078d4; }
 @media (prefers-color-scheme: light) {
-  [data-theme="auto"] .win-spinner-ring circle { stroke: #0078d4; }
+  [data-theme="auto"] .win-dots { color: #0078d4; }
 }
-@keyframes winSpin {
+.win-dots i {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 7px;
+  height: 7px;
+  margin: -3.5px 0 0 -3.5px;
+  border-radius: 50%;
+  background: currentColor;
+  transform: rotate(calc(var(--i) * 60deg)) translateY(-12px);
+  opacity: calc(1 - var(--i) * 0.12);
+  box-shadow: 0 0 4px color-mix(in srgb, currentColor 40%, transparent);
+}
+@keyframes winOrbit {
   to { transform: rotate(360deg); }
 }
 .win-spinner-label {
@@ -422,6 +424,28 @@ body {
   border: none;
   padding: 2px 0;
 }
+.msg-time {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 6px;
+  opacity: 0.85;
+  letter-spacing: 0.02em;
+  line-height: 1.3;
+}
+.chat-msg.user .msg-time {
+  text-align: right;
+  padding-right: 2px;
+}
+.chat-msg.ai .msg-time,
+.chat-msg.error .msg-time {
+  padding-left: 44px;
+}
+.chat-msg.user .msg-actions {
+  padding-left: 0;
+  justify-content: flex-end;
+  margin-top: 6px;
+}
 .ask-icon-btn.send.sending {
   pointer-events: none;
   opacity: 0.85;
@@ -433,10 +457,16 @@ body {
   content: "";
   width: 18px;
   height: 18px;
-  border: 2.5px solid rgba(255,255,255,0.35);
-  border-top-color: #fff;
   border-radius: 50%;
-  animation: winSpin 0.75s linear infinite;
+  background:
+    radial-gradient(circle closest-side, #fff 92%, transparent) 50% 8% / 3.2px 3.2px,
+    radial-gradient(circle closest-side, rgba(255,255,255,0.8) 92%, transparent) 88% 30% / 3.2px 3.2px,
+    radial-gradient(circle closest-side, rgba(255,255,255,0.6) 92%, transparent) 82% 78% / 3.2px 3.2px,
+    radial-gradient(circle closest-side, rgba(255,255,255,0.42) 92%, transparent) 18% 78% / 3.2px 3.2px,
+    radial-gradient(circle closest-side, rgba(255,255,255,0.28) 92%, transparent) 12% 30% / 3.2px 3.2px,
+    radial-gradient(circle closest-side, rgba(255,255,255,0.18) 92%, transparent) 50% 50% / 0 0;
+  background-repeat: no-repeat;
+  animation: winOrbit 0.85s linear infinite;
 }
 
 .chat-hint {
@@ -1435,7 +1465,8 @@ body {
     saveHistory(list);
   }
   function formatMeta(ts) {
-    return new Date(ts).toLocaleString('ja-JP', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+    const d = new Date(ts);
+    return d.toLocaleString('ja-JP', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
   }
   function deleteHistoryItem(id) {
     const list = loadHistory().filter(h => h.id !== id);
@@ -1666,8 +1697,8 @@ body {
   function renderMessagesFromData(msgs) {
     clearUI();
     (msgs || []).forEach(m => {
-      if (m.role === 'user') addMessage(m.content, 'user', false);
-      else if (m.role === 'assistant') addMessage(m.content, 'ai', false);
+      if (m.role === 'user') addMessage(m.content, 'user', false, m.ts);
+      else if (m.role === 'assistant') addMessage(m.content, 'ai', false, m.ts);
     });
   }
 
@@ -1731,8 +1762,9 @@ body {
     const isJa = (document.documentElement.lang || 'ja').startsWith('ja');
     bubble.innerHTML =
       '<div class="win-spinner" role="status" aria-live="polite">' +
-        '<div class="win-spinner-ring" aria-hidden="true">' +
-          '<svg viewBox="0 0 28 28"><circle cx="14" cy="14" r="11"/></svg>' +
+        '<div class="win-dots" aria-hidden="true">' +
+          '<i style="--i:0"></i><i style="--i:1"></i><i style="--i:2"></i>' +
+          '<i style="--i:3"></i><i style="--i:4"></i><i style="--i:5"></i>' +
         '</div>' +
         '<span class="win-spinner-label">' + (isJa ? '考え中…' : 'Thinking…') + '</span>' +
       '</div>';
@@ -1755,25 +1787,42 @@ body {
   async function sendMessage(text) {
     if (!text || isSending) return;
     if (!started) showChatView();
-    addMessage(text, "user", true);
-    conversationMessages.push({ role: "user", content: text });
+    const userTs = Date.now();
+    addMessage(text, "user", true, userTs);
+    conversationMessages.push({ role: "user", content: text, ts: userTs });
     if (!currentId) currentId = 'c_' + Date.now();
     saveCurrent();
 
     setSendingUI(true);
     showLoadingMessage();
     try {
+      // 現在の日時（JST）を system に付与して AI が年・日付・時間を答えられるようにする
+      const nowJst = new Date().toLocaleString('ja-JP', {
+        timeZone: 'Asia/Tokyo',
+        year: 'numeric', month: 'long', day: 'numeric', weekday: 'long',
+        hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
+      });
+      const msgsForApi = conversationMessages.map((m, idx) => {
+        if (idx === 0 && m.role === 'system') {
+          return {
+            role: 'system',
+            content: m.content + '\n\n【現在の日時（日本時間）】' + nowJst + '\n質問に「今何時」「今日の日付」「何年」などが含まれたら、この日時を正確に使って答えてください。'
+          };
+        }
+        return { role: m.role, content: m.content };
+      });
       const response = await fetch(API_SERVER_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: conversationMessages })
+        body: JSON.stringify({ messages: msgsForApi })
       });
       const data = await response.json();
       if (!response.ok) throw new Error(`[HTTP ${response.status}] ${data.error || response.statusText}`);
       const reply = data.choices[0].message.content;
-      conversationMessages.push({ role: "assistant", content: reply });
+      const aiTs = Date.now();
+      conversationMessages.push({ role: "assistant", content: reply, ts: aiTs });
       removeLoadingMessage();
-      addMessage(reply, "ai", true);
+      addMessage(reply, "ai", true, aiTs);
       if (typeof window.speakText === 'function') window.speakText(reply);
       saveCurrent();
       archiveCurrentToHistory();
@@ -1809,7 +1858,47 @@ body {
     return btn;
   }
 
-  function addMessage(text, type, scroll) {
+
+  function formatMessageTime(ts) {
+    const d = new Date(ts || Date.now());
+    const isJa = (document.documentElement.lang || 'ja').startsWith('ja');
+    if (isJa) {
+      const y = d.getFullYear();
+      const m = d.getMonth() + 1;
+      const day = d.getDate();
+      const hh = String(d.getHours()).padStart(2, '0');
+      const mm = String(d.getMinutes()).padStart(2, '0');
+      const ss = String(d.getSeconds()).padStart(2, '0');
+      return y + '年' + m + '月' + day + '日 ' + hh + ':' + mm + ':' + ss;
+    }
+    return d.toLocaleString('en-US', {
+      year: 'numeric', month: 'short', day: 'numeric',
+      hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
+    });
+  }
+
+  function createCopyButton(text) {
+    const copyBtn = createActionButton(
+      '<rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>',
+      "コピー",
+      async () => {
+        try {
+          await navigator.clipboard.writeText(text);
+          copyBtn.classList.add("copied");
+          setTimeout(() => copyBtn.classList.remove("copied"), 1800);
+        } catch (e) {
+          const ta = document.createElement("textarea");
+          ta.value = text; document.body.appendChild(ta); ta.select();
+          document.execCommand("copy"); document.body.removeChild(ta);
+          copyBtn.classList.add("copied");
+          setTimeout(() => copyBtn.classList.remove("copied"), 1800);
+        }
+      }
+    );
+    return copyBtn;
+  }
+
+  function addMessage(text, type, scroll, ts) {
     const wrap = document.createElement("div");
     wrap.className = "chat-msg " + type;
     const isUser = type.indexOf("user") === 0;
@@ -1820,9 +1909,19 @@ body {
     if (isAi || isError) bubble.innerHTML = linkify(escapeHTML(text));
     else bubble.textContent = text;
 
+    const timeEl = document.createElement("div");
+    timeEl.className = "msg-time";
+    timeEl.textContent = formatMessageTime(ts);
+
     if (isUser) {
+      wrap.appendChild(timeEl);
       wrap.appendChild(bubble);
+      const actions = document.createElement("div");
+      actions.className = "msg-actions";
+      actions.appendChild(createCopyButton(text));
+      wrap.appendChild(actions);
     } else {
+      wrap.appendChild(timeEl);
       const row = document.createElement("div");
       row.className = "msg-row";
       const avatar = document.createElement("div");
@@ -1835,24 +1934,7 @@ body {
       if (isAi) {
         const actions = document.createElement("div");
         actions.className = "msg-actions";
-        const copyBtn = createActionButton(
-          '<rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>',
-          "コピー",
-          async () => {
-            try {
-              await navigator.clipboard.writeText(text);
-              copyBtn.classList.add("copied");
-              setTimeout(() => copyBtn.classList.remove("copied"), 1800);
-            } catch (e) {
-              const ta = document.createElement("textarea");
-              ta.value = text; document.body.appendChild(ta); ta.select();
-              document.execCommand("copy"); document.body.removeChild(ta);
-              copyBtn.classList.add("copied");
-              setTimeout(() => copyBtn.classList.remove("copied"), 1800);
-            }
-          }
-        );
-        actions.appendChild(copyBtn);
+        actions.appendChild(createCopyButton(text));
         actions.appendChild(createActionButton(
           '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/>',
           "読み上げ",
