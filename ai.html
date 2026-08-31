@@ -321,43 +321,183 @@ body {
   70% { box-shadow: 0 0 0 14px transparent; }
   100% { box-shadow: 0 0 0 0 transparent; }
 }
-.talk-banner {
+/* Phone-call style conversation screen */
+.phone-call-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 2500;
   display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: max(28px, env(safe-area-inset-top)) 24px max(36px, env(safe-area-inset-bottom));
+  background:
+    radial-gradient(ellipse 80% 50% at 50% 20%, color-mix(in srgb, var(--pink) 28%, transparent), transparent 60%),
+    radial-gradient(ellipse 70% 40% at 50% 100%, color-mix(in srgb, var(--purple) 22%, transparent), transparent 55%),
+    #0c0f14;
+  color: #f6f3ec;
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+.phone-call-screen.open {
+  display: flex;
+  opacity: 1;
+  transform: translateY(0);
+}
+.phone-call-top {
+  width: 100%;
+  max-width: 420px;
+  text-align: center;
+  padding-top: 12px;
+}
+.phone-call-label {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(246,243,236,0.55);
+  margin-bottom: 6px;
+}
+.phone-call-timer {
+  font-size: 15px;
+  font-weight: 700;
+  color: rgba(246,243,236,0.8);
+  font-variant-numeric: tabular-nums;
+}
+.phone-call-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 22px;
+  flex: 1;
+  justify-content: center;
+}
+.phone-avatar-wrap {
+  position: relative;
+  width: 148px;
+  height: 148px;
+}
+.phone-avatar-ring {
+  position: absolute;
+  inset: -10px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,145,82,0.35);
+  animation: phoneRing 2.2s ease-out infinite;
+}
+.phone-avatar-ring.r2 {
+  inset: -22px;
+  border-color: rgba(31,158,148,0.25);
+  animation-delay: 0.55s;
+}
+.phone-call-screen.state-listening .phone-avatar-ring {
+  border-color: rgba(63,184,201,0.5);
+}
+.phone-call-screen.state-thinking .phone-avatar-ring {
+  border-color: rgba(242,184,75,0.45);
+  animation-duration: 1.2s;
+}
+.phone-call-screen.state-speaking .phone-avatar-ring {
+  border-color: rgba(255,145,82,0.55);
+}
+@keyframes phoneRing {
+  0% { transform: scale(0.92); opacity: 0.85; }
+  100% { transform: scale(1.18); opacity: 0; }
+}
+.phone-avatar {
+  width: 148px;
+  height: 148px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: rgba(255,255,255,0.08);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.45);
+  border: 3px solid rgba(255,255,255,0.12);
+}
+.phone-call-name {
+  font-size: 26px;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+}
+.phone-call-status {
+  font-size: 15px;
+  font-weight: 700;
+  color: rgba(246,243,236,0.7);
+  min-height: 1.4em;
+}
+.phone-call-transcript {
+  max-width: 320px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: rgba(246,243,236,0.5);
+  text-align: center;
+  line-height: 1.5;
+  min-height: 2.8em;
+  padding: 0 8px;
+}
+.phone-wave {
+  display: flex;
+  align-items: flex-end;
+  gap: 5px;
+  height: 28px;
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+.phone-call-screen.state-listening .phone-wave,
+.phone-call-screen.state-speaking .phone-wave {
+  opacity: 1;
+}
+.phone-wave span {
+  width: 4px;
+  border-radius: 4px;
+  background: linear-gradient(180deg, var(--pink), var(--purple));
+  animation: phoneBar 0.9s ease-in-out infinite;
+}
+.phone-wave span:nth-child(1) { height: 10px; animation-delay: 0s; }
+.phone-wave span:nth-child(2) { height: 18px; animation-delay: 0.12s; }
+.phone-wave span:nth-child(3) { height: 26px; animation-delay: 0.24s; }
+.phone-wave span:nth-child(4) { height: 16px; animation-delay: 0.36s; }
+.phone-wave span:nth-child(5) { height: 22px; animation-delay: 0.48s; }
+.phone-wave span:nth-child(6) { height: 12px; animation-delay: 0.2s; }
+.phone-wave span:nth-child(7) { height: 20px; animation-delay: 0.32s; }
+@keyframes phoneBar {
+  0%, 100% { transform: scaleY(0.45); opacity: 0.55; }
+  50% { transform: scaleY(1); opacity: 1; }
+}
+.phone-call-actions {
+  display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  padding: 8px 14px;
-  margin: 0 16px 8px;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--pink) 14%, var(--surface));
-  border: 1px solid color-mix(in srgb, var(--pink) 35%, var(--border));
-  color: var(--text);
-  font-size: 13px;
-  font-weight: 800;
-  flex-shrink: 0;
+  gap: 28px;
+  width: 100%;
+  max-width: 420px;
+  padding-bottom: 8px;
 }
-.talk-banner.show { display: flex; }
-.talk-banner .talk-dot {
-  width: 8px; height: 8px; border-radius: 50%;
-  background: var(--pink);
-  animation: talkDot 1s ease-in-out infinite;
-}
-@keyframes talkDot {
-  0%, 100% { opacity: 0.35; transform: scale(0.85); }
-  50% { opacity: 1; transform: scale(1.15); }
-}
-.talk-banner button {
-  border: 1px solid var(--border);
-  background: var(--surface);
-  color: var(--text);
-  font-family: inherit;
-  font-size: 12px;
-  font-weight: 800;
-  padding: 6px 12px;
-  border-radius: 999px;
+.phone-action-btn {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: none;
+  display: grid;
+  place-items: center;
   cursor: pointer;
+  transition: transform 0.2s, filter 0.2s;
+  color: #fff;
 }
-.talk-banner button:hover { background: var(--surface-hover); }
+.phone-action-btn svg { width: 26px; height: 26px; }
+.phone-action-btn:hover { transform: scale(1.06); }
+.phone-action-btn.end {
+  background: #e74c3c;
+  box-shadow: 0 10px 28px rgba(231,76,60,0.4);
+}
+.phone-action-btn.end:hover { filter: brightness(1.08); }
+.phone-action-hint {
+  font-size: 12px;
+  font-weight: 700;
+  color: rgba(246,243,236,0.5);
+  margin-top: 10px;
+  text-align: center;
+}
+
 
 .history-sort-bar {
   display: flex;
@@ -1249,11 +1389,6 @@ body {
     </div>
   </div>
   <div class="chat-panel">
-    <div class="talk-banner" id="talkBanner" role="status">
-      <span class="talk-dot" aria-hidden="true"></span>
-      <span id="talkBannerText">会話モード：聞いています…</span>
-      <button type="button" id="talkStopBtn">終了</button>
-    </div>
     <div class="chat-box" id="chat-box"></div>
     <div class="ask-bar" id="chatAskBar">
       <button class="ask-icon-btn" id="chatNewBtn" aria-label="新しい会話" title="新しい会話">＋</button>
@@ -1287,6 +1422,37 @@ body {
   </div>
 </div>
 
+
+<div class="phone-call-screen" id="phoneCallScreen" aria-hidden="true">
+  <div class="phone-call-top">
+    <div class="phone-call-label">おいさしAI</div>
+    <div class="phone-call-timer" id="phoneCallTimer">00:00</div>
+  </div>
+  <div class="phone-call-center">
+    <div class="phone-avatar-wrap">
+      <div class="phone-avatar-ring" aria-hidden="true"></div>
+      <div class="phone-avatar-ring r2" aria-hidden="true"></div>
+      <img class="phone-avatar" src="favicon-512AI.png" alt="おいさしAI" width="148" height="148">
+    </div>
+    <div class="phone-call-name">おいさしAI</div>
+    <div class="phone-call-status" id="phoneCallStatus">接続中…</div>
+    <div class="phone-wave" aria-hidden="true">
+      <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+    </div>
+    <div class="phone-call-transcript" id="phoneCallTranscript"></div>
+  </div>
+  <div>
+    <div class="phone-call-actions">
+      <button type="button" class="phone-action-btn end" id="talkStopBtn" aria-label="通話終了" title="通話終了">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10.68 13.31a16 16 0 0 0 3.41 2.6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7 2 2 0 0 1 1.72 2v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91"/>
+          <line x1="23" y1="1" x2="1" y2="23"/>
+        </svg>
+      </button>
+    </div>
+    <div class="phone-action-hint">通話を終了</div>
+  </div>
+</div>
 <div class="history-backdrop" id="historyBackdrop"></div>
 <div class="history-panel" id="historyPanel">
   <div class="history-head">
@@ -2360,8 +2526,10 @@ body {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     const talkBtn = document.getElementById('talkModeBtn');
     const startTalkBtn = document.getElementById('startTalkModeBtn');
-    const talkBanner = document.getElementById('talkBanner');
-    const talkBannerText = document.getElementById('talkBannerText');
+    const phoneScreen = document.getElementById('phoneCallScreen');
+    const phoneStatus = document.getElementById('phoneCallStatus');
+    const phoneTranscript = document.getElementById('phoneCallTranscript');
+    const phoneTimer = document.getElementById('phoneCallTimer');
     const talkStopBtn = document.getElementById('talkStopBtn');
     const talkBtns = [talkBtn, startTalkBtn].filter(Boolean);
 
@@ -2377,6 +2545,8 @@ body {
     let talkActive = false;
     let talkRec = null;
     let talkBusy = false;
+    let callTimerId = null;
+    let callStartedAt = 0;
 
     function getLang() {
       try {
@@ -2389,13 +2559,49 @@ body {
     function isJa() {
       return (document.documentElement.lang || 'ja').startsWith('ja');
     }
+    function formatCallTime(sec) {
+      const m = String(Math.floor(sec / 60)).padStart(2, '0');
+      const s = String(sec % 60).padStart(2, '0');
+      return m + ':' + s;
+    }
+    function startCallTimer() {
+      callStartedAt = Date.now();
+      if (phoneTimer) phoneTimer.textContent = '00:00';
+      clearInterval(callTimerId);
+      callTimerId = setInterval(() => {
+        const sec = Math.floor((Date.now() - callStartedAt) / 1000);
+        if (phoneTimer) phoneTimer.textContent = formatCallTime(sec);
+      }, 1000);
+    }
+    function stopCallTimer() {
+      clearInterval(callTimerId);
+      callTimerId = null;
+    }
+    function setPhoneState(state, statusText, transcript) {
+      if (phoneScreen) {
+        phoneScreen.classList.remove('state-listening', 'state-thinking', 'state-speaking');
+        if (state) phoneScreen.classList.add('state-' + state);
+      }
+      if (phoneStatus && statusText != null) phoneStatus.textContent = statusText;
+      if (phoneTranscript && transcript != null) phoneTranscript.textContent = transcript;
+    }
     function setBanner(text) {
-      if (talkBannerText) talkBannerText.textContent = text;
+      // compat: map old banner texts to phone status
+      if (phoneStatus) phoneStatus.textContent = text;
     }
     function setTalkUI(on) {
       talkActive = on;
       talkBtns.forEach(b => { if (b) b.classList.toggle('active', on); });
-      if (talkBanner) talkBanner.classList.toggle('show', on);
+      if (phoneScreen) {
+        phoneScreen.classList.toggle('open', on);
+        phoneScreen.setAttribute('aria-hidden', on ? 'false' : 'true');
+      }
+      document.body.style.overflow = on ? 'hidden' : '';
+      if (on) startCallTimer();
+      else {
+        stopCallTimer();
+        setPhoneState(null, '', '');
+      }
     }
     function stopRecognition() {
       try { if (talkRec) talkRec.onend = null; talkRec.stop(); } catch (e) {}
@@ -2429,7 +2635,7 @@ body {
       if (!talkActive || talkBusy || isSending) return;
       stopRecognition();
       talkBtns.forEach(b => { if (b) b.classList.add('listening'); });
-      setBanner(isJa() ? '会話モード：聞いています… 話しかけてください' : 'Talk mode: Listening…');
+      setPhoneState('listening', isJa() ? '聞いています…' : 'Listening…', '');
 
       const rec = new SpeechRecognition();
       talkRec = rec;
@@ -2447,7 +2653,7 @@ body {
         if (!said || !talkActive) return;
         talkBusy = true;
         talkBtns.forEach(b => { if (b) b.classList.remove('listening'); });
-        setBanner(isJa() ? '会話モード：考えています…' : 'Talk mode: Thinking…');
+        setPhoneState('thinking', isJa() ? '考えています…' : 'Thinking…', said);
 
         if (!started) {
           conversationMessages = [{ role: 'system', content: SYSTEM_PROMPT }];
@@ -2460,7 +2666,7 @@ body {
         if (!talkActive) { talkBusy = false; return; }
 
         if (reply) {
-          setBanner(isJa() ? '会話モード：読み上げ中…' : 'Talk mode: Speaking…');
+          setPhoneState('speaking', isJa() ? '話しています…' : 'Speaking…', reply);
           waitSpeechEnd().then(() => {
             talkBusy = false;
             if (talkActive) listenOnce();
@@ -2468,7 +2674,7 @@ body {
         } else {
           talkBusy = false;
           if (talkActive) {
-            setBanner(isJa() ? '会話モード：エラー。もう一度話してください' : 'Talk mode: Error. Try again');
+            setPhoneState('listening', isJa() ? 'もう一度話してください' : 'Please try again', '');
             setTimeout(() => { if (talkActive) listenOnce(); }, 800);
           }
         }
@@ -2503,7 +2709,7 @@ body {
     function toggleTalkMode() {
       if (talkActive) { stopTalkMode(); return; }
       setTalkUI(true);
-      setBanner(isJa() ? '会話モード開始' : 'Talk mode started');
+      setPhoneState('listening', isJa() ? '接続中…' : 'Connecting…', '');
       listenOnce();
     }
 
