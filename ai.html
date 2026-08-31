@@ -2647,6 +2647,81 @@ body {
       });
     }
 
+    // 発信音（リングバック風：ツー…ツー…）
+    function playRingbackTone() {
+      return new Promise((resolve) => {
+        try {
+          const Ctx = window.AudioContext || window.webkitAudioContext;
+          if (!Ctx) { resolve(); return; }
+          const ctx = new Ctx();
+          const master = ctx.createGain();
+          master.gain.value = 0.18;
+          master.connect(ctx.destination);
+          const ring = (start, dur) => {
+            // 400Hz + 450Hz の重ねで電話らしい響きに
+            [400, 450].forEach((freq) => {
+              const osc = ctx.createOscillator();
+              const g = ctx.createGain();
+              osc.type = 'sine';
+              osc.frequency.value = freq;
+              g.gain.setValueAtTime(0.0001, start);
+              g.gain.exponentialRampToValueAtTime(0.55, start + 0.03);
+              g.gain.setValueAtTime(0.55, start + dur - 0.05);
+              g.gain.exponentialRampToValueAtTime(0.0001, start + dur);
+              osc.connect(g);
+              g.connect(master);
+              osc.start(start);
+              osc.stop(start + dur + 0.02);
+            });
+          };
+          const t0 = ctx.currentTime + 0.05;
+          // 約1秒オン → 2秒オフ × 2回
+          ring(t0, 1.0);
+          ring(t0 + 3.0, 1.0);
+          setTimeout(() => {
+            try { ctx.close(); } catch (e) {}
+            resolve();
+          }, 4500);
+        } catch (e) {
+          resolve();
+        }
+      });
+    }
+
+    function waitSpeechEndAlways() {
+      return new Promise((resolve) => {
+        if (!window.speechSynthesis) { resolve(); return; }
+        const start = Date.now();
+        const tick = () => {
+          if (!window.speechSynthesis.speaking && !window.speechSynthesis.pending) {
+            setTimeout(resolve, 300);
+            return;
+          }
+          if (Date.now() - start > 30000) { resolve(); return; }
+          setTimeout(tick, 200);
+        };
+        setTimeout(tick, 350);
+      });
+    }
+
+    async function playOpeningGreeting() {
+      const hour = Number(new Date().toLocaleString('en-US', { timeZone: 'Asia/Tokyo', hour: 'numeric', hour12: false }));
+      let greet;
+      if (isJa()) {
+        if (hour >= 5 && hour < 11) greet = 'お電話ありがとうございます。おいさしAIです。おはようございます。ご用件をお話しください。';
+        else if (hour >= 18 || hour < 5) greet = 'お電話ありがとうございます。おいさしAIです。こんばんは。ご用件をお話しください。';
+        else greet = 'お電話ありがとうございます。おいさしAIです。こんにちは。ご用件をお話しください。';
+      } else {
+        greet = "Thank you for calling. This is Oisasi AI. How can I help you?";
+      }
+      setPhoneState('speaking', isJa() ? '話しています…' : 'Speaking…', greet);
+      // 通話画面上にもメッセージとして出したい場合はチャット側は履歴に残さない
+      if (typeof window.speakTextForce === 'function') {
+        window.speakTextForce(greet);
+      }
+      await waitSpeechEndAlways();
+    }
+
     function discardTalkSessionAndGoStart() {
       // 通話内容は履歴に残さず破棄してスタートへ
       conversationMessages = [{ role: 'system', content: SYSTEM_PROMPT }];
@@ -2823,10 +2898,17 @@ body {
       catch (e) { setTimeout(() => { if (talkActive && !talkBusy) listenOnce(); }, 500); }
     }
 
-    function toggleTalkMode() {
+    async function toggleTalkMode() {
       if (talkActive) { stopTalkMode(); return; }
       setTalkUI(true);
-      setPhoneState('listening', isJa() ? '接続中…' : 'Connecting…', '');
+      talkBusy = true;
+      setPhoneState('thinking', isJa() ? '発信中…' : 'Calling…', '');
+      await playRingbackTone();
+      if (!talkActive) { talkBusy = false; return; }
+      // 最初はおいさしAIが話す
+      await playOpeningGreeting();
+      if (!talkActive) { talkBusy = false; return; }
+      talkBusy = false;
       listenOnce();
     }
 
