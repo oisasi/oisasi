@@ -477,6 +477,27 @@ h1 span {
   background: var(--cyan);
   box-shadow: 0 0 14px color-mix(in srgb, var(--cyan) 50%, transparent);
 }
+.ai-card {
+  background: linear-gradient(135deg, color-mix(in srgb, var(--purple) 16%, transparent), color-mix(in srgb, var(--cyan) 10%, transparent));
+  border-color: color-mix(in srgb, var(--purple) 40%, transparent);
+}
+.ai-card:hover {
+  border-color: color-mix(in srgb, var(--purple) 60%, transparent);
+  box-shadow: 0 0 40px color-mix(in srgb, var(--purple) 40%, transparent), var(--shadow);
+}
+.ai-card .card-icon,
+.ai-icon {
+  background: linear-gradient(145deg, color-mix(in srgb, var(--purple) 35%, transparent), color-mix(in srgb, var(--cyan) 25%, transparent));
+  padding: 0;
+  overflow: hidden;
+}
+.ai-card .card-icon img {
+  border-radius: 12px;
+}
+.ai-card:hover .card-arrow {
+  background: var(--purple);
+  box-shadow: 0 0 14px color-mix(in srgb, var(--purple) 50%, transparent);
+}
 .witch-card {
   background: linear-gradient(135deg, color-mix(in srgb, var(--purple) 14%, transparent), color-mix(in srgb, var(--pink) 9%, transparent));
   border-color: color-mix(in srgb, var(--purple) 30%, transparent);
@@ -496,6 +517,15 @@ h1 span {
 }
 .pill-music::before {
   background: linear-gradient(135deg, var(--cyan), #0a9aaa);
+}
+.pill-ai {
+  border-color: color-mix(in srgb, var(--purple) 40%, transparent);
+}
+.pill-ai:hover {
+  box-shadow: 0 12px 28px color-mix(in srgb, var(--purple) 40%, transparent);
+}
+.pill-ai::before {
+  background: linear-gradient(135deg, var(--purple), var(--cyan));
 }
 
 .pills { display: flex; flex-wrap: wrap; gap: 10px; }
@@ -914,9 +944,9 @@ footer { margin-top: 52px; text-align: center; }
         </div>
         <div class="card-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
       </a>
-      <a class="card" href="https://oisasi.f5.si/ai">
-        <div class="card-icon">
-          <img src="おいさしロゴ.png" alt="おいさしAI">
+      <a class="card ai-card" href="https://oisasi.f5.si/ai">
+        <div class="card-icon ai-icon">
+          <img src="oisasi-logoAI.png" alt="おいさしAI">
         </div>
         <div class="card-body">
           <div class="card-title" data-i18n="card_ai">おいさしAI</div>
@@ -980,7 +1010,7 @@ footer { margin-top: 52px; text-align: center; }
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
         <span data-i18n="music">音楽</span>
       </a>
-      <a class="pill" href="https://oisasi.f5.si/ai">
+      <a class="pill pill-ai" href="https://oisasi.f5.si/ai">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a4 4 0 0 1 4 4v1a4 4 0 0 1-8 0V6a4 4 0 0 1 4-4z"/><path d="M6 10v1a6 6 0 0 0 12 0v-1"/><path d="M9 18h6"/><path d="M10 21h4"/></svg>
         <span data-i18n="ai_pill">AI</span>
       </a>
