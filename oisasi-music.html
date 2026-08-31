@@ -168,23 +168,34 @@ a, button, .card, .btn, .pill, .icon-btn, .hamburger, .settings-options button {
   100% { background-position: 200% center; }
 }
 
-.nav-desktop { display: none; align-items: center; gap: 4px; }
-.nav-desktop a {
-  padding: 8px 13px; border-radius: 11px; color: var(--muted); text-decoration: none;
-  font-size: 14px; font-weight: 700; transition: all 0.3s; white-space: nowrap; position: relative;
+.nav-desktop { display: none; align-items: center; gap: 12px; }
+.sns-group {
+  display: flex; align-items: center; gap: 2px;
+  padding: 4px; border-radius: 14px;
+  background: var(--surface); border: 1px solid var(--border);
+  transition: border-color 0.3s, box-shadow 0.3s;
 }
-.nav-desktop a::after {
-  content: ""; position: absolute; left: 13px; right: 13px; bottom: 5px; height: 2px;
-  background: linear-gradient(90deg, var(--cyan), var(--sky));
-  border-radius: 2px; transform: scaleX(0); transition: transform 0.3s;
+.sns-group:hover {
+  border-color: color-mix(in srgb, var(--cyan) 40%, transparent);
+  box-shadow: 0 0 16px color-mix(in srgb, var(--cyan) 15%, transparent);
 }
-.nav-desktop a:hover { color: var(--text); background: var(--surface); }
-.nav-desktop a:hover::after { transform: scaleX(1); }
+.sns-icon {
+  width: 36px; height: 36px; border-radius: 10px;
+  display: grid; place-items: center; color: var(--muted);
+  text-decoration: none; transition: all 0.3s;
+}
+.sns-icon:hover {
+  color: var(--text); background: var(--surface-hover);
+  transform: scale(1.1);
+}
+.sns-icon svg { width: 18px; height: 18px; }
 .nav-desktop a.accent {
+  padding: 8px 14px; border-radius: 11px;
   background: linear-gradient(135deg, var(--cyan), var(--teal)); color: #041018;
+  text-decoration: none; font-size: 14px; font-weight: 700;
   box-shadow: 0 4px 16px color-mix(in srgb, var(--cyan) 35%, transparent);
+  transition: all 0.3s; white-space: nowrap;
 }
-.nav-desktop a.accent::after { display: none; }
 .nav-desktop a.accent:hover { transform: translateY(-2px); }
 
 .header-actions { display: flex; align-items: center; gap: 8px; z-index: 1001; }
@@ -258,11 +269,24 @@ a, button, .card, .btn, .pill, .icon-btn, .hamburger, .settings-options button {
   background: var(--surface); border: 1px solid var(--border);
   transform: translateY(28px); opacity: 0; transition: all 0.45s cubic-bezier(0.22,1,0.36,1);
 }
-.nav-mobile.open a { transform: translateY(0); opacity: 1; }
-.nav-mobile.open a:nth-child(1) { transition-delay: 0.06s; }
-.nav-mobile.open a:nth-child(2) { transition-delay: 0.12s; }
-.nav-mobile.open a:nth-child(3) { transition-delay: 0.18s; }
-.nav-mobile.open a:nth-child(4) { transition-delay: 0.24s; }
+.nav-mobile.open a,
+.nav-mobile.open .sns-mobile-group { transform: translateY(0); opacity: 1; }
+.nav-mobile .sns-mobile-group {
+  display: flex; gap: 12px; margin-bottom: 8px;
+  transform: translateY(28px); opacity: 0;
+  transition: all 0.45s cubic-bezier(0.22,1,0.36,1);
+  transition-delay: 0.06s;
+}
+.nav-mobile.open .sns-mobile-group { transition-delay: 0.06s; }
+.nav-mobile.open a { transition-delay: 0.18s; }
+.nav-mobile .sns-mobile-group a {
+  min-width: auto; width: 64px; height: 64px; padding: 0;
+  flex-direction: column; gap: 4px; font-size: 11px; justify-content: center;
+  transform: none !important; opacity: 1 !important; transition: none !important;
+}
+.nav-mobile .sns-mobile-group .icon {
+  width: 32px; height: 32px; font-size: 18px;
+}
 .nav-mobile a:hover {
   background: linear-gradient(135deg, color-mix(in srgb, var(--cyan) 20%, transparent), color-mix(in srgb, var(--teal) 12%, transparent));
   border-color: color-mix(in srgb, var(--cyan) 40%, transparent); transform: scale(1.04);
@@ -335,6 +359,9 @@ h1 span {
   display: flex; align-items: center; justify-content: center; gap: 10px;
   padding: 18px 22px; border-radius: var(--radius); text-decoration: none; font-weight: 800; font-size: 16px;
   transition: all 0.4s cubic-bezier(0.22,1,0.36,1); margin-bottom: 12px;
+}
+.btn-icon {
+  width: 22px; height: 22px; flex-shrink: 0;
 }
 .btn-primary {
   background: linear-gradient(135deg, var(--cyan), var(--teal)); color: #041018;
@@ -506,9 +533,17 @@ footer { margin-top: 48px; text-align: center; }
       <div class="logo-text"><span>oisasimusic</span></div>
     </a>
     <nav class="nav-desktop">
-      <a href="#about" data-i18n="nav_about">概要</a>
-      <a href="#ops" data-i18n="nav_ops">運営</a>
-      <a href="#links" data-i18n="nav_links">リンク</a>
+      <div class="sns-group" title="oisasimusic SNS">
+        <a class="sns-icon" href="https://www.youtube.com/@oisasi_music" target="_blank" rel="noopener" aria-label="YouTube" title="YouTube">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.5 31.5 0 0 0 0 12a31.5 31.5 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.5 31.5 0 0 0 24 12a31.5 31.5 0 0 0-.5-5.8zM9.75 15.5v-7l6.5 3.5-6.5 3.5z"/></svg>
+        </a>
+        <a class="sns-icon" href="https://www.instagram.com/oisasimusic/" target="_blank" rel="noopener" aria-label="Instagram" title="Instagram">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/></svg>
+        </a>
+        <a class="sns-icon" href="https://www.facebook.com/oisasimusic/" target="_blank" rel="noopener" aria-label="Facebook" title="Facebook">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 13.5h2.5l.5-3H14v-2c0-.9.3-1.5 1.5-1.5H17V4.1c-.3 0-1.3-.1-2.4-.1C12.1 4 10.5 5.4 10.5 8.1V10.5H8v3h2.5V20h3.5v-6.5z"/></svg>
+        </a>
+      </div>
       <a class="accent" href="index.html" data-i18n="nav_home">おいさしTOP</a>
     </nav>
     <div class="header-actions">
@@ -549,9 +584,17 @@ footer { margin-top: 48px; text-align: center; }
 </div>
 
 <nav class="nav-mobile" id="navMobile">
-  <a href="#about" onclick="closeAll()"><span class="icon">🎵</span> <span data-i18n="nav_about">概要</span></a>
-  <a href="#ops" onclick="closeAll()"><span class="icon">📡</span> <span data-i18n="nav_ops">運営</span></a>
-  <a href="#links" onclick="closeAll()"><span class="icon">🔗</span> <span data-i18n="nav_links">リンク</span></a>
+  <div class="sns-mobile-group">
+    <a href="https://www.youtube.com/@oisasi_music" target="_blank" rel="noopener" onclick="closeAll()">
+      <span class="icon">▶️</span> YouTube
+    </a>
+    <a href="https://www.instagram.com/oisasimusic/" target="_blank" rel="noopener" onclick="closeAll()">
+      <span class="icon">📸</span> Instagram
+    </a>
+    <a href="https://www.facebook.com/oisasimusic/" target="_blank" rel="noopener" onclick="closeAll()">
+      <span class="icon">📘</span> Facebook
+    </a>
+  </div>
   <a href="index.html" onclick="closeAll()"><span class="icon">🏠</span> <span data-i18n="nav_home">おいさしTOP</span></a>
 </nav>
 
@@ -569,18 +612,24 @@ footer { margin-top: 48px; text-align: center; }
     <h1><span data-i18n-html="hero_title">おいさしミュージック<br>Oisasi Music Official</span></h1>
     <p class="subtitle">@oisasi_music</p>
     <p class="lead">
-      <span data-i18n="hero_lead">創造とリズムの音楽チャンネル。公式YouTubeのみ運営中。</span>
+      <span data-i18n="hero_lead">創造とリズムの音楽チャンネル。公式YouTube・Instagram・Facebookで運営中。</span>
       <span class="tag">@oisasi_music</span>
     </p>
     <p class="period" data-i18n="period">2025年8月〜2026年12月の曲を発信中</p>
   </header>
 
   <section class="section">
-    <a class="btn btn-primary" href="https://www.youtube.com/@oisasi_music">
-      🎵 <span data-i18n="btn_youtube">公式YouTubeはこちら！</span>
+    <a class="btn btn-primary" href="https://www.youtube.com/@oisasi_music" target="_blank" rel="noopener">
+      <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.5 31.5 0 0 0 0 12a31.5 31.5 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.5 31.5 0 0 0 24 12a31.5 31.5 0 0 0-.5-5.8zM9.75 15.5v-7l6.5 3.5-6.5 3.5z"/></svg>
+      <span data-i18n="btn_youtube">公式YouTubeはこちら！</span>
     </a>
-    <a class="btn btn-secondary" href="oisasi-music-player.html">
-      ▶ <span data-i18n="btn_player">試聴サイトへ</span>
+    <a class="btn btn-secondary" href="https://www.instagram.com/oisasimusic/" target="_blank" rel="noopener">
+      <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/></svg>
+      <span data-i18n="btn_instagram">公式Instagram</span>
+    </a>
+    <a class="btn btn-secondary" href="https://www.facebook.com/oisasimusic/" target="_blank" rel="noopener">
+      <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M14 13.5h2.5l.5-3H14v-2c0-.9.3-1.5 1.5-1.5H17V4.1c-.3 0-1.3-.1-2.4-.1C12.1 4 10.5 5.4 10.5 8.1V10.5H8v3h2.5V20h3.5v-6.5z"/></svg>
+      <span data-i18n="btn_facebook">公式Facebook</span>
     </a>
     <div class="notice">
       <span class="notice-icon">ℹ️</span>
@@ -598,7 +647,7 @@ footer { margin-top: 48px; text-align: center; }
   <section class="section" id="ops">
     <div class="sec-title" data-i18n="sec_ops">運営について</div>
     <div class="info-box">
-      <p data-i18n-html="ops_body">現在は<strong>公式YouTubeのみ</strong>で運営しています。<br>他のSNSアカウントはありません。</p>
+      <p data-i18n-html="ops_body">現在は<strong>公式YouTube・Instagram・Facebook</strong>で運営しています。<br>その他のSNSアカウントはありません。</p>
     </div>
   </section>
 
@@ -636,32 +685,34 @@ footer { margin-top: 48px; text-align: center; }
     ja: {
       settings: '設定', theme: 'テーマ', language: '言語',
       auto: '自動', dark: 'ダーク', light: 'ライト',
-      nav_about: '概要', nav_ops: '運営', nav_links: 'リンク', nav_home: 'おいさしTOP',
+      nav_home: 'おいさしTOP',
       hero_title: 'おいさしミュージック<br>Oisasi Music Official',
-      hero_lead: '創造とリズムの音楽チャンネル。公式YouTubeのみ運営中。',
+      hero_lead: '創造とリズムの音楽チャンネル。公式YouTube・Instagram・Facebookで運営中。',
       period: '2025年8月〜2026年12月の曲を発信中',
       btn_youtube: '公式YouTubeはこちら！',
-      btn_player: '試聴サイトへ',
+      btn_instagram: '公式Instagram',
+      btn_facebook: '公式Facebook',
       notice: 'oisasi osoj の曲を除き、すべて AI 音楽です。',
       sec_about: '概要', sec_ops: '運営について', sec_links: '関連リンク',
       about_body: 'おいさしミュージックは、おいさし公式の音楽専門チャンネルです。<br>キーボードの音とスワンの優雅さをテーマに、創造とリズムの音楽を発信しています。<br><strong>2025年8月から2026年12月までの曲</strong>を中心に公開中です。',
-      ops_body: '現在は<strong>公式YouTubeのみ</strong>で運営しています。<br>他のSNSアカウントはありません。',
+      ops_body: '現在は<strong>公式YouTube・Instagram・Facebook</strong>で運営しています。<br>その他のSNSアカウントはありません。',
       link_home: 'おいさし公式', link_witch: 'おいじぃ魔女', link_game: 'ゲーム', link_blog: 'ブログ',
       note: '※ おいさし公式の総合SNSは', note2: 'をご覧ください。'
     },
     en: {
       settings: 'Settings', theme: 'Theme', language: 'Language',
       auto: 'Auto', dark: 'Dark', light: 'Light',
-      nav_about: 'About', nav_ops: 'Operations', nav_links: 'Links', nav_home: 'Oisasi TOP',
+      nav_home: 'Oisasi TOP',
       hero_title: 'Oisasi Music<br>Official',
-      hero_lead: 'A music channel of creation and rhythm. Official YouTube only.',
+      hero_lead: 'A music channel of creation and rhythm. Official on YouTube, Instagram & Facebook.',
       period: 'Releasing tracks from Aug 2025 to Dec 2026',
       btn_youtube: 'Official YouTube',
-      btn_player: 'Listening Site',
+      btn_instagram: 'Official Instagram',
+      btn_facebook: 'Official Facebook',
       notice: 'All tracks are AI music, except songs by oisasi osoj.',
       sec_about: 'About', sec_ops: 'Operations', sec_links: 'Related Links',
       about_body: 'Oisasi Music is the official music channel of Oisasi.<br>Featuring keyboard sounds and swan-like elegance — music of creation and rhythm.<br>Mainly releasing tracks from <strong>August 2025 to December 2026</strong>.',
-      ops_body: 'Currently operating on <strong>official YouTube only</strong>.<br>No other SNS accounts.',
+      ops_body: 'Currently operating on <strong>official YouTube, Instagram & Facebook</strong>.<br>No other SNS accounts.',
       link_home: 'Oisasi Official', link_witch: 'Oijii Witch', link_game: 'Games', link_blog: 'Blog',
       note: '※ For all official Oisasi SNS, see', note2: '.'
     }
