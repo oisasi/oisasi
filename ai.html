@@ -293,6 +293,65 @@ body {
   transform: scale(1.05);
   box-shadow: 0 4px 16px color-mix(in srgb, var(--pink) 40%, transparent);
 }
+.ask-icon-btn.mic.listening {
+  color: #fff;
+  background: linear-gradient(135deg, #e74c3c, #c0392b);
+  box-shadow: 0 0 0 0 rgba(231,76,60,0.45);
+  animation: micPulse 1.2s ease-out infinite;
+}
+@keyframes micPulse {
+  0% { box-shadow: 0 0 0 0 rgba(231,76,60,0.45); }
+  70% { box-shadow: 0 0 0 12px rgba(231,76,60,0); }
+  100% { box-shadow: 0 0 0 0 rgba(231,76,60,0); }
+}
+.ask-icon-btn.mic:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.history-sort-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px 8px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.history-sort-bar label {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+.history-sort-select {
+  flex: 1;
+  min-width: 0;
+  appearance: none;
+  -webkit-appearance: none;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 700;
+  padding: 8px 28px 8px 10px;
+  border-radius: 10px;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23a8ab9e' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  transition: border-color 0.2s, background 0.2s;
+}
+.history-sort-select:hover {
+  background-color: var(--surface-hover);
+  border-color: color-mix(in srgb, var(--pink) 35%, var(--border));
+}
+.history-sort-select:focus {
+  outline: none;
+  border-color: color-mix(in srgb, var(--pink) 50%, var(--border));
+}
+
 
 /* CHAT VIEW */
 .chat-view {
@@ -1060,6 +1119,9 @@ body {
   </h1>
   <div class="ask-bar" id="startAskBar">
     <input type="text" id="start-input" data-i18n-placeholder="ask_placeholder" placeholder="おいさしAI に相談">
+    <button class="ask-icon-btn mic" id="startMicBtn" type="button" aria-label="音声入力" title="音声入力">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+    </button>
     <button class="ask-icon-btn send" id="startSendBtn" aria-label="送信">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/></svg>
     </button>
@@ -1101,6 +1163,9 @@ body {
     <div class="ask-bar" id="chatAskBar">
       <button class="ask-icon-btn" id="chatNewBtn" aria-label="新しい会話" title="新しい会話">＋</button>
       <input type="text" id="user-input" data-i18n-placeholder="ask_placeholder" placeholder="おいさしAI に相談">
+      <button class="ask-icon-btn mic" id="chatMicBtn" type="button" aria-label="音声入力" title="音声入力">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+      </button>
       <button class="ask-icon-btn send" id="send-btn" aria-label="送信">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/></svg>
       </button>
@@ -1129,6 +1194,16 @@ body {
   <div class="history-head">
     <h3>チャット履歴</h3>
     <button class="history-close" id="historyClose" aria-label="閉じる">×</button>
+  </div>
+  <div class="history-sort-bar">
+    <label for="historySortSelect">並び替え</label>
+    <select id="historySortSelect" class="history-sort-select" aria-label="履歴の並び替え">
+      <option value="newest">新しい順</option>
+      <option value="oldest">古い順</option>
+      <option value="title-asc">タイトル昇順</option>
+      <option value="title-desc">タイトル降順</option>
+      <option value="pinned">固定優先</option>
+    </select>
   </div>
   <div class="history-list" id="historyList">
     <div class="history-empty">まだ履歴がありません</div>
@@ -1638,21 +1713,50 @@ body {
     row.appendChild(menuWrap);
     return row;
   }
+  const HISTORY_SORT_KEY = 'oisasi-ai-history-sort';
+  let historySortMode = localStorage.getItem(HISTORY_SORT_KEY) || 'newest';
+
+  function sortHistoryList(list, mode) {
+    const arr = list.slice();
+    const titleOf = (x) => (x.title || '').toString();
+    switch (mode) {
+      case 'oldest':
+        arr.sort((a, b) => (a.updatedAt || 0) - (b.updatedAt || 0));
+        break;
+      case 'title-asc':
+        arr.sort((a, b) => titleOf(a).localeCompare(titleOf(b), 'ja'));
+        break;
+      case 'title-desc':
+        arr.sort((a, b) => titleOf(b).localeCompare(titleOf(a), 'ja'));
+        break;
+      case 'pinned':
+        arr.sort((a, b) => {
+          const ap = a.pinned ? 1 : 0;
+          const bp = b.pinned ? 1 : 0;
+          if (ap !== bp) return bp - ap;
+          return (b.updatedAt || 0) - (a.updatedAt || 0);
+        });
+        break;
+      case 'newest':
+      default:
+        arr.sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+        break;
+    }
+    return arr;
+  }
+
   function renderHistoryList() {
-    const list = loadHistory();
-    list.sort((a, b) => {
-      const ap = a.pinned ? 1 : 0;
-      const bp = b.pinned ? 1 : 0;
-      if (ap !== bp) return bp - ap;
-      return (b.updatedAt || 0) - (a.updatedAt || 0);
-    });
+    const list = sortHistoryList(loadHistory(), historySortMode);
+    const sortSel = document.getElementById('historySortSelect');
+    if (sortSel && sortSel.value !== historySortMode) sortSel.value = historySortMode;
     if (!list.length) {
       historyList.innerHTML = '<div class="history-empty">まだ履歴がありません</div>';
       return;
     }
     historyList.innerHTML = '';
-    const pinned = list.filter(i => i.pinned);
-    const others = list.filter(i => !i.pinned);
+    // pinned section only when mode is pinned
+    const pinned = historySortMode === 'pinned' ? list.filter(i => i.pinned) : [];
+    const others = historySortMode === 'pinned' ? list.filter(i => !i.pinned) : list;
 
     if (pinned.length) {
       const label = document.createElement('div');
@@ -2010,8 +2114,131 @@ body {
     startInput.value = '';
     startInput.focus();
   });
+
   const panelClearAll = document.getElementById('panelClearAll');
   if (panelClearAll) panelClearAll.addEventListener('click', clearAllHistory);
+
+  // History sort
+  const historySortSelect = document.getElementById('historySortSelect');
+  if (historySortSelect) {
+    historySortSelect.value = historySortMode;
+    historySortSelect.addEventListener('change', () => {
+      historySortMode = historySortSelect.value || 'newest';
+      localStorage.setItem(HISTORY_SORT_KEY, historySortMode);
+      renderHistoryList();
+    });
+  }
+
+  // ===== Microphone (Web Speech API) =====
+  (function setupMic() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const startMicBtn = document.getElementById('startMicBtn');
+    const chatMicBtn = document.getElementById('chatMicBtn');
+    const micBtns = [startMicBtn, chatMicBtn].filter(Boolean);
+
+    if (!SpeechRecognition) {
+      micBtns.forEach(btn => {
+        btn.disabled = true;
+        btn.title = 'このブラウザは音声入力に対応していません';
+      });
+      return;
+    }
+
+    let recognition = null;
+    let listening = false;
+    let activeInput = null;
+    let baseText = '';
+
+    function getLang() {
+      try {
+        const pref = localStorage.getItem('oisasi-lang') || 'auto';
+        if (pref === 'en') return 'en-US';
+        if (pref === 'ja') return 'ja-JP';
+        return (navigator.language || 'ja').toLowerCase().startsWith('ja') ? 'ja-JP' : 'en-US';
+      } catch (e) {
+        return 'ja-JP';
+      }
+    }
+
+    function setListeningUI(on) {
+      listening = on;
+      micBtns.forEach(btn => btn.classList.toggle('listening', on));
+    }
+
+    function stopMic() {
+      try { if (recognition) recognition.stop(); } catch (e) {}
+      recognition = null;
+      setListeningUI(false);
+      activeInput = null;
+    }
+
+    function startMic(inputEl) {
+      if (listening) {
+        stopMic();
+        return;
+      }
+      if (!inputEl || inputEl.disabled) return;
+
+      activeInput = inputEl;
+      baseText = (inputEl.value || '').trim();
+      recognition = new SpeechRecognition();
+      recognition.lang = getLang();
+      recognition.interimResults = true;
+      recognition.continuous = false;
+      recognition.maxAlternatives = 1;
+
+      recognition.onstart = () => setListeningUI(true);
+      recognition.onerror = (ev) => {
+        setListeningUI(false);
+        if (ev && ev.error === 'not-allowed') {
+          alert((document.documentElement.lang || 'ja').startsWith('ja')
+            ? 'マイクの使用が許可されていません。ブラウザの設定を確認してください。'
+            : 'Microphone access was denied. Please check browser settings.');
+        }
+      };
+      recognition.onend = () => setListeningUI(false);
+      recognition.onresult = (event) => {
+        let interim = '';
+        let finalText = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          const r = event.results[i];
+          if (r.isFinal) finalText += r[0].transcript;
+          else interim += r[0].transcript;
+        }
+        const spoken = (finalText || interim).trim();
+        if (!spoken || !activeInput) return;
+        const joined = baseText ? (baseText + ' ' + spoken) : spoken;
+        activeInput.value = joined;
+        if (finalText) baseText = joined;
+      };
+
+      try {
+        recognition.start();
+      } catch (e) {
+        setListeningUI(false);
+      }
+    }
+
+    if (startMicBtn) {
+      startMicBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        startMic(document.getElementById('start-input'));
+      });
+    }
+    if (chatMicBtn) {
+      chatMicBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        startMic(document.getElementById('user-input'));
+      });
+    }
+
+    // stop mic when sending
+    const _origSetSending = typeof setSendingUI === 'function' ? setSendingUI : null;
+    // setSendingUI is in same scope - patch by wrapping is harder; just stop on send button clicks
+    document.getElementById('send-btn')?.addEventListener('click', () => { if (listening) stopMic(); }, true);
+    document.getElementById('startSendBtn')?.addEventListener('click', () => { if (listening) stopMic(); }, true);
+  })();
+
   const confirmCancel = document.getElementById('confirmCancel');
   const confirmOk = document.getElementById('confirmOk');
   const confirmOverlay = document.getElementById('confirmOverlay');
