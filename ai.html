@@ -377,6 +377,68 @@ body {
 }
 .msg-action-btn.copied { color: var(--pink); }
 .msg-action-btn.copied svg { stroke: var(--pink); }
+
+/* Windows-style progress ring spinner */
+.win-spinner {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 4px 0;
+}
+.win-spinner-ring {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  position: relative;
+}
+.win-spinner-ring svg {
+  width: 100%;
+  height: 100%;
+  animation: winSpin 1.2s linear infinite;
+}
+.win-spinner-ring circle {
+  fill: none;
+  stroke: var(--cyan, #3fb8c9);
+  stroke-width: 2.8;
+  stroke-linecap: round;
+  stroke-dasharray: 60 40;
+  transform-origin: center;
+}
+[data-theme="light"] .win-spinner-ring circle { stroke: #0078d4; }
+@media (prefers-color-scheme: light) {
+  [data-theme="auto"] .win-spinner-ring circle { stroke: #0078d4; }
+}
+@keyframes winSpin {
+  to { transform: rotate(360deg); }
+}
+.win-spinner-label {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--muted);
+  letter-spacing: 0.02em;
+}
+.chat-msg.loading .chat-bubble {
+  background: transparent;
+  border: none;
+  padding: 2px 0;
+}
+.ask-icon-btn.send.sending {
+  pointer-events: none;
+  opacity: 0.85;
+}
+.ask-icon-btn.send.sending svg {
+  display: none;
+}
+.ask-icon-btn.send.sending::after {
+  content: "";
+  width: 18px;
+  height: 18px;
+  border: 2.5px solid rgba(255,255,255,0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: winSpin 0.75s linear infinite;
+}
+
 .chat-hint {
   text-align: center; font-size: 11.5px; color: var(--muted);
   padding: 2px 12px 10px; flex-shrink: 0;
@@ -1641,16 +1703,65 @@ body {
     closeHistory();
   }
 
+  let isSending = false;
+  let loadingEl = null;
+
+  function setSendingUI(on) {
+    isSending = on;
+    inputField.disabled = on;
+    sendBtn.disabled = on;
+    startInput.disabled = on;
+    startSendBtn.disabled = on;
+    sendBtn.classList.toggle('sending', on);
+    startSendBtn.classList.toggle('sending', on);
+  }
+
+  function showLoadingMessage() {
+    removeLoadingMessage();
+    const wrap = document.createElement("div");
+    wrap.className = "chat-msg ai loading";
+    wrap.id = "ai-loading-msg";
+    const row = document.createElement("div");
+    row.className = "msg-row";
+    const avatar = document.createElement("div");
+    avatar.className = "chat-avatar";
+    avatar.innerHTML = '<img src="favicon-180AI.png" alt="おいさしAI" loading="lazy">';
+    const bubble = document.createElement("div");
+    bubble.className = "chat-bubble";
+    const isJa = (document.documentElement.lang || 'ja').startsWith('ja');
+    bubble.innerHTML =
+      '<div class="win-spinner" role="status" aria-live="polite">' +
+        '<div class="win-spinner-ring" aria-hidden="true">' +
+          '<svg viewBox="0 0 28 28"><circle cx="14" cy="14" r="11"/></svg>' +
+        '</div>' +
+        '<span class="win-spinner-label">' + (isJa ? '考え中…' : 'Thinking…') + '</span>' +
+      '</div>';
+    row.appendChild(avatar);
+    row.appendChild(bubble);
+    wrap.appendChild(row);
+    chatBox.appendChild(wrap);
+    chatBox.scrollTop = chatBox.scrollHeight;
+    loadingEl = wrap;
+    return wrap;
+  }
+
+  function removeLoadingMessage() {
+    if (loadingEl && loadingEl.parentNode) loadingEl.parentNode.removeChild(loadingEl);
+    loadingEl = null;
+    const leftover = document.getElementById('ai-loading-msg');
+    if (leftover) leftover.remove();
+  }
+
   async function sendMessage(text) {
-    if (!text) return;
+    if (!text || isSending) return;
     if (!started) showChatView();
     addMessage(text, "user", true);
     conversationMessages.push({ role: "user", content: text });
     if (!currentId) currentId = 'c_' + Date.now();
     saveCurrent();
 
-    inputField.disabled = true;
-    sendBtn.disabled = true;
+    setSendingUI(true);
+    showLoadingMessage();
     try {
       const response = await fetch(API_SERVER_URL, {
         method: "POST",
@@ -1661,18 +1772,19 @@ body {
       if (!response.ok) throw new Error(`[HTTP ${response.status}] ${data.error || response.statusText}`);
       const reply = data.choices[0].message.content;
       conversationMessages.push({ role: "assistant", content: reply });
+      removeLoadingMessage();
       addMessage(reply, "ai", true);
       if (typeof window.speakText === 'function') window.speakText(reply);
       saveCurrent();
       archiveCurrentToHistory();
       updateChatTitleUI();
     } catch (error) {
+      removeLoadingMessage();
       addMessage(`${t('chat_error', '通信エラーが発生しました。')}\n${error.message}`, "error", true);
       conversationMessages.pop();
       saveCurrent();
     } finally {
-      inputField.disabled = false;
-      sendBtn.disabled = false;
+      setSendingUI(false);
       inputField.focus();
     }
   }
@@ -1745,18 +1857,6 @@ body {
           '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/>',
           "読み上げ",
           () => { if (typeof window.speakTextForce === 'function') window.speakTextForce(text); }
-        ));
-        actions.appendChild(createActionButton(
-          '<path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/>',
-          "良い回答", function () { this.classList.toggle("copied"); }
-        ));
-        actions.appendChild(createActionButton(
-          '<path d="M10 15V19a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/>',
-          "改善が必要", function () { this.classList.toggle("copied"); }
-        ));
-        actions.appendChild(createActionButton(
-          '<polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>',
-          "再生成", () => {}
         ));
         wrap.appendChild(actions);
       }
