@@ -2168,10 +2168,11 @@ body {
     if (!started) showChatView();
 
     const userTs = Date.now();
-    addMessage(plain, "user", true, userTs);
+    const displayText = (opts.displayText != null ? String(opts.displayText) : plain).trim() || plain;
+    addMessage(displayText, "user", true, userTs);
     conversationMessages.push({ role: "user", content: plain, ts: userTs });
     if (!currentId) currentId = 'c_' + Date.now();
-    saveCurrent();
+    if (!opts.fromTalk) saveCurrent();
 
     setSendingUI(true);
     showLoadingMessage();
@@ -2204,18 +2205,19 @@ body {
       addMessage(reply, "ai", true, aiTs);
       if (opts.fromTalk) {
         if (typeof window.speakTextForce === 'function') window.speakTextForce(reply);
-      } else if (typeof window.speakText === 'function') {
-        window.speakText(reply);
+        // 通話は履歴・永続保存しない
+      } else {
+        if (typeof window.speakText === 'function') window.speakText(reply);
+        saveCurrent();
+        archiveCurrentToHistory();
+        updateChatTitleUI();
       }
-      saveCurrent();
-      archiveCurrentToHistory();
-      updateChatTitleUI();
       return reply;
     } catch (error) {
       removeLoadingMessage();
       addMessage(`${t('chat_error', '通信エラーが発生しました。')}\n${error.message}`, "error", true);
       conversationMessages.pop();
-      saveCurrent();
+      if (!opts.fromTalk) saveCurrent();
       return null;
     } finally {
       setSendingUI(false);
@@ -2607,13 +2609,74 @@ body {
       try { if (talkRec) talkRec.onend = null; talkRec.stop(); } catch (e) {}
       talkRec = null;
     }
+    function playDisconnectTone() {
+      return new Promise((resolve) => {
+        try {
+          const Ctx = window.AudioContext || window.webkitAudioContext;
+          if (!Ctx) { resolve(); return; }
+          const ctx = new Ctx();
+          const master = ctx.createGain();
+          master.gain.value = 0.22;
+          master.connect(ctx.destination);
+          // ツーツーツー（約400Hz・短いビープを3回）
+          const beep = (start, dur) => {
+            const osc = ctx.createOscillator();
+            const g = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.value = 400;
+            g.gain.setValueAtTime(0.0001, start);
+            g.gain.exponentialRampToValueAtTime(0.9, start + 0.02);
+            g.gain.setValueAtTime(0.9, start + dur - 0.04);
+            g.gain.exponentialRampToValueAtTime(0.0001, start + dur);
+            osc.connect(g);
+            g.connect(master);
+            osc.start(start);
+            osc.stop(start + dur + 0.02);
+          };
+          const t0 = ctx.currentTime + 0.05;
+          beep(t0, 0.28);
+          beep(t0 + 0.42, 0.28);
+          beep(t0 + 0.84, 0.28);
+          setTimeout(() => {
+            try { ctx.close(); } catch (e) {}
+            resolve();
+          }, 1400);
+        } catch (e) {
+          resolve();
+        }
+      });
+    }
+
+    function discardTalkSessionAndGoStart() {
+      // 通話内容は履歴に残さず破棄してスタートへ
+      conversationMessages = [{ role: 'system', content: SYSTEM_PROMPT }];
+      currentId = null;
+      started = false;
+      try { clearUI(); } catch (e) {}
+      localStorage.removeItem(STORAGE_CURRENT);
+      if (chatView) chatView.hidden = true;
+      if (startView) startView.hidden = false;
+      document.body.style.overflow = '';
+      try {
+        if (startInput) {
+          startInput.value = '';
+          startInput.focus();
+        }
+      } catch (e) {}
+      closeHistory();
+    }
+
     function stopTalkMode() {
       talkActive = false;
       talkBusy = false;
       stopRecognition();
       if (window.speechSynthesis) window.speechSynthesis.cancel();
-      setTalkUI(false);
       talkBtns.forEach(b => { if (b) b.classList.remove('listening'); });
+      setPhoneState(null, isJa() ? '通話終了' : 'Call ended', '');
+      playDisconnectTone().then(() => {
+        setTalkUI(false);
+        discardTalkSessionAndGoStart();
+      });
     }
     function waitSpeechEnd() {
       return new Promise((resolve) => {
@@ -2644,6 +2707,41 @@ body {
       rec.continuous = false;
       rec.maxAlternatives = 1;
 
+      function isGoodbyeMessage(text) {
+        const s = (text || '').toLowerCase().replace(/\s+/g, '');
+        // 正規化（全角半角・よくある表記ゆれ）
+        const n = s
+          .replace(/[！!。．.？?、,]/g, '')
+          .replace(/ー/g, '')
+          .replace(/～/g, '');
+        const patterns = [
+          'またね', 'またねー', 'またね', 'じゃあね', 'じゃーね', 'じゃね',
+          'バイバイ', 'ばいばい', 'ばいばーい', 'bye', 'goodbye', 'good bye', 'see you', 'seeyou',
+          'さようなら', 'さよなら', 'サヨウナラ',
+          '失礼します', 'しつれいします', 'では失礼',
+          'おやすみ', 'おやすみなさい',
+          'お疲れ様', 'おつかれさま', 'おつかれ',
+          'また今度', 'ではまた', 'それじゃ', 'そんじゃ',
+          '通話終了', '電話切', 'でんわき', '切って', 'おわり', '終わり', '終了',
+          'ありがとうまた', 'どうもまた'
+        ];
+        // 短い終了系は全文一致寄り、長いのは部分一致
+        for (const p of patterns) {
+          const q = p.toLowerCase().replace(/\s+/g, '').replace(/ー/g, '');
+          if (!q) continue;
+          if (n === q || n.indexOf(q) !== -1) {
+            // 「切って」単体などは誤検知しやすいので短すぎる場合は前後チェック
+            if (q.length <= 2) continue;
+            return true;
+          }
+        }
+        // 正規表現で柔らかく判定
+        if (/(またね|じゃあね|じゃーね|バイバイ|ばいばい|さようなら|さよなら|失礼します|おやすみ|see\s*you|good\s*bye|\bbye\b)/i.test(text || '')) {
+          return true;
+        }
+        return false;
+      }
+
       rec.onresult = async (event) => {
         let said = '';
         for (let i = event.resultIndex; i < event.results.length; i++) {
@@ -2651,6 +2749,7 @@ body {
         }
         said = (said || '').trim();
         if (!said || !talkActive) return;
+        const shouldHangUp = isGoodbyeMessage(said);
         talkBusy = true;
         talkBtns.forEach(b => { if (b) b.classList.remove('listening'); });
         setPhoneState('thinking', isJa() ? '考えています…' : 'Thinking…', said);
@@ -2662,18 +2761,36 @@ body {
           localStorage.removeItem(STORAGE_CURRENT);
         }
 
-        const reply = await sendMessage(said, { fromTalk: true });
+        // 終了の挨拶のときは短い返答になるよう促す（履歴には残さない通話）
+        let sendText = said;
+        if (shouldHangUp) {
+          sendText = said + (isJa()
+            ? '（これは通話の終了の挨拶です。短く温かく返事をしてください。長話は不要です。）'
+            : ' (This is a farewell to end the call. Reply briefly and warmly.)');
+        }
+
+        const reply = await sendMessage(sendText, { fromTalk: true, displayText: said });
         if (!talkActive) { talkBusy = false; return; }
 
         if (reply) {
           setPhoneState('speaking', isJa() ? '話しています…' : 'Speaking…', reply);
           waitSpeechEnd().then(() => {
             talkBusy = false;
-            if (talkActive) listenOnce();
+            if (!talkActive) return;
+            if (shouldHangUp) {
+              setPhoneState(null, isJa() ? '通話終了' : 'Call ended', '');
+              stopTalkMode();
+            } else {
+              listenOnce();
+            }
           });
         } else {
           talkBusy = false;
           if (talkActive) {
+            if (shouldHangUp) {
+              stopTalkMode();
+              return;
+            }
             setPhoneState('listening', isJa() ? 'もう一度話してください' : 'Please try again', '');
             setTimeout(() => { if (talkActive) listenOnce(); }, 800);
           }
