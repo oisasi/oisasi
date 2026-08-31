@@ -309,6 +309,56 @@ body {
   cursor: not-allowed;
 }
 
+
+.ask-icon-btn.talk-btn.active,
+.ask-icon-btn.talk-btn.listening {
+  color: #fff;
+  background: linear-gradient(135deg, var(--pink), var(--purple));
+  animation: talkPulse 1.4s ease-out infinite;
+}
+@keyframes talkPulse {
+  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--pink) 45%, transparent); }
+  70% { box-shadow: 0 0 0 14px transparent; }
+  100% { box-shadow: 0 0 0 0 transparent; }
+}
+.talk-banner {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 8px 14px;
+  margin: 0 16px 8px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--pink) 14%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--pink) 35%, var(--border));
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+.talk-banner.show { display: flex; }
+.talk-banner .talk-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--pink);
+  animation: talkDot 1s ease-in-out infinite;
+}
+@keyframes talkDot {
+  0%, 100% { opacity: 0.35; transform: scale(0.85); }
+  50% { opacity: 1; transform: scale(1.15); }
+}
+.talk-banner button {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 6px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.talk-banner button:hover { background: var(--surface-hover); }
+
 .history-sort-bar {
   display: flex;
   align-items: center;
@@ -1122,6 +1172,9 @@ body {
     <button class="ask-icon-btn mic" id="startMicBtn" type="button" aria-label="音声入力" title="音声入力">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
     </button>
+    <button class="ask-icon-btn talk-btn" id="startTalkModeBtn" type="button" aria-label="会話モード" title="会話モード">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+    </button>
     <button class="ask-icon-btn send" id="startSendBtn" aria-label="送信">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/></svg>
     </button>
@@ -1159,9 +1212,17 @@ body {
     </div>
   </div>
   <div class="chat-panel">
+    <div class="talk-banner" id="talkBanner" role="status">
+      <span class="talk-dot" aria-hidden="true"></span>
+      <span id="talkBannerText">会話モード：聞いています…</span>
+      <button type="button" id="talkStopBtn">終了</button>
+    </div>
     <div class="chat-box" id="chat-box"></div>
     <div class="ask-bar" id="chatAskBar">
       <button class="ask-icon-btn" id="chatNewBtn" aria-label="新しい会話" title="新しい会話">＋</button>
+      <button class="ask-icon-btn talk-btn" id="talkModeBtn" type="button" aria-label="会話モード" title="会話モード">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+      </button>
       <input type="text" id="user-input" data-i18n-placeholder="ask_placeholder" placeholder="おいさしAI に相談">
       <button class="ask-icon-btn mic" id="chatMicBtn" type="button" aria-label="音声入力" title="音声入力">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
@@ -1424,10 +1485,19 @@ body {
   function getUserMessages(msgs) {
     return (msgs || []).filter(m => m.role === 'user' || m.role === 'assistant');
   }
+  function extractTextContent(content) {
+    if (content == null) return '';
+    if (typeof content === 'string') return content;
+    if (Array.isArray(content)) {
+      return content.filter(p => p && p.type === 'text' && p.text).map(p => p.text).join(' ').trim();
+    }
+    return String(content);
+  }
   function makeTitle(msgs) {
     const firstUser = (msgs || []).find(m => m.role === 'user');
     if (!firstUser) return '新しい会話';
-    const t = firstUser.content.trim().replace(/\s+/g, ' ');
+    let t = extractTextContent(firstUser.content).trim().replace(/\s+/g, ' ');
+    if (!t) return '新しい会話';
     return t.length > 36 ? t.slice(0, 36) + '…' : t;
   }
   function getCurrentTitle() {
@@ -1801,8 +1871,8 @@ body {
   function renderMessagesFromData(msgs) {
     clearUI();
     (msgs || []).forEach(m => {
-      if (m.role === 'user') addMessage(m.content, 'user', false, m.ts);
-      else if (m.role === 'assistant') addMessage(m.content, 'ai', false, m.ts);
+      if (m.role === 'user') addMessage(extractTextContent(m.content), 'user', false, m.ts);
+      else if (m.role === 'assistant') addMessage(extractTextContent(m.content), 'ai', false, m.ts);
     });
   }
 
@@ -1888,19 +1958,21 @@ body {
     if (leftover) leftover.remove();
   }
 
-  async function sendMessage(text) {
-    if (!text || isSending) return;
+  async function sendMessage(text, opts) {
+    opts = opts || {};
+    const plain = (text || '').trim();
+    if (!plain || isSending) return null;
     if (!started) showChatView();
+
     const userTs = Date.now();
-    addMessage(text, "user", true, userTs);
-    conversationMessages.push({ role: "user", content: text, ts: userTs });
+    addMessage(plain, "user", true, userTs);
+    conversationMessages.push({ role: "user", content: plain, ts: userTs });
     if (!currentId) currentId = 'c_' + Date.now();
     saveCurrent();
 
     setSendingUI(true);
     showLoadingMessage();
     try {
-      // 現在の日時（JST）を system に付与して AI が年・日付・時間を答えられるようにする
       const nowJst = new Date().toLocaleString('ja-JP', {
         timeZone: 'Asia/Tokyo',
         year: 'numeric', month: 'long', day: 'numeric', weekday: 'long',
@@ -1913,7 +1985,7 @@ body {
             content: m.content + '\n\n【現在の日時（日本時間）】' + nowJst + '\n質問に「今何時」「今日の日付」「何年」などが含まれたら、この日時を正確に使って答えてください。'
           };
         }
-        return { role: m.role, content: m.content };
+        return { role: m.role, content: typeof m.content === 'string' ? m.content : extractTextContent(m.content) };
       });
       const response = await fetch(API_SERVER_URL, {
         method: "POST",
@@ -1927,18 +1999,24 @@ body {
       conversationMessages.push({ role: "assistant", content: reply, ts: aiTs });
       removeLoadingMessage();
       addMessage(reply, "ai", true, aiTs);
-      if (typeof window.speakText === 'function') window.speakText(reply);
+      if (opts.fromTalk) {
+        if (typeof window.speakTextForce === 'function') window.speakTextForce(reply);
+      } else if (typeof window.speakText === 'function') {
+        window.speakText(reply);
+      }
       saveCurrent();
       archiveCurrentToHistory();
       updateChatTitleUI();
+      return reply;
     } catch (error) {
       removeLoadingMessage();
       addMessage(`${t('chat_error', '通信エラーが発生しました。')}\n${error.message}`, "error", true);
       conversationMessages.pop();
       saveCurrent();
+      return null;
     } finally {
       setSendingUI(false);
-      inputField.focus();
+      if (!opts.fromTalk) inputField.focus();
     }
   }
 
@@ -2010,8 +2088,9 @@ body {
     const isError = type.indexOf("error") === 0;
     const bubble = document.createElement("div");
     bubble.className = "chat-bubble";
-    if (isAi || isError) bubble.innerHTML = linkify(escapeHTML(text));
-    else bubble.textContent = text;
+    const displayText = typeof text === 'string' ? text : extractTextContent(text);
+    if (isAi || isError) bubble.innerHTML = linkify(escapeHTML(displayText || ''));
+    else bubble.textContent = displayText || '';
 
     const timeEl = document.createElement("div");
     timeEl.className = "msg-time";
@@ -2022,7 +2101,7 @@ body {
       wrap.appendChild(bubble);
       const actions = document.createElement("div");
       actions.className = "msg-actions";
-      actions.appendChild(createCopyButton(text));
+      actions.appendChild(createCopyButton(displayText || ''));
       wrap.appendChild(actions);
     } else {
       wrap.appendChild(timeEl);
@@ -2038,11 +2117,11 @@ body {
       if (isAi) {
         const actions = document.createElement("div");
         actions.className = "msg-actions";
-        actions.appendChild(createCopyButton(text));
+        actions.appendChild(createCopyButton(displayText || ''));
         actions.appendChild(createActionButton(
           '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/>',
           "読み上げ",
-          () => { if (typeof window.speakTextForce === 'function') window.speakTextForce(text); }
+          () => { if (typeof window.speakTextForce === 'function') window.speakTextForce(displayText || ''); }
         ));
         wrap.appendChild(actions);
       }
@@ -2067,8 +2146,7 @@ body {
   } catch (e) {}
 
   function startNewProjectFromStart(text) {
-    if (!text) return;
-    // always new project when typing from start page
+    if (!(text || '').trim()) return;
     conversationMessages = [{ role: "system", content: SYSTEM_PROMPT }];
     currentId = 'c_' + Date.now();
     clearUI();
@@ -2239,6 +2317,172 @@ body {
     document.getElementById('startSendBtn')?.addEventListener('click', () => { if (listening) stopMic(); }, true);
   })();
 
+
+  // ===== 会話モード（マイク連続対話） =====
+  (function setupTalkMode() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const talkBtn = document.getElementById('talkModeBtn');
+    const startTalkBtn = document.getElementById('startTalkModeBtn');
+    const talkBanner = document.getElementById('talkBanner');
+    const talkBannerText = document.getElementById('talkBannerText');
+    const talkStopBtn = document.getElementById('talkStopBtn');
+    const talkBtns = [talkBtn, startTalkBtn].filter(Boolean);
+
+    if (!SpeechRecognition) {
+      talkBtns.forEach(b => {
+        if (!b) return;
+        b.disabled = true;
+        b.title = 'このブラウザは会話モードに対応していません';
+      });
+      return;
+    }
+
+    let talkActive = false;
+    let talkRec = null;
+    let talkBusy = false;
+
+    function getLang() {
+      try {
+        const pref = localStorage.getItem('oisasi-lang') || 'auto';
+        if (pref === 'en') return 'en-US';
+        if (pref === 'ja') return 'ja-JP';
+        return (navigator.language || 'ja').toLowerCase().startsWith('ja') ? 'ja-JP' : 'en-US';
+      } catch (e) { return 'ja-JP'; }
+    }
+    function isJa() {
+      return (document.documentElement.lang || 'ja').startsWith('ja');
+    }
+    function setBanner(text) {
+      if (talkBannerText) talkBannerText.textContent = text;
+    }
+    function setTalkUI(on) {
+      talkActive = on;
+      talkBtns.forEach(b => { if (b) b.classList.toggle('active', on); });
+      if (talkBanner) talkBanner.classList.toggle('show', on);
+    }
+    function stopRecognition() {
+      try { if (talkRec) talkRec.onend = null; talkRec.stop(); } catch (e) {}
+      talkRec = null;
+    }
+    function stopTalkMode() {
+      talkActive = false;
+      talkBusy = false;
+      stopRecognition();
+      if (window.speechSynthesis) window.speechSynthesis.cancel();
+      setTalkUI(false);
+      talkBtns.forEach(b => { if (b) b.classList.remove('listening'); });
+    }
+    function waitSpeechEnd() {
+      return new Promise((resolve) => {
+        if (!window.speechSynthesis) { resolve(); return; }
+        const start = Date.now();
+        const tick = () => {
+          if (!talkActive) { resolve(); return; }
+          if (!window.speechSynthesis.speaking && !window.speechSynthesis.pending) {
+            setTimeout(resolve, 350);
+            return;
+          }
+          if (Date.now() - start > 60000) { resolve(); return; }
+          setTimeout(tick, 200);
+        };
+        setTimeout(tick, 400);
+      });
+    }
+    function listenOnce() {
+      if (!talkActive || talkBusy || isSending) return;
+      stopRecognition();
+      talkBtns.forEach(b => { if (b) b.classList.add('listening'); });
+      setBanner(isJa() ? '会話モード：聞いています… 話しかけてください' : 'Talk mode: Listening…');
+
+      const rec = new SpeechRecognition();
+      talkRec = rec;
+      rec.lang = getLang();
+      rec.interimResults = false;
+      rec.continuous = false;
+      rec.maxAlternatives = 1;
+
+      rec.onresult = async (event) => {
+        let said = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          if (event.results[i].isFinal) said += event.results[i][0].transcript;
+        }
+        said = (said || '').trim();
+        if (!said || !talkActive) return;
+        talkBusy = true;
+        talkBtns.forEach(b => { if (b) b.classList.remove('listening'); });
+        setBanner(isJa() ? '会話モード：考えています…' : 'Talk mode: Thinking…');
+
+        if (!started) {
+          conversationMessages = [{ role: 'system', content: SYSTEM_PROMPT }];
+          currentId = 'c_' + Date.now();
+          clearUI();
+          localStorage.removeItem(STORAGE_CURRENT);
+        }
+
+        const reply = await sendMessage(said, { fromTalk: true });
+        if (!talkActive) { talkBusy = false; return; }
+
+        if (reply) {
+          setBanner(isJa() ? '会話モード：読み上げ中…' : 'Talk mode: Speaking…');
+          waitSpeechEnd().then(() => {
+            talkBusy = false;
+            if (talkActive) listenOnce();
+          });
+        } else {
+          talkBusy = false;
+          if (talkActive) {
+            setBanner(isJa() ? '会話モード：エラー。もう一度話してください' : 'Talk mode: Error. Try again');
+            setTimeout(() => { if (talkActive) listenOnce(); }, 800);
+          }
+        }
+      };
+
+      rec.onerror = (ev) => {
+        talkBtns.forEach(b => { if (b) b.classList.remove('listening'); });
+        if (!talkActive) return;
+        if (ev.error === 'not-allowed') {
+          alert(isJa()
+            ? 'マイクの使用が許可されていません。ブラウザの設定を確認してください。'
+            : 'Microphone access was denied.');
+          stopTalkMode();
+          return;
+        }
+        if (!talkBusy) {
+          setTimeout(() => { if (talkActive && !talkBusy) listenOnce(); }, 400);
+        }
+      };
+
+      rec.onend = () => {
+        talkBtns.forEach(b => { if (b) b.classList.remove('listening'); });
+        if (talkActive && !talkBusy) {
+          setTimeout(() => { if (talkActive && !talkBusy) listenOnce(); }, 300);
+        }
+      };
+
+      try { rec.start(); }
+      catch (e) { setTimeout(() => { if (talkActive && !talkBusy) listenOnce(); }, 500); }
+    }
+
+    function toggleTalkMode() {
+      if (talkActive) { stopTalkMode(); return; }
+      setTalkUI(true);
+      setBanner(isJa() ? '会話モード開始' : 'Talk mode started');
+      listenOnce();
+    }
+
+    talkBtns.forEach(b => b && b.addEventListener('click', (e) => {
+      e.preventDefault();
+      toggleTalkMode();
+    }));
+    if (talkStopBtn) talkStopBtn.addEventListener('click', () => stopTalkMode());
+
+    const chatNewBtnEl = document.getElementById('chatNewBtn');
+    if (chatNewBtnEl) chatNewBtnEl.addEventListener('click', () => { if (talkActive) stopTalkMode(); });
+    const backStartBtnEl = document.getElementById('backStartBtn');
+    if (backStartBtnEl) backStartBtnEl.addEventListener('click', () => { if (talkActive) stopTalkMode(); });
+  })();
+
+
   const confirmCancel = document.getElementById('confirmCancel');
   const confirmOk = document.getElementById('confirmOk');
   const confirmOverlay = document.getElementById('confirmOverlay');
@@ -2264,6 +2508,8 @@ body {
       sendMessage(text);
     }
   });
+
+
 })();
 </script>
 <script>
