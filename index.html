@@ -593,85 +593,25 @@ footer { margin-top: 52px; text-align: center; }
   transform: translateY(-2px);
 }
 
-/* OFFLINE OVERLAY (full-screen) */
-.offline-overlay {
-  position: fixed; inset: 0; z-index: 5000;
-  display: flex; align-items: center; justify-content: center; padding: 24px;
-  background: var(--bg);
-  opacity: 0; visibility: hidden; pointer-events: none;
-  transition: opacity 0.5s cubic-bezier(0.22,1,0.36,1), visibility 0s linear 0.5s;
-}
-.offline-overlay.show {
-  opacity: 1; visibility: visible; pointer-events: auto;
-  transition: opacity 0.5s cubic-bezier(0.22,1,0.36,1), visibility 0s linear 0s;
-}
-.offline-overlay .oo-bg {
-  position: absolute; inset: 0; z-index: 0; overflow: hidden;
-  background:
-    radial-gradient(ellipse 90% 60% at 15% -10%, color-mix(in srgb, var(--purple) 40%, transparent), transparent 55%),
-    radial-gradient(ellipse 70% 50% at 90% 5%, color-mix(in srgb, var(--pink) 30%, transparent), transparent 50%),
-    radial-gradient(ellipse 60% 40% at 50% 110%, color-mix(in srgb, var(--cyan) 14%, transparent), transparent 50%);
-}
-.offline-overlay .oo-card {
-  position: relative; z-index: 1; width: min(420px, 100%);
-  text-align: center; padding: 40px 30px 34px;
-  background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 26px;
-  box-shadow: var(--shadow);
-  transform: translateY(24px) scale(0.97); opacity: 0;
-  transition: transform 0.55s cubic-bezier(0.22,1,0.36,1), opacity 0.55s cubic-bezier(0.22,1,0.36,1);
-}
-.offline-overlay.show .oo-card { transform: translateY(0) scale(1); opacity: 1; transition-delay: 0.08s; }
-.oo-icon-wrap {
-  width: 84px; height: 84px; margin: 0 auto 22px; border-radius: 50%;
-  display: grid; place-items: center;
-  background: linear-gradient(135deg, color-mix(in srgb, var(--pink) 30%, transparent), color-mix(in srgb, var(--purple) 24%, transparent));
-  border: 1px solid color-mix(in srgb, var(--pink) 35%, transparent);
-  animation: ooPulse 2.4s ease-in-out infinite;
-}
-@keyframes ooPulse {
-  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--pink) 28%, transparent); }
-  50% { box-shadow: 0 0 0 14px transparent; }
-}
-.oo-icon-wrap svg { width: 38px; height: 38px; color: var(--pink); }
-.oo-icon-wrap.oo-online svg { color: #21c98a; }
-.oo-icon-wrap.oo-online {
-  background: linear-gradient(135deg, color-mix(in srgb, #21c98a 30%, transparent), color-mix(in srgb, #00b4d8 24%, transparent));
-  border-color: color-mix(in srgb, #21c98a 35%, transparent);
-}
-.oo-title { font-size: 21px; font-weight: 900; letter-spacing: -0.01em; margin-bottom: 10px; }
-.oo-desc { font-size: 14px; color: var(--muted); line-height: 1.7; margin-bottom: 26px; }
-.oo-actions { display: flex; flex-direction: column; gap: 10px; }
-.oo-retry {
-  width: 100%; padding: 14px; border: none; border-radius: 14px;
-  background: linear-gradient(135deg, var(--pink), var(--purple)); color: #fff;
-  font-family: inherit; font-size: 14.5px; font-weight: 700; cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.22,1,0.36,1);
-  display: flex; align-items: center; justify-content: center; gap: 8px;
-}
-.oo-retry:hover { transform: translateY(-2px); box-shadow: 0 10px 26px color-mix(in srgb, var(--pink) 40%, transparent); }
-.oo-retry:active { transform: translateY(0) scale(0.98); }
-.oo-retry:disabled { opacity: 0.65; cursor: default; transform: none; box-shadow: none; }
-.oo-retry svg { width: 16px; height: 16px; transition: transform 0.6s cubic-bezier(0.22,1,0.36,1); }
-.oo-retry.spinning svg { animation: ooSpin 0.9s linear infinite; }
-@keyframes ooSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-.oo-status { margin-top: 16px; font-size: 12px; color: var(--muted); min-height: 16px; }
-.oo-status .oo-dot {
-  display: inline-block; width: 6px; height: 6px; border-radius: 50%;
-  background: var(--pink); margin-right: 6px; animation: ooBlink 1.4s ease-in-out infinite;
-}
-@keyframes ooBlink { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
-
-/* small "back online" toast (used once the overlay has closed) */
-.online-toast {
+/* Offline / Online top popup */
+.network-toast {
   position: fixed; top: calc(var(--header-h) + 12px); left: 50%; z-index: 2000;
   transform: translate(-50%, -14px); opacity: 0; visibility: hidden;
-  display: flex; align-items: center; gap: 8px; padding: 11px 18px; border-radius: 999px;
-  background: linear-gradient(135deg, #21c98a, #00b4d8); color: #fff;
+  display: flex; align-items: center; gap: 8px; padding: 11px 20px; border-radius: 999px;
   font-size: 13px; font-weight: 700; box-shadow: 0 10px 28px rgba(0,0,0,0.3);
   transition: all 0.4s cubic-bezier(0.22,1,0.36,1);
+  pointer-events: none;
 }
-.online-toast.show { transform: translate(-50%, 0); opacity: 1; visibility: visible; }
-.online-toast svg { width: 15px; height: 15px; }
+.network-toast.show {
+  transform: translate(-50%, 0); opacity: 1; visibility: visible;
+}
+.network-toast.offline {
+  background: linear-gradient(135deg, #ff5a7a, #e84a9a); color: #fff;
+}
+.network-toast.online {
+  background: linear-gradient(135deg, #21c98a, #00b4d8); color: #fff;
+}
+.network-toast svg { width: 15px; height: 15px; flex-shrink: 0; }
 
 /* ===== PC Layout ===== */
 @media (min-width: 768px) {
@@ -833,35 +773,17 @@ footer { margin-top: 52px; text-align: center; }
 <div class="sparkle" style="top:62%;left:8%;animation-delay:2.1s"></div>
 <div class="sparkle" style="top:78%;left:72%;animation-delay:0.6s"></div>
 
-<div class="offline-overlay" id="offlineOverlay" role="alert" aria-live="assertive" aria-modal="true">
-  <div class="oo-bg" aria-hidden="true"></div>
-  <div class="oo-card">
-    <div class="oo-icon-wrap" id="ooIconWrap">
-      <svg id="ooIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="1" y1="1" x2="23" y2="23"/>
-        <path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/>
-        <path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/>
-        <path d="M10.71 5.05A16 16 0 0 1 22.58 9"/>
-        <path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/>
-        <path d="M8.53 16.11a6 6 0 0 1 6.95 0"/>
-        <line x1="12" y1="20" x2="12.01" y2="20"/>
-      </svg>
-    </div>
-    <div class="oo-title" id="ooTitle" data-i18n="offline_title">オフラインです</div>
-    <p class="oo-desc" id="ooDesc" data-i18n="offline_desc_full">インターネットに接続されていないため、このページを表示できません。接続を確認してから再読み込みしてください。</p>
-    <div class="oo-actions">
-      <button class="oo-retry" id="offlineRetry" type="button">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
-        <span id="ooRetryLabel" data-i18n="offline_retry">再読み込み</span>
-      </button>
-    </div>
-    <div class="oo-status" id="ooStatus"><span class="oo-dot"></span><span data-i18n="offline_watching">接続を自動でチェックしています…</span></div>
-  </div>
-</div>
-
-<div class="online-toast" id="onlineToast" role="status" aria-live="polite">
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
-  <span data-i18n="online_desc">インターネットに再接続しました</span>
+<div class="network-toast" id="networkToast" role="status" aria-live="polite">
+  <svg id="networkToastIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="1" y1="1" x2="23" y2="23"/>
+    <path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/>
+    <path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/>
+    <path d="M10.71 5.05A16 16 0 0 1 22.58 9"/>
+    <path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/>
+    <path d="M8.53 16.11a6 6 0 0 1 6.95 0"/>
+    <line x1="12" y1="20" x2="12.01" y2="20"/>
+  </svg>
+  <span id="networkToastText" data-i18n="offline_title">オフラインです</span>
 </div>
 
 <header class="header" id="header">
@@ -1241,121 +1163,61 @@ footer { margin-top: 52px; text-align: center; }
   }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
   sections.forEach(s => observer.observe(s));
 
-  /* ===== オフラインエラー（全画面） ===== */
-  const offlineOverlay = document.getElementById('offlineOverlay');
-  const offlineRetry = document.getElementById('offlineRetry');
-  const ooIconWrap = document.getElementById('ooIconWrap');
-  const ooTitleEl = document.getElementById('ooTitle');
-  const ooDescEl = document.getElementById('ooDesc');
-  const ooRetryLabel = document.getElementById('ooRetryLabel');
-  const ooStatus = document.getElementById('ooStatus');
-  const onlineToast = document.getElementById('onlineToast');
-
-  let watchdogTimer = null;
+  /* ===== オフライン / オンライン 上部ポップアップ ===== */
+  const networkToast = document.getElementById('networkToast');
+  const networkToastText = document.getElementById('networkToastText');
+  const networkToastIcon = document.getElementById('networkToastIcon');
   let toastTimer = null;
-  let overlayIsShown = false;
+  let isOfflineShown = false;
 
-  function ooText(key) {
+  const offlineIconSVG = '<line x1="1" y1="1" x2="23" y2="23"/><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/><path d="M10.71 5.05A16 16 0 0 1 22.58 9"/><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/>';
+  const onlineIconSVG = '<path d="M20 6L9 17l-5-5"/>';
+
+  function ntText(key) {
     const t = i18n[resolveLang(currentLangPref)];
     return t[key] != null ? t[key] : key;
   }
 
-  function refreshOfflineOverlayTexts() {
-    if (!overlayIsShown) return;
-    ooTitleEl.textContent = ooText('offline_title');
-    ooDescEl.textContent = ooText('offline_desc_full');
-    ooRetryLabel.textContent = ooText('offline_retry');
-    ooStatus.lastElementChild.textContent = ooText('offline_watching');
-  }
-
-  // Same-origin request with a short timeout; the most reliable way to know
-  // whether the network is *actually* reachable (navigator.onLine only
-  // reflects the OS network interface, not real connectivity).
-  function checkConnectivity() {
-    return new Promise(resolve => {
-      if (!navigator.onLine) { resolve(false); return; }
-      const controller = new AbortController();
-      const timer = setTimeout(() => { controller.abort(); resolve(false); }, 3500);
-      fetch(location.href, { method: 'HEAD', cache: 'no-store', signal: controller.signal })
-        .then(() => { clearTimeout(timer); resolve(true); })
-        .catch(() => { clearTimeout(timer); resolve(false); });
-    });
-  }
-
-  function startWatchdog() {
-    stopWatchdog();
-    watchdogTimer = setInterval(async () => {
-      const ok = await checkConnectivity();
-      if (ok) handleBackOnline();
-    }, 4000);
-  }
-  function stopWatchdog() {
-    clearInterval(watchdogTimer);
-    watchdogTimer = null;
-  }
-
-  function showOfflineOverlay() {
-    overlayIsShown = true;
+  function showNetworkToast(type) {
     clearTimeout(toastTimer);
-    onlineToast.classList.remove('show');
-    ooIconWrap.classList.remove('oo-online');
-    refreshOfflineOverlayTexts();
-    offlineOverlay.classList.add('show');
-    document.body.style.overflow = 'hidden';
-    startWatchdog();
-  }
-
-  function handleBackOnline() {
-    if (!overlayIsShown) return;
-    overlayIsShown = false;
-    stopWatchdog();
-    offlineOverlay.classList.remove('show');
-    document.body.style.overflow = '';
-    onlineToast.classList.add('show');
-    toastTimer = setTimeout(() => onlineToast.classList.remove('show'), 3200);
-  }
-
-  async function updateOnlineStatus() {
-    if (!navigator.onLine) {
-      showOfflineOverlay();
-      return;
+    networkToast.classList.remove('offline', 'online', 'show');
+    void networkToast.offsetWidth; // reflow for animation restart
+    if (type === 'offline') {
+      isOfflineShown = true;
+      networkToast.classList.add('offline');
+      networkToastText.textContent = ntText('offline_title');
+      networkToastIcon.innerHTML = offlineIconSVG;
+      networkToast.classList.add('show');
+    } else {
+      isOfflineShown = false;
+      networkToast.classList.add('online');
+      networkToastText.textContent = ntText('online_desc');
+      networkToastIcon.innerHTML = onlineIconSVG;
+      networkToast.classList.add('show');
+      toastTimer = setTimeout(() => networkToast.classList.remove('show'), 3200);
     }
-    const ok = await checkConnectivity();
-    if (ok) handleBackOnline();
-    else showOfflineOverlay();
   }
 
-  window.addEventListener('offline', showOfflineOverlay);
-  window.addEventListener('online', updateOnlineStatus);
-
-  // Reload かどうかに関わらず、読み込み時点でオフラインなら全画面エラーを表示
-  if (!navigator.onLine) {
-    showOfflineOverlay();
-  } else {
-    checkConnectivity().then(ok => { if (!ok) showOfflineOverlay(); });
+  function handleOffline() {
+    showNetworkToast('offline');
   }
 
-  offlineRetry.addEventListener('click', async () => {
-    offlineRetry.disabled = true;
-    offlineRetry.classList.add('spinning');
-    const ok = await checkConnectivity();
-    if (ok) {
-      location.reload();
-      return;
-    }
-    offlineRetry.classList.remove('spinning');
-    offlineRetry.disabled = false;
-    offlineOverlay.querySelector('.oo-card').animate(
-      [{ transform: 'translateY(0) translateX(0)' }, { transform: 'translateY(0) translateX(-6px)' }, { transform: 'translateY(0) translateX(6px)' }, { transform: 'translateY(0) translateX(0)' }],
-      { duration: 320 }
-    );
-  });
+  function handleOnline() {
+    if (isOfflineShown) showNetworkToast('online');
+  }
 
-  // applyLang が呼ばれた際にオーバーレイの文言も更新する
+  window.addEventListener('offline', handleOffline);
+  window.addEventListener('online', handleOnline);
+
+  if (!navigator.onLine) handleOffline();
+
+  // 言語切替時にオフライン表示中なら文言更新
   const _applyLangOrig = applyLang;
   applyLang = function (pref) {
     _applyLangOrig(pref);
-    refreshOfflineOverlayTexts();
+    if (isOfflineShown) {
+      networkToastText.textContent = ntText('offline_title');
+    }
   };
 
   window.closeAll = closeAll;
