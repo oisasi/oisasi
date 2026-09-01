@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>おいじぃ魔女と電話 | Oijii Witch Call</title>
+<meta name="description" content="おいじぃ魔女と電話で会話できます。">
+<meta name="theme-color" content="#0c0618">
+<link rel="icon" type="image/png" href="おいじぃ魔女.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  height: 100%;
+  font-family: "Zen Maru Gothic", "Hiragino Maru Gothic ProN", "Yu Gothic", system-ui, sans-serif;
+  background: #0c0618;
+  color: #f2eef8;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+.dial-screen {
+  position: fixed; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 24px;
+  background:
+    radial-gradient(ellipse 90% 55% at 50% 0%, rgba(155,109,255,0.28), transparent 55%),
+    radial-gradient(ellipse 70% 45% at 50% 100%, rgba(61,255,168,0.14), transparent 50%),
+    #0c0618;
+  transition: opacity 0.3s, visibility 0.3s;
+}
+.dial-screen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+.dial-avatar {
+  width: 120px; height: 120px; border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid rgba(155,109,255,0.35);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.45);
+  margin-bottom: 18px;
+}
+.dial-name { font-size: 28px; font-weight: 900; letter-spacing: -0.02em; margin-bottom: 6px; }
+.dial-sub { font-size: 14px; font-weight: 700; color: rgba(242,238,248,0.55); margin-bottom: 36px; }
+.call-btn {
+  width: 78px; height: 78px; border-radius: 50%; border: none;
+  background: linear-gradient(135deg, #9b6dff, #3dffa8);
+  color: #fff; cursor: pointer;
+  display: grid; place-items: center;
+  box-shadow: 0 12px 32px rgba(155,109,255,0.4);
+  transition: transform 0.2s, filter 0.2s;
+}
+.call-btn:hover { transform: scale(1.06); filter: brightness(1.06); }
+.call-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+.call-btn svg { width: 32px; height: 32px; }
+.call-hint { margin-top: 14px; font-size: 13px; font-weight: 700; color: rgba(242,238,248,0.5); }
+.back-link {
+  position: absolute; top: max(16px, env(safe-area-inset-top)); left: 16px;
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 10px 14px; border-radius: 999px;
+  border: 1px solid rgba(180,140,255,0.2);
+  background: rgba(255,255,255,0.06);
+  color: #f2eef8; text-decoration: none;
+  font-size: 13px; font-weight: 700;
+}
+.back-link:hover { background: rgba(255,255,255,0.1); }
+.unsupported {
+  margin-top: 20px; font-size: 13px; color: #ff8a9a; font-weight: 700; text-align: center;
+}
+
+.phone-call-screen {
+  position: fixed; inset: 0; z-index: 10;
+  display: none; flex-direction: column;
+  align-items: center; justify-content: space-between;
+  padding: max(28px, env(safe-area-inset-top)) 24px max(36px, env(safe-area-inset-bottom));
+  background:
+    radial-gradient(ellipse 80% 50% at 50% 20%, rgba(155,109,255,0.32), transparent 60%),
+    radial-gradient(ellipse 70% 40% at 50% 100%, rgba(61,255,168,0.18), transparent 55%),
+    #0c0618;
+  opacity: 0; transform: translateY(12px);
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+.phone-call-screen.open { display: flex; opacity: 1; transform: translateY(0); }
+.phone-call-top { width: 100%; max-width: 420px; text-align: center; padding-top: 12px; }
+.phone-call-label {
+  font-size: 13px; font-weight: 700; letter-spacing: 0.12em;
+  text-transform: uppercase; color: rgba(242,238,248,0.55); margin-bottom: 6px;
+}
+.phone-call-timer {
+  font-size: 15px; font-weight: 700; color: rgba(242,238,248,0.85);
+  font-variant-numeric: tabular-nums;
+}
+.phone-call-center {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 22px; flex: 1; justify-content: center;
+}
+.phone-avatar-wrap { position: relative; width: 148px; height: 148px; }
+.phone-avatar-ring {
+  position: absolute; inset: -10px; border-radius: 50%;
+  border: 2px solid rgba(155,109,255,0.45);
+  animation: phoneRing 2.2s ease-out infinite;
+}
+.phone-avatar-ring.r2 {
+  inset: -22px; border-color: rgba(61,255,168,0.28); animation-delay: 0.55s;
+}
+.phone-call-screen.state-listening .phone-avatar-ring { border-color: rgba(110,255,197,0.55); }
+.phone-call-screen.state-thinking .phone-avatar-ring { border-color: rgba(196,77,255,0.5); animation-duration: 1.2s; }
+.phone-call-screen.state-speaking .phone-avatar-ring { border-color: rgba(155,109,255,0.6); }
+.phone-call-screen.state-calling .phone-avatar-ring { border-color: rgba(61,255,168,0.55); }
+@keyframes phoneRing {
+  0% { transform: scale(0.92); opacity: 0.85; }
+  100% { transform: scale(1.18); opacity: 0; }
+}
+.phone-avatar {
+  width: 148px; height: 148px; border-radius: 50%; object-fit: cover;
+  background: rgba(255,255,255,0.08);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.5);
+  border: 3px solid rgba(155,109,255,0.35);
+}
+.phone-call-name { font-size: 26px; font-weight: 900; letter-spacing: -0.02em; }
+.phone-call-status {
+  font-size: 15px; font-weight: 700; color: rgba(242,238,248,0.72); min-height: 1.4em;
+}
+.phone-call-transcript {
+  max-width: 320px; font-size: 13.5px; font-weight: 600;
+  color: rgba(242,238,248,0.5); text-align: center; line-height: 1.5;
+  min-height: 2.8em; padding: 0 8px;
+}
+.phone-wave {
+  display: flex; align-items: flex-end; gap: 5px; height: 28px;
+  opacity: 0; transition: opacity 0.25s;
+}
+.phone-call-screen.state-listening .phone-wave,
+.phone-call-screen.state-speaking .phone-wave,
+.phone-call-screen.state-calling .phone-wave { opacity: 1; }
+.phone-wave span {
+  width: 4px; border-radius: 4px;
+  background: linear-gradient(180deg, #9b6dff, #3dffa8);
+  animation: phoneBar 0.9s ease-in-out infinite;
+}
+.phone-wave span:nth-child(1) { height: 10px; animation-delay: 0s; }
+.phone-wave span:nth-child(2) { height: 18px; animation-delay: 0.12s; }
+.phone-wave span:nth-child(3) { height: 26px; animation-delay: 0.24s; }
+.phone-wave span:nth-child(4) { height: 16px; animation-delay: 0.36s; }
+.phone-wave span:nth-child(5) { height: 22px; animation-delay: 0.48s; }
+.phone-wave span:nth-child(6) { height: 12px; animation-delay: 0.2s; }
+.phone-wave span:nth-child(7) { height: 20px; animation-delay: 0.32s; }
+@keyframes phoneBar {
+  0%, 100% { transform: scaleY(0.45); opacity: 0.55; }
+  50% { transform: scaleY(1); opacity: 1; }
+}
+.phone-call-actions {
+  display: flex; align-items: center; justify-content: center;
+  gap: 28px; width: 100%; max-width: 420px; padding-bottom: 8px;
+}
+.phone-action-btn {
+  width: 64px; height: 64px; border-radius: 50%; border: none;
+  display: grid; place-items: center; cursor: pointer;
+  transition: transform 0.2s, filter 0.2s; color: #fff;
+}
+.phone-action-btn svg { width: 26px; height: 26px; }
+.phone-action-btn:hover { transform: scale(1.06); }
+.phone-action-btn.end {
+  background: #e74c3c;
+  box-shadow: 0 10px 28px rgba(231,76,60,0.4);
+}
+.phone-action-hint {
+  font-size: 12px; font-weight: 700; color: rgba(242,238,248,0.5);
+  margin-top: 10px; text-align: center;
+}
+</style>
+</head>
+<body>
+
+<div class="dial-screen" id="dialScreen">
+  <a class="back-link" href="oijiiw.ai.html">← チャットへ</a>
+  <img class="dial-avatar" src="おいじぃ魔女.png" alt="おいじぃ魔女" width="120" height="120">
+  <div class="dial-name">おいじぃ魔女</div>
+  <div class="dial-sub">音声で会話できるのぞぃ</div>
+  <button type="button" class="call-btn" id="startCallBtn" aria-label="発信">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.11 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.81.36 1.6.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c1.21.34 2 .57 2.81.7A2 2 0 0 1 22 16.92z"/>
+    </svg>
+  </button>
+  <div class="call-hint">タップして発信</div>
+  <p class="unsupported" id="unsupportedMsg" hidden>このブラウザは音声通話に対応していないのぞぃ（Chrome / Edge 推奨）</p>
+</div>
+
+<div class="phone-call-screen" id="phoneCallScreen" aria-hidden="true">
+  <div class="phone-call-top">
+    <div class="phone-call-label">おいじぃ魔女</div>
+    <div class="phone-call-timer" id="phoneCallTimer">00:00</div>
+  </div>
+  <div class="phone-call-center">
+    <div class="phone-avatar-wrap">
+      <div class="phone-avatar-ring" aria-hidden="true"></div>
+      <div class="phone-avatar-ring r2" aria-hidden="true"></div>
+      <img class="phone-avatar" src="おいじぃ魔女.png" alt="おいじぃ魔女" width="148" height="148">
+    </div>
+    <div class="phone-call-name">おいじぃ魔女</div>
+    <div class="phone-call-status" id="phoneCallStatus">接続中…</div>
+    <div class="phone-wave" aria-hidden="true">
+      <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+    </div>
+    <div class="phone-call-transcript" id="phoneCallTranscript"></div>
+  </div>
+  <div>
+    <div class="phone-call-actions">
+      <button type="button" class="phone-action-btn end" id="endCallBtn" aria-label="通話終了" title="通話終了">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10.68 13.31a16 16 0 0 0 3.41 2.6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7 2 2 0 0 1 1.72 2v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91"/>
+          <line x1="23" y1="1" x2="1" y2="23"/>
+        </svg>
+      </button>
+    </div>
+    <div class="phone-action-hint">通話を終了</div>
+  </div>
+</div>
+
+<script>
+(function () {
+  const API_SERVER_URL = "https://oijii-majo-api.oisasioisasi.workers.dev";
+  const SYSTEM_PROMPT = `あなたは『おいじぃ魔女』というキャラクターです。以下の言葉遣いを厳守して返答してください。
+・一人称：わたくし
+・二人称：お主、お主ら
+・語尾：「〜ぞぃ」「〜のぞぃ」「〜ぞい」「〜からのぅ」「〜かのぅ」
+・笑い声：「フォッフォッフォ！」「ヒッヒッヒ…」
+・性格：少し偉そうですが、親しみやすくユーモアのある老魔女です。
+・電話での会話なので、短く聞き取りやすい口語で答えてください。一度に長く話しすぎないでください。
+・おいじぃ魔女のsns
+https://www.instagram.com/oijiiw (Instagram)
+https://www.youtube.com/@oijiiw (YouTube)
+https://www.facebook.com/oijiiw (Facebook)
+https://x.com/oijiiw (X)
+https://www.tiktok.com/@oijiiw (TikTok)
+おいじぃ魔女のホームページは https://oisasi.f5.si/oijiiw です
+・おいさし公式ホームページは https://oisasi.f5.si です。`;
+
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const dialScreen = document.getElementById('dialScreen');
+  const phoneScreen = document.getElementById('phoneCallScreen');
+  const phoneStatus = document.getElementById('phoneCallStatus');
+  const phoneTranscript = document.getElementById('phoneCallTranscript');
+  const phoneTimer = document.getElementById('phoneCallTimer');
+  const startCallBtn = document.getElementById('startCallBtn');
+  const endCallBtn = document.getElementById('endCallBtn');
+  const unsupportedMsg = document.getElementById('unsupportedMsg');
+
+  let conversationMessages = [{ role: 'system', content: SYSTEM_PROMPT }];
+  let talkActive = false;
+  let talkRec = null;
+  let talkBusy = false;
+  let isSending = false;
+  let callTimerId = null;
+  let callStartedAt = 0;
+
+  if (!SpeechRecognition) {
+    startCallBtn.disabled = true;
+    unsupportedMsg.hidden = false;
+  }
+
+  function isJa() {
+    return (navigator.language || 'ja').toLowerCase().startsWith('ja');
+  }
+  function getLang() { return isJa() ? 'ja-JP' : 'en-US'; }
+
+  function formatCallTime(sec) {
+    const m = String(Math.floor(sec / 60)).padStart(2, '0');
+    const s = String(sec % 60).padStart(2, '0');
+    return m + ':' + s;
+  }
+  function startCallTimer() {
+    callStartedAt = Date.now();
+    phoneTimer.textContent = '00:00';
+    clearInterval(callTimerId);
+    callTimerId = setInterval(() => {
+      phoneTimer.textContent = formatCallTime(Math.floor((Date.now() - callStartedAt) / 1000));
+    }, 1000);
+  }
+  function stopCallTimer() {
+    clearInterval(callTimerId);
+    callTimerId = null;
+  }
+
+  function setPhoneState(state, statusText, transcript) {
+    phoneScreen.classList.remove('state-listening', 'state-thinking', 'state-speaking', 'state-calling');
+    if (state) phoneScreen.classList.add('state-' + state);
+    if (statusText != null) phoneStatus.textContent = statusText;
+    if (transcript != null) phoneTranscript.textContent = transcript;
+  }
+
+  function setCallUI(on) {
+    talkActive = on;
+    phoneScreen.classList.toggle('open', on);
+    phoneScreen.setAttribute('aria-hidden', on ? 'false' : 'true');
+    dialScreen.classList.toggle('hidden', on);
+    if (on) startCallTimer();
+    else {
+      stopCallTimer();
+      setPhoneState(null, '', '');
+    }
+  }
+
+  function speak(text) {
+    if (!text || !('speechSynthesis' in window)) return;
+    try {
+      window.speechSynthesis.cancel();
+      const clean = String(text).replace(/https?:\/\/[^\s]+/g, '').replace(/[#*_`>~]/g, '');
+      if (!clean.trim()) return;
+      const u = new SpeechSynthesisUtterance(clean);
+      u.lang = getLang();
+      window.speechSynthesis.speak(u);
+    } catch (e) {}
+  }
+
+  function waitSpeechEnd() {
+    return new Promise((resolve) => {
+      if (!window.speechSynthesis) { resolve(); return; }
+      const start = Date.now();
+      const tick = () => {
+        if (!window.speechSynthesis.speaking && !window.speechSynthesis.pending) {
+          setTimeout(resolve, 300);
+          return;
+        }
+        if (Date.now() - start > 45000) { resolve(); return; }
+        setTimeout(tick, 200);
+      };
+      setTimeout(tick, 350);
+    });
+  }
+
+  function playTone(kind) {
+    return new Promise((resolve) => {
+      try {
+        const Ctx = window.AudioContext || window.webkitAudioContext;
+        if (!Ctx) { resolve(); return; }
+        const ctx = new Ctx();
+        const master = ctx.createGain();
+        master.gain.value = kind === 'ring' ? 0.18 : 0.22;
+        master.connect(ctx.destination);
+        const t0 = ctx.currentTime + 0.05;
+        if (kind === 'ring') {
+          const ring = (start, dur) => {
+            [400, 450].forEach((freq) => {
+              const osc = ctx.createOscillator();
+              const g = ctx.createGain();
+              osc.type = 'sine';
+              osc.frequency.value = freq;
+              g.gain.setValueAtTime(0.0001, start);
+              g.gain.exponentialRampToValueAtTime(0.55, start + 0.03);
+              g.gain.setValueAtTime(0.55, start + dur - 0.05);
+              g.gain.exponentialRampToValueAtTime(0.0001, start + dur);
+              osc.connect(g); g.connect(master);
+              osc.start(start); osc.stop(start + dur + 0.02);
+            });
+          };
+          ring(t0, 1.0);
+          ring(t0 + 3.0, 1.0);
+          setTimeout(() => { try { ctx.close(); } catch (e) {} resolve(); }, 4500);
+        } else {
+          const beep = (start, dur) => {
+            const osc = ctx.createOscillator();
+            const g = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.value = 400;
+            g.gain.setValueAtTime(0.0001, start);
+            g.gain.exponentialRampToValueAtTime(0.9, start + 0.02);
+            g.gain.setValueAtTime(0.9, start + dur - 0.04);
+            g.gain.exponentialRampToValueAtTime(0.0001, start + dur);
+            osc.connect(g); g.connect(master);
+            osc.start(start); osc.stop(start + dur + 0.02);
+          };
+          beep(t0, 0.28);
+          beep(t0 + 0.42, 0.28);
+          beep(t0 + 0.84, 0.28);
+          setTimeout(() => { try { ctx.close(); } catch (e) {} resolve(); }, 1400);
+        }
+      } catch (e) { resolve(); }
+    });
+  }
+
+  function isGoodbyeMessage(text) {
+    const raw = text || '';
+    if (/(またね|じゃあね|じゃーね|バイバイ|ばいばい|さようなら|さよなら|失礼します|おやすみ|see\s*you|good\s*bye|\bbye\b|通話終了|電話切|終わり|終了)/i.test(raw)) {
+      return true;
+    }
+    const n = raw.toLowerCase().replace(/\s+/g, '').replace(/[！!。．.？?、,ー～]/g, '');
+    const patterns = ['またね','じゃあね','じゃね','バイバイ','ばいばい','bye','goodbye','seeyou','さようなら','さよなら','失礼します','おやすみ','また今度','ではまた','通話終了'];
+    return patterns.some(p => n === p || n.indexOf(p) !== -1);
+  }
+
+  async function askAI(userText) {
+    isSending = true;
+    conversationMessages.push({ role: 'user', content: userText });
+    try {
+      const nowJst = new Date().toLocaleString('ja-JP', {
+        timeZone: 'Asia/Tokyo',
+        year: 'numeric', month: 'long', day: 'numeric', weekday: 'long',
+        hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
+      });
+      const msgs = conversationMessages.map((m, idx) => {
+        if (idx === 0 && m.role === 'system') {
+          return { role: 'system', content: m.content + '\n\n【現在の日時（日本時間）】' + nowJst };
+        }
+        return { role: m.role, content: m.content };
+      });
+      const response = await fetch(API_SERVER_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: msgs })
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || response.statusText);
+      const reply = data.choices[0].message.content;
+      conversationMessages.push({ role: 'assistant', content: reply });
+      return reply;
+    } catch (e) {
+      conversationMessages.pop();
+      return null;
+    } finally {
+      isSending = false;
+    }
+  }
+
+  function stopRecognition() {
+    try { if (talkRec) { talkRec.onend = null; talkRec.stop(); } } catch (e) {}
+    talkRec = null;
+  }
+
+  function endCall() {
+    talkActive = false;
+    talkBusy = false;
+    stopRecognition();
+    if (window.speechSynthesis) window.speechSynthesis.cancel();
+    setPhoneState(null, isJa() ? '通話終了のぞぃ' : 'Call ended', '');
+    playTone('busy').then(() => {
+      setCallUI(false);
+      conversationMessages = [{ role: 'system', content: SYSTEM_PROMPT }];
+    });
+  }
+
+  async function openingGreeting() {
+    const hour = Number(new Date().toLocaleString('en-US', { timeZone: 'Asia/Tokyo', hour: 'numeric', hour12: false }));
+    let greet;
+    if (isJa()) {
+      if (hour >= 5 && hour < 11) greet = 'フォッフォッフォ！お電話ご苦労なのぞぃ。わたくしはおいじぃ魔女ぞぃ。おはようぞぃ。ご用件を申してみるのぞぃ！';
+      else if (hour >= 18 || hour < 5) greet = 'フォッフォッフォ！お電話ご苦労なのぞぃ。わたくしはおいじぃ魔女ぞぃ。こんばんはぞぃ。ご用件を申してみるのぞぃ！';
+      else greet = 'フォッフォッフォ！お電話ご苦労なのぞぃ。わたくしはおいじぃ魔女ぞぃ。こんにちはぞぃ。ご用件を申してみるのぞぃ！';
+    } else {
+      greet = 'Fofofo! Thank you for calling. I am Oijii Witch. What do you need, hmm?';
+    }
+    setPhoneState('speaking', isJa() ? '話しているのぞぃ…' : 'Speaking…', greet);
+    speak(greet);
+    await waitSpeechEnd();
+  }
+
+  function listenOnce() {
+    if (!talkActive || talkBusy || isSending) return;
+    stopRecognition();
+    setPhoneState('listening', isJa() ? '聞いているのぞぃ…' : 'Listening…', '');
+
+    const rec = new SpeechRecognition();
+    talkRec = rec;
+    rec.lang = getLang();
+    rec.interimResults = false;
+    rec.continuous = false;
+    rec.maxAlternatives = 1;
+
+    rec.onresult = async (event) => {
+      let said = '';
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        if (event.results[i].isFinal) said += event.results[i][0].transcript;
+      }
+      said = (said || '').trim();
+      if (!said || !talkActive) return;
+
+      const shouldHangUp = isGoodbyeMessage(said);
+      talkBusy = true;
+      setPhoneState('thinking', isJa() ? '魔力を練っているのぞぃ…' : 'Thinking…', said);
+
+      let sendText = said;
+      if (shouldHangUp) {
+        sendText = said + (isJa()
+          ? '（これは通話の終了の挨拶です。キャラクター口調のまま、短く温かく返事をしてください。）'
+          : ' (This is a farewell to end the call. Reply briefly in character.)');
+      }
+
+      const reply = await askAI(sendText);
+      if (!talkActive) { talkBusy = false; return; }
+
+      if (reply) {
+        setPhoneState('speaking', isJa() ? '話しているのぞぃ…' : 'Speaking…', reply);
+        speak(reply);
+        await waitSpeechEnd();
+        talkBusy = false;
+        if (!talkActive) return;
+        if (shouldHangUp) endCall();
+        else listenOnce();
+      } else {
+        talkBusy = false;
+        if (!talkActive) return;
+        if (shouldHangUp) { endCall(); return; }
+        setPhoneState('listening', isJa() ? 'もう一度申してみるのぞぃ' : 'Please try again', '');
+        setTimeout(() => { if (talkActive) listenOnce(); }, 800);
+      }
+    };
+
+    rec.onerror = (ev) => {
+      if (!talkActive) return;
+      if (ev.error === 'not-allowed') {
+        alert(isJa() ? 'マイクの使用が許可されていないのぞぃ！' : 'Microphone access denied.');
+        endCall();
+        return;
+      }
+      if (!talkBusy) setTimeout(() => { if (talkActive && !talkBusy) listenOnce(); }, 400);
+    };
+
+    rec.onend = () => {
+      if (talkActive && !talkBusy) {
+        setTimeout(() => { if (talkActive && !talkBusy) listenOnce(); }, 300);
+      }
+    };
+
+    try { rec.start(); }
+    catch (e) { setTimeout(() => { if (talkActive && !talkBusy) listenOnce(); }, 500); }
+  }
+
+  async function startCall() {
+    if (talkActive || !SpeechRecognition) return;
+    conversationMessages = [{ role: 'system', content: SYSTEM_PROMPT }];
+    setCallUI(true);
+    talkBusy = true;
+    setPhoneState('calling', isJa() ? '発信中のぞぃ…' : 'Calling…', '');
+    await playTone('ring');
+    if (!talkActive) { talkBusy = false; return; }
+    await openingGreeting();
+    if (!talkActive) { talkBusy = false; return; }
+    talkBusy = false;
+    listenOnce();
+  }
+
+  startCallBtn.addEventListener('click', startCall);
+  endCallBtn.addEventListener('click', endCall);
+})();
+</script>
+</body>
+</html>
