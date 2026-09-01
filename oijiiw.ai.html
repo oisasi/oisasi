@@ -292,6 +292,7 @@ a, button, .card, .pill, .sns, .icon-btn, .hamburger, .settings-options button, 
   position: fixed; top: var(--header-h); left: 0; right: 0; bottom: 0;
   max-width: 680px; margin: 0 auto; width: 100%;
   display: flex; flex-direction: column; padding: 0;
+  min-height: 0; overflow: hidden;
 }
 
 .hero {
@@ -299,6 +300,7 @@ a, button, .card, .pill, .sns, .icon-btn, .hamburger, .settings-options button, 
   padding: 10px 16px; border-bottom: 1px solid var(--border); flex-shrink: 0;
   animation: heroIn 0.6s cubic-bezier(0.22,1,0.36,1) both;
 }
+.hero .hero-text { flex: 1; min-width: 0; }
 @keyframes heroIn {
   from { opacity: 0; transform: translateY(-12px); }
   to { opacity: 1; transform: translateY(0); }
@@ -346,11 +348,10 @@ h1 span {
 }
 
 .section {
-  margin-bottom: 0; opacity: 0; transform: translateY(16px);
-  transition: opacity 0.5s cubic-bezier(0.22,1,0.36,1), transform 0.5s cubic-bezier(0.22,1,0.36,1);
+  margin-bottom: 0; opacity: 1; transform: none;
   flex: 1; min-height: 0; display: flex; flex-direction: column;
 }
-.section.visible { opacity: 1; transform: translateY(0); }
+.section.visible { opacity: 1; transform: none; }
 
 /* Chat */
 .chat-panel {
@@ -623,15 +624,57 @@ footer { margin-top: 48px; text-align: center; }
 
 
 
-.chat-call-btn {
-  flex-shrink: 0; width: 44px; height: 44px; border: none; border-radius: 12px;
-  background: linear-gradient(135deg, var(--purple), var(--green));
-  color: #fff; display: grid; place-items: center; cursor: pointer;
-  box-shadow: 0 4px 14px color-mix(in srgb, var(--purple) 40%, transparent);
-  transition: transform 0.2s, filter 0.2s; text-decoration: none;
+/* 会話モード — ヒーロー右上の目立つボタン */
+.hero {
+  position: relative;
 }
-.chat-call-btn svg { width: 20px; height: 20px; }
-.chat-call-btn:hover { transform: scale(1.06); filter: brightness(1.08); }
+.hero-call-btn {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  padding: 10px 16px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--green) 35%, var(--border));
+  background: linear-gradient(135deg, var(--purple), var(--green));
+  color: #fff;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 800;
+  text-decoration: none;
+  white-space: nowrap;
+  box-shadow: 0 6px 20px color-mix(in srgb, var(--purple) 40%, transparent);
+  transition: transform 0.2s, filter 0.2s, box-shadow 0.2s;
+}
+.hero-call-btn svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+.hero-call-btn:hover {
+  transform: translateY(-2px) scale(1.03);
+  filter: brightness(1.08);
+  box-shadow: 0 10px 28px color-mix(in srgb, var(--green) 40%, transparent);
+  color: #fff;
+}
+.hero-call-btn .call-pulse {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 0 0 rgba(255,255,255,0.55);
+  animation: callPulse 1.6s ease-out infinite;
+}
+@keyframes callPulse {
+  0% { box-shadow: 0 0 0 0 rgba(255,255,255,0.5); }
+  70% { box-shadow: 0 0 0 10px transparent; }
+  100% { box-shadow: 0 0 0 0 transparent; }
+}
+@media (max-width: 420px) {
+  .hero-call-btn span.label { display: none; }
+  .hero-call-btn { padding: 10px 12px; }
+}
 
 </style>
 </head>
@@ -737,6 +780,13 @@ footer { margin-top: 48px; text-align: center; }
       <h1><span data-i18n="chat_title_short">おいじぃ魔女</span></h1>
       <p class="subtitle">@oijiiw</p>
     </div>
+    <a href="oijiiw-phone.html" class="hero-call-btn" id="startCallBtn" aria-label="会話モード" title="会話モード（電話）">
+      <span class="call-pulse" aria-hidden="true"></span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.11 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.81.36 1.6.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c1.21.34 2 .57 2.81.7A2 2 0 0 1 22 16.92z"/>
+      </svg>
+      <span class="label">会話モード</span>
+    </a>
   </header>
 
   <section class="section">
@@ -750,11 +800,6 @@ footer { margin-top: 48px; text-align: center; }
         </div>
       </div>
       <div class="chat-input-row">
-        <a href="oijiiw-phone.html" class="chat-call-btn" id="startCallBtn" aria-label="会話モード" title="会話モード（電話）" style="text-decoration:none">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.11 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.81.36 1.6.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c1.21.34 2 .57 2.81.7A2 2 0 0 1 22 16.92z"/>
-          </svg>
-        </a>
         <input type="text" id="user-input" data-i18n-placeholder="chat_placeholder" placeholder="ここに入力するのぞぃ...">
         <button class="chat-send-btn" id="send-btn" aria-label="送信">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/></svg>
@@ -767,35 +812,6 @@ footer { margin-top: 48px; text-align: center; }
   <footer>
     <div class="footer-pill">2026 Oijii Witch / Oisasi Official</div>
   </footer>
-</div>
-
-
-    <div class="witch-call-timer" id="witchCallTimer">00:00</div>
-  </div>
-  <div class="witch-call-center">
-    <div class="witch-avatar-wrap">
-      <div class="witch-avatar-ring" aria-hidden="true"></div>
-      <div class="witch-avatar-ring r2" aria-hidden="true"></div>
-      <img class="witch-avatar" src="おいじぃ魔女.png" alt="おいじぃ魔女" width="148" height="148">
-    </div>
-    <div class="witch-call-name">おいじぃ魔女</div>
-    <div class="witch-call-status" id="witchCallStatus">接続中…</div>
-    <div class="witch-wave" aria-hidden="true">
-      <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
-    </div>
-    <div class="witch-call-transcript" id="witchCallTranscript"></div>
-  </div>
-  <div>
-    <div class="witch-call-actions">
-      <button type="button" class="witch-end-btn" id="witchEndCallBtn" aria-label="通話終了" title="通話終了">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M10.68 13.31a16 16 0 0 0 3.41 2.6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7 2 2 0 0 1 1.72 2v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91"/>
-          <line x1="23" y1="1" x2="1" y2="23"/>
-        </svg>
-      </button>
-    </div>
-    <div class="witch-end-hint">通話を終了</div>
-  </div>
 </div>
 
 <script>
