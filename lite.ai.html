@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>おいさしAI</title>
+<meta name="description" content="おいさし公式AIチャット">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui,sans-serif;font-size:15px;line-height:1.5;color:#222;background:#fff;height:100dvh;display:flex;flex-direction:column}
+header{padding:12px 16px;border-bottom:1px solid #eee;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-shrink:0}
+header a{color:#06c;text-decoration:none;font-size:14px}
+header a:hover{text-decoration:underline}
+header h1{font-size:1.1rem;font-weight:700}
+#start{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 16px;text-align:center}
+#start h2{font-size:1.25rem;margin-bottom:8px}
+#start p{color:#666;margin-bottom:20px;font-size:14px}
+#chat{flex:1;display:none;flex-direction:column;min-height:0}
+#chat.open{display:flex}
+#messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:14px}
+.msg{max-width:90%}
+.msg.user{align-self:flex-end}
+.msg.ai,.msg.error{align-self:flex-start}
+.msg .bubble{padding:10px 14px;border-radius:12px;white-space:pre-wrap;word-break:break-word}
+.msg.user .bubble{background:#eee}
+.msg.ai .bubble{background:transparent;padding:4px 0}
+.msg.error .bubble{background:#fee;border:1px solid #fcc;color:#a33;font-size:13px}
+.msg .time{font-size:11px;color:#999;margin-bottom:4px}
+.msg.user .time{text-align:right}
+.msg a{color:#06c}
+.bar{display:flex;gap:8px;padding:12px 16px;border-top:1px solid #eee;flex-shrink:0}
+.bar input{flex:1;padding:10px 12px;border:1px solid #ccc;border-radius:8px;font-size:15px;font-family:inherit}
+.bar input:focus{outline:none;border-color:#06c}
+.bar button{padding:10px 16px;border:1px solid #ccc;border-radius:8px;background:#f5f5f5;font-size:14px;font-family:inherit;cursor:pointer}
+.bar button:hover{background:#eee}
+.bar button:disabled{opacity:.5;cursor:not-allowed}
+.bar button.primary{background:#06c;color:#fff;border-color:#06c}
+.bar button.primary:hover{background:#05a}
+.hint{text-align:center;font-size:11px;color:#999;padding:0 16px 8px}
+.top-actions{display:flex;gap:8px;padding:8px 16px 0;flex-shrink:0}
+.top-actions button{padding:6px 12px;border:1px solid #ddd;border-radius:6px;background:#fafafa;font-size:13px;font-family:inherit;cursor:pointer}
+.top-actions button:hover{background:#f0f0f0}
+#history{display:none;position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:100}
+#history.open{display:block}
+#history-panel{position:absolute;left:0;top:0;bottom:0;width:min(300px,85vw);background:#fff;padding:16px;overflow-y:auto;border-right:1px solid #ddd}
+#history-panel h3{font-size:15px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center}
+#history-panel h3 button{border:none;background:none;font-size:18px;cursor:pointer;color:#666}
+.hist-item{display:block;width:100%;text-align:left;padding:10px 12px;margin-bottom:6px;border:1px solid #eee;border-radius:8px;background:#fafafa;font-family:inherit;font-size:13px;cursor:pointer}
+.hist-item:hover{background:#f0f0f0}
+.hist-item .t{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hist-item .m{font-size:11px;color:#999;margin-top:2px}
+.hist-empty{color:#999;font-size:13px;text-align:center;padding:24px}
+#loading{color:#666;font-size:14px}
+</style>
+</head>
+<body>
+
+<header>
+  <a href="index.html">← ホーム</a>
+  <h1>おいさしAI</h1>
+  <a href="#" id="histBtn">履歴</a>
+</header>
+
+<div id="start">
+  <h2>おいさしAI</h2>
+  <p>何かお手伝いできることはありますか？</p>
+  <div class="bar" style="border:none;width:100%;max-width:420px">
+    <input type="text" id="start-input" placeholder="おいさしAI に相談" autocomplete="off">
+    <button type="button" class="primary" id="startSend">送信</button>
+  </div>
+</div>
+
+<div id="chat">
+  <div class="top-actions">
+    <button type="button" id="backBtn">← 戻る</button>
+    <button type="button" id="newBtn">新しい会話</button>
+  </div>
+  <div id="messages"></div>
+  <p class="hint">※ AIの自動応答です。誤りを含む場合があります。</p>
+  <div class="bar">
+    <input type="text" id="user-input" placeholder="メッセージを入力" autocomplete="off">
+    <button type="button" class="primary" id="send-btn">送信</button>
+  </div>
+</div>
+
+<div id="history">
+  <div id="history-panel">
+    <h3>履歴 <button type="button" id="histClose" aria-label="閉じる">×</button></h3>
+    <div id="hist-list"></div>
+    <button type="button" id="clearHist" style="width:100%;margin-top:12px;padding:10px;border:1px solid #fcc;border-radius:8px;background:#fff;color:#c33;font-size:13px;cursor:pointer;font-family:inherit">履歴をすべて削除</button>
+  </div>
+</div>
+
+<script>
+(function () {
+  const API = "https://oijii-majo-api.oisasioisasi.workers.dev";
+  const SYSTEM = `あなたは「おいさしAI」という、おいさし公式サイトのAIアシスタントです。
+・丁寧で親しみやすい、自然な日本語（敬体）で簡潔に答えてください。特定のキャラクター口調や方言は使わないでください。
+・おいさし関連のSNSやサイトについて聞かれたら、以下の情報をもとに正確に案内してください。
+・おいじぃ魔女のSNS
+  https://www.instagram.com/oijiiw （Instagram）
+  https://www.youtube.com/@oijiiw （YouTube）
+  https://www.facebook.com/oijiiw （Facebook）
+  https://x.com/oijiiw （X）
+  https://www.tiktok.com/@oijiiw （TikTok）
+  おいじぃ魔女のホームページ： https://oisasi.f5.si/oijiiw
+・おいじぃ魔女雑学のSNS
+  https://www.instagram.com/oijiizatu （Instagram）
+  https://www.youtube.com/@oijiizatu （YouTube）
+  https://www.facebook.com/oijiizatu （Facebook）
+  https://x.com/oijiizatu （X）
+  https://www.tiktok.com/@oijiizatu （TikTok）
+  雑学ホームページ： https://oisasi.f5.si/oijiizatu
+・おいさしのSNS
+  https://www.youtube.com/@oisasiofficial （YouTube）
+  https://www.facebook.com/oisasiofficial （Facebook）
+  https://x.com/oisasiofficial （X）
+  https://www.tiktok.com/@oisasiofficial （TikTok）
+・おいさしAI（このチャット自身）のSNSについて聞かれた場合、または「@oisasiai」と指定された場合のみ、以下を案内してください（それ以外では案内しない）。
+  おいさしAIのSNS（@oisasiai）
+  https://www.instagram.com/oisasiai （Instagram）
+  https://www.facebook.com/oisasiai （Facebook）
+  https://www.youtube.com/@oisasiai （YouTube）
+・おいさし公式ホームページ： https://oisasi.f5.si`;
+
+  const STORAGE_CURRENT = "oisasi-ai-current";
+  const STORAGE_HISTORY = "oisasi-ai-history";
+  const MAX_HISTORY = 30;
+
+  let messages = [{ role: "system", content: SYSTEM }];
+  let currentId = null;
+  let started = false;
+  let sending = false;
+
+  const startEl = document.getElementById("start");
+  const chatEl = document.getElementById("chat");
+  const msgsEl = document.getElementById("messages");
+  const startInput = document.getElementById("start-input");
+  const startSend = document.getElementById("startSend");
+  const userInput = document.getElementById("user-input");
+  const sendBtn = document.getElementById("send-btn");
+  const histEl = document.getElementById("history");
+  const histList = document.getElementById("hist-list");
+
+  function loadHist() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_HISTORY) || "[]"); }
+    catch (e) { return []; }
+  }
+  function saveHist(list) {
+    localStorage.setItem(STORAGE_HISTORY, JSON.stringify(list.slice(0, MAX_HISTORY)));
+  }
+  function visible(msgs) {
+    return (msgs || []).filter(m => m.role === "user" || m.role === "assistant");
+  }
+  function textOf(c) {
+    if (c == null) return "";
+    if (typeof c === "string") return c;
+    if (Array.isArray(c)) return c.filter(p => p && p.type === "text" && p.text).map(p => p.text).join(" ").trim();
+    return String(c);
+  }
+  function makeTitle(msgs) {
+    const u = (msgs || []).find(m => m.role === "user");
+    if (!u) return "新しい会話";
+    let t = textOf(u.content).trim().replace(/\s+/g, " ");
+    if (!t) return "新しい会話";
+    return t.length > 36 ? t.slice(0, 36) + "…" : t;
+  }
+  function saveCurrent() {
+    const vis = visible(messages);
+    if (!vis.length) { localStorage.removeItem(STORAGE_CURRENT); return; }
+    const data = {
+      id: currentId || ("c_" + Date.now()),
+      title: makeTitle(messages),
+      updatedAt: Date.now(),
+      messages: messages
+    };
+    currentId = data.id;
+    localStorage.setItem(STORAGE_CURRENT, JSON.stringify(data));
+  }
+  function archive() {
+    const vis = visible(messages);
+    if (!vis.length) return;
+    const id = currentId || ("c_" + Date.now());
+    const item = { id, title: makeTitle(messages), updatedAt: Date.now(), messages };
+    let list = loadHist().filter(h => h.id !== id);
+    list.unshift(item);
+    saveHist(list);
+  }
+  function fmt(ts) {
+    const d = new Date(ts);
+    return d.toLocaleString("ja-JP", { year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
+  }
+  function escapeHTML(s) {
+    return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+  }
+  function linkify(s) {
+    return s.replace(/(https?:\/\/[^\s\(\)\<\>]+)/g, function (url) {
+      const clean = url.replace(/[\.\,\;\:]$/, "");
+      return '<a href="' + clean + '" target="_blank" rel="noopener noreferrer">' + clean + "</a>";
+    });
+  }
+  function fmtTime(ts) {
+    const d = new Date(ts || Date.now());
+    const pad = n => String(n).padStart(2, "0");
+    return d.getFullYear() + "年" + (d.getMonth()+1) + "月" + d.getDate() + "日 " + pad(d.getHours()) + ":" + pad(d.getMinutes()) + ":" + pad(d.getSeconds());
+  }
+
+  function addMsg(text, type, ts) {
+    const wrap = document.createElement("div");
+    wrap.className = "msg " + type;
+    const time = document.createElement("div");
+    time.className = "time";
+    time.textContent = fmtTime(ts);
+    const bubble = document.createElement("div");
+    bubble.className = "bubble";
+    const t = typeof text === "string" ? text : textOf(text);
+    if (type === "ai" || type === "error") bubble.innerHTML = linkify(escapeHTML(t || ""));
+    else bubble.textContent = t || "";
+    wrap.appendChild(time);
+    wrap.appendChild(bubble);
+    msgsEl.appendChild(wrap);
+    msgsEl.scrollTop = msgsEl.scrollHeight;
+  }
+
+  function showChat() {
+    if (started) return;
+    started = true;
+    startEl.style.display = "none";
+    chatEl.classList.add("open");
+  }
+
+  function reset() {
+    archive();
+    messages = [{ role: "system", content: SYSTEM }];
+    currentId = null;
+    msgsEl.innerHTML = "";
+    started = false;
+    chatEl.classList.remove("open");
+    startEl.style.display = "";
+    localStorage.removeItem(STORAGE_CURRENT);
+    startInput.value = "";
+    startInput.focus();
+    closeHist();
+  }
+
+  function backToStart() {
+    archive();
+    messages = [{ role: "system", content: SYSTEM }];
+    currentId = null;
+    msgsEl.innerHTML = "";
+    started = false;
+    chatEl.classList.remove("open");
+    startEl.style.display = "";
+    localStorage.removeItem(STORAGE_CURRENT);
+    closeHist();
+    startInput.value = "";
+    startInput.focus();
+  }
+
+  function setSending(on) {
+    sending = on;
+    userInput.disabled = on;
+    sendBtn.disabled = on;
+    startInput.disabled = on;
+    startSend.disabled = on;
+  }
+
+  let loadingEl = null;
+  function showLoading() {
+    removeLoading();
+    const wrap = document.createElement("div");
+    wrap.className = "msg ai";
+    wrap.id = "loading";
+    wrap.innerHTML = '<div class="bubble" id="loading">考え中…</div>';
+    msgsEl.appendChild(wrap);
+    msgsEl.scrollTop = msgsEl.scrollHeight;
+    loadingEl = wrap;
+  }
+  function removeLoading() {
+    if (loadingEl) { loadingEl.remove(); loadingEl = null; }
+    const el = document.getElementById("loading");
+    if (el) el.remove();
+  }
+
+  async function send(text) {
+    const plain = (text || "").trim();
+    if (!plain || sending) return;
+    if (!started) showChat();
+
+    const userTs = Date.now();
+    addMsg(plain, "user", userTs);
+    messages.push({ role: "user", content: plain, ts: userTs });
+    if (!currentId) currentId = "c_" + Date.now();
+    saveCurrent();
+
+    setSending(true);
+    showLoading();
+    try {
+      const nowJst = new Date().toLocaleString("ja-JP", {
+        timeZone: "Asia/Tokyo",
+        year: "numeric", month: "long", day: "numeric", weekday: "long",
+        hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false
+      });
+      const apiMsgs = messages.map((m, i) => {
+        if (i === 0 && m.role === "system") {
+          return { role: "system", content: m.content + "\n\n【現在の日時（日本時間）】" + nowJst + "\n質問に「今何時」「今日の日付」「何年」などが含まれたら、この日時を正確に使って答えてください。" };
+        }
+        return { role: m.role, content: typeof m.content === "string" ? m.content : textOf(m.content) };
+      });
+      const res = await fetch(API, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages: apiMsgs })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error("[HTTP " + res.status + "] " + (data.error || res.statusText));
+      const reply = data.choices[0].message.content;
+      const aiTs = Date.now();
+      messages.push({ role: "assistant", content: reply, ts: aiTs });
+      removeLoading();
+      addMsg(reply, "ai", aiTs);
+      saveCurrent();
+      archive();
+    } catch (err) {
+      removeLoading();
+      addMsg("通信エラーが発生しました。\n" + err.message, "error", Date.now());
+      messages.pop();
+      saveCurrent();
+    } finally {
+      setSending(false);
+      userInput.focus();
+    }
+  }
+
+  function loadChat(item) {
+    closeHist();
+    messages = item.messages && item.messages.length
+      ? item.messages
+      : [{ role: "system", content: SYSTEM }];
+    currentId = item.id;
+    if (!messages.length || messages[0].role !== "system") {
+      messages = [{ role: "system", content: SYSTEM }, ...messages];
+    }
+    showChat();
+    msgsEl.innerHTML = "";
+    messages.forEach(m => {
+      if (m.role === "user") addMsg(textOf(m.content), "user", m.ts);
+      else if (m.role === "assistant") addMsg(textOf(m.content), "ai", m.ts);
+    });
+    saveCurrent();
+  }
+
+  function renderHist() {
+    const list = loadHist();
+    if (!list.length) {
+      histList.innerHTML = '<div class="hist-empty">まだ履歴がありません</div>';
+      return;
+    }
+    histList.innerHTML = "";
+    list.forEach(item => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "hist-item";
+      btn.innerHTML = '<div class="t"></div><div class="m"></div>';
+      btn.querySelector(".t").textContent = item.title || "会話";
+      btn.querySelector(".m").textContent = fmt(item.updatedAt);
+      btn.addEventListener("click", () => loadChat(item));
+      histList.appendChild(btn);
+    });
+  }
+
+  function openHist() {
+    renderHist();
+    histEl.classList.add("open");
+  }
+  function closeHist() {
+    histEl.classList.remove("open");
+  }
+
+  // restore
+  try {
+    const raw = localStorage.getItem(STORAGE_CURRENT);
+    if (raw) {
+      const data = JSON.parse(raw);
+      if (data && data.messages && visible(data.messages).length) {
+        messages = data.messages;
+        currentId = data.id || null;
+        showChat();
+        msgsEl.innerHTML = "";
+        messages.forEach(m => {
+          if (m.role === "user") addMsg(textOf(m.content), "user", m.ts);
+          else if (m.role === "assistant") addMsg(textOf(m.content), "ai", m.ts);
+        });
+      }
+    }
+  } catch (e) {}
+
+  startSend.addEventListener("click", () => {
+    const t = startInput.value.trim();
+    startInput.value = "";
+    if (!t) return;
+    messages = [{ role: "system", content: SYSTEM }];
+    currentId = "c_" + Date.now();
+    msgsEl.innerHTML = "";
+    started = false;
+    localStorage.removeItem(STORAGE_CURRENT);
+    send(t);
+  });
+  startInput.addEventListener("keypress", e => {
+    if (e.key === "Enter") {
+      const t = startInput.value.trim();
+      startInput.value = "";
+      if (!t) return;
+      messages = [{ role: "system", content: SYSTEM }];
+      currentId = "c_" + Date.now();
+      msgsEl.innerHTML = "";
+      started = false;
+      localStorage.removeItem(STORAGE_CURRENT);
+      send(t);
+    }
+  });
+  sendBtn.addEventListener("click", () => {
+    const t = userInput.value.trim();
+    userInput.value = "";
+    send(t);
+  });
+  userInput.addEventListener("keypress", e => {
+    if (e.key === "Enter") {
+      const t = userInput.value.trim();
+      userInput.value = "";
+      send(t);
+    }
+  });
+
+  document.getElementById("backBtn").addEventListener("click", backToStart);
+  document.getElementById("newBtn").addEventListener("click", reset);
+  document.getElementById("histBtn").addEventListener("click", e => { e.preventDefault(); openHist(); });
+  document.getElementById("histClose").addEventListener("click", closeHist);
+  histEl.addEventListener("click", e => { if (e.target === histEl) closeHist(); });
+  document.getElementById("clearHist").addEventListener("click", () => {
+    if (!loadHist().length) return;
+    if (confirm("履歴をすべて削除します。よろしいですか？")) {
+      saveHist([]);
+      renderHist();
+    }
+  });
+})();
+</script>
+</body>
+</html>
