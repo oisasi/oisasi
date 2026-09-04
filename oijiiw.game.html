@@ -7604,11 +7604,11 @@ function __notifySplashDone(){
    ゲームデータ定義
 ========================================================= */
 const GAMES = [
-    { id: 'press',     file: 'games/press.html',     icon: '🏗️', name: 'おいじぃのデス・プレス\n順位決定戦', nameEn: 'Oijii Death Press\nRanking Battle', desc: '足場を選んでプレス機の運命を試せ', descEn: 'Pick a platform and face the press of fate' },
-    { id: 'explosion', file: 'games/explosion.html', icon: '🏭', name: 'おいじぃ魔女大爆発\n複雑なる工場', nameEn: 'Oijii Witch Blast\nComplex Factory', desc: '危険なスイッチを選ぶ緊迫サバイバル', descEn: 'Survive by choosing the right switches' },
-    { id: 'chase',     file: 'games/chase.html',     icon: '🌀', name: 'おいじぃ魔女の猛追 DX', nameEn: 'Oijii Witch Chase DX', desc: '迷路を逃げ回る60秒サバイバル', descEn: '60-second maze chase survival' },
-    { id: 'hq',        file: 'games/hq.html',        icon: '🚪', name: 'おいじぃ魔女本社入り口\n運ゲー', nameEn: 'Witch HQ Entrance\nLuck Game', desc: '3つのドアから魔女を避けろ', descEn: 'Avoid the witch behind three doors' },
-    { id: 'dodge',     file: 'games/dodge.html',     icon: '<span class="witch-img" role="img" aria-label="魔女"></span>', name: 'おいじぃ魔女の\nドッジボール大会', nameEn: 'Oijii Witch\nDodgeball Cup', desc: '巨大鉄球を避け続けるサバイバル', descEn: 'Dodge giant iron balls to survive' }];
+    { id: 'press',     file: 'press.html',     icon: '🏗️', name: 'おいじぃのデス・プレス\n順位決定戦', nameEn: 'Oijii Death Press\nRanking Battle', desc: '足場を選んでプレス機の運命を試せ', descEn: 'Pick a platform and face the press of fate' },
+    { id: 'explosion', file: 'explosion.html', icon: '🏭', name: 'おいじぃ魔女大爆発\n複雑なる工場', nameEn: 'Oijii Witch Blast\nComplex Factory', desc: '危険なスイッチを選ぶ緊迫サバイバル', descEn: 'Survive by choosing the right switches' },
+    { id: 'chase',     file: 'chase.html',     icon: '🌀', name: 'おいじぃ魔女の猛追 DX', nameEn: 'Oijii Witch Chase DX', desc: '迷路を逃げ回る60秒サバイバル', descEn: '60-second maze chase survival' },
+    { id: 'hq',        file: 'hq.html',        icon: '🚪', name: 'おいじぃ魔女本社入り口\n運ゲー', nameEn: 'Witch HQ Entrance\nLuck Game', desc: '3つのドアから魔女を避けろ', descEn: 'Avoid the witch behind three doors' },
+    { id: 'dodge',     file: 'dodge.html',     icon: '<span class="witch-img" role="img" aria-label="魔女"></span>', name: 'おいじぃ魔女の\nドッジボール大会', nameEn: 'Oijii Witch\nDodgeball Cup', desc: '巨大鉄球を避け続けるサバイバル', descEn: 'Dodge giant iron balls to survive' }];
 
 /* =========================================================
    ストレージ（複数ユーザー対応）
@@ -21920,12 +21920,24 @@ if ('speechSynthesis' in window) {
 <script>
 const GAME_HTML = {};
 
+function resolveGameUrl(file) {
+    /* 本体HTMLと同じディレクトリ基準で解決（サブパス配置・拡張子なしURLでもOK） */
+    try {
+        var base = document.baseURI || location.href;
+        /* location が .../oijiiw.game のようなファイルURLのときもディレクトリを取る */
+        return new URL(file, base).href;
+    } catch (e) {
+        return file;
+    }
+}
+
 async function ensureGameHtml(gameId) {
     if (GAME_HTML[gameId]) return GAME_HTML[gameId];
     const game = (typeof GAMES !== 'undefined') ? GAMES.find(g => g.id === gameId) : null;
-    const file = (game && game.file) ? game.file : ('games/' + gameId + '.html');
-    const res = await fetch(file, { cache: 'force-cache' });
-    if (!res.ok) throw new Error('HTTP ' + res.status + ' for ' + file);
+    const file = (game && game.file) ? game.file : (gameId + '.html');
+    const url = resolveGameUrl(file);
+    const res = await fetch(url, { cache: 'no-cache' });
+    if (!res.ok) throw new Error('HTTP ' + res.status + ' for ' + url);
     const html = await res.text();
     GAME_HTML[gameId] = html;
     return html;
@@ -21936,7 +21948,7 @@ async function ensureGameHtml(gameId) {
     try {
         if (typeof GAMES === 'undefined') return;
         GAMES.forEach(function(g) {
-            ensureGameHtml(g.id).catch(function(){});
+            ensureGameHtml(g.id).catch(function(err){ console.warn('preload', g.id, err); });
         });
     } catch (e) {}
 })();
