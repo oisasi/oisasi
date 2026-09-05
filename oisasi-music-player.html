@@ -837,9 +837,12 @@ footer {
       const key = el.getAttribute('data-i18n-placeholder');
       if (t[key] != null) el.placeholder = t[key];
     });
-    // Update track count unit
-    const unit = t.tracks_unit || '曲';
-    trackCountEl.textContent = `${tracks.length} ${unit}`;
+    // Update track count unit (safe: only if player is already initialized)
+    const countEl = document.getElementById('trackCount');
+    if (countEl && typeof tracks !== 'undefined') {
+      const unit = t.tracks_unit || '曲';
+      countEl.textContent = `${tracks.length} ${unit}`;
+    }
   }
 
   function applyTheme(theme) {
