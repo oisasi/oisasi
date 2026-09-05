@@ -825,55 +825,59 @@ footer { display: none; }
     }
   ];
 
-  // ⚡ 強力処理用の外部情報取得関数（複数プロキシフォールバック対応）
+  // ⚡ 強力処理用の外部情報取得関数（DuckDuckGo + Wikipediaフォールバック）
   async function fetchExtraContext(query) {
     const targetUrl = `https://html.duckduckgo.com/html/?q=${encodeURIComponent(query)}`;
-    
-    // プロキシ候補リスト
     const proxyList = [
       url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
-      url => `https://corsproxy.io/?${encodeURIComponent(url)}`,
-      url => `https://thingproxy.freeboard.io/fetch/${url}`
+      url => `https://corsproxy.io/?${encodeURIComponent(url)}`
     ];
 
     let htmlText = null;
 
+    // 1. DuckDuckGo検索を試みる
     for (const makeProxyUrl of proxyList) {
       try {
-        const proxyUrl = makeProxyUrl(targetUrl);
-        const res = await fetch(proxyUrl, { method: "GET" });
+        const res = await fetch(makeProxyUrl(targetUrl));
         if (res.ok) {
           htmlText = await res.text();
-          if (htmlText && htmlText.length > 200) break;
+          if (htmlText && htmlText.includes('.result__body')) break; 
         }
-      } catch (err) {
-        console.warn("強力処理プロキシ接続失敗、次のプロキシを試します:", err);
-      }
+      } catch (err) { console.warn("プロキシ失敗:", err); }
     }
 
-    if (!htmlText) {
-      console.warn("すべての強力処理プロキシで取得に失敗したため、通常モデル処理へ移行します。");
-      return null;
+    if (htmlText && htmlText.includes('.result__body')) {
+      try {
+        const doc = new DOMParser().parseFromString(htmlText, "text/html");
+        let snippets = [];
+        doc.querySelectorAll('.result__body').forEach((el, i) => {
+          if (i < 3) {
+            const t = el.querySelector('.result__title')?.textContent?.trim();
+            const s = el.querySelector('.result__snippet')?.textContent?.trim();
+            if (t && s) snippets.push(`【${t}】\n${s}`);
+          }
+        });
+        if (snippets.length > 0) return snippets.join("\n\n");
+      } catch (e) { console.warn("解析エラー:", e); }
     }
 
+    // 2. DuckDuckGoが弾かれた場合、Wikipedia API（公式）で検索
+    console.warn("検索プロキシがブロックされたため、Wikipedia検索に切り替えます。");
     try {
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(htmlText, "text/html");
-      const results = doc.querySelectorAll('.result__body');
-      
-      let snippets = [];
-      results.forEach((el, index) => {
-        if (index < 4) {
-          const title = el.querySelector('.result__title')?.textContent?.trim() || "";
-          const snippet = el.querySelector('.result__snippet')?.textContent?.trim() || "";
-          if (title && snippet) snippets.push(`【参照情報】${title}\n【詳細】${snippet}`);
-        }
-      });
-      return snippets.join("\n\n");
-    } catch (err) {
-      console.warn("解析エラー:", err);
-      return null;
-    }
+      const wikiUrl = `https://ja.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(query)}&utf8=&format=json&origin=*`;
+      const res = await fetch(wikiUrl);
+      const data = await res.json();
+      if (data.query && data.query.search && data.query.search.length > 0) {
+        let snippets = [];
+        data.query.search.slice(0, 3).forEach(item => {
+          const cleanSnippet = item.snippet.replace(/<[^>]+>/g, ''); // HTMLタグ除去
+          snippets.push(`【Wikipedia: ${item.title}】\n${cleanSnippet}`);
+        });
+        return snippets.join("\n\n");
+      }
+    } catch(e) { console.warn("Wikipedia検索失敗:", e); }
+
+    return null;
   }
 
   function t(key, fallback) {
@@ -881,6 +885,7 @@ footer { display: none; }
     return (dict && dict[key] != null) ? dict[key] : fallback;
   }
 
+  // 送信処理（エラー時のクラッシュ対策を強化）
   async function sendMessage() {
     const inputField = document.getElementById("user-input");
     const sendBtn = document.getElementById("send-btn");
@@ -890,7 +895,6 @@ footer { display: none; }
     if (text === "") return;
 
     addMessage(text, "user");
-
     inputField.value = "";
     inputField.disabled = true;
     sendBtn.disabled = true;
@@ -901,11 +905,10 @@ footer { display: none; }
     let payloadMessages = [...conversationMessages];
     let userPromptWithContext = text;
 
-    // 強力処理がONの場合、外部コンテキストを補足
     if (powerToggle && powerToggle.checked) {
       const extraContext = await fetchExtraContext(text);
-      if (extraContext && extraContext.length > 0) {
-        userPromptWithContext = `[補足情報]\n${extraContext}\n\n[お主の質問]\n${text}\n\n上記情報を参考にして、最新・詳細な内容を含めて回答してください。`;
+      if (extraContext) {
+        userPromptWithContext = `[検索による補足情報]\n${extraContext}\n\n[お主の質問]\n${text}\n\n上記情報を参考にして、最新・詳細な内容を含めて回答してください。`;
       }
     }
 
@@ -920,9 +923,15 @@ footer { display: none; }
 
       const data = await response.json();
 
+      // エラー時のメッセージを正しく展開する修正
       if (!response.ok) {
-        const errorDetail = data.error ? data.error : response.statusText;
-        throw new Error(`[HTTP ${response.status}] ${errorDetail}`);
+        const errorMsg = data.error ? (typeof data.error === 'object' ? JSON.stringify(data.error) : data.error) : response.statusText;
+        throw new Error(`サーバーエラー: ${errorMsg}`);
+      }
+
+      // choicesが存在しない場合のクラッシュ対策
+      if (!data || !data.choices || !data.choices[0] || !data.choices[0].message) {
+        throw new Error(`AIから正しいデータが届きませんでした。詳細: ${JSON.stringify(data)}`);
       }
 
       const majoReply = data.choices[0].message.content;
@@ -936,8 +945,9 @@ footer { display: none; }
 
     } catch (error) {
       removeMessage(thinkingId);
+      // 本当のエラー理由をチャット画面に表示
       addMessage(`${t('chat_error', 'ぐあっ！通信エラーが発生したぞい！')}\n${error.message}`, "error");
-      console.error(error);
+      console.error("通信エラー詳細:", error);
     } finally {
       inputField.disabled = false;
       sendBtn.disabled = false;
