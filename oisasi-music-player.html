@@ -349,7 +349,16 @@ body {
   cursor: pointer; position: relative;
   border: 1px solid var(--border);
   touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
   transition: box-shadow 0.2s, height 0.15s;
+}
+.progress-bar::before {
+  content: "";
+  position: absolute;
+  left: 0; right: 0;
+  top: -14px; bottom: -14px;
+  z-index: 1;
 }
 .progress-bar:hover, .progress-bar.dragging {
   height: 14px;
@@ -1255,10 +1264,10 @@ body {
       </div>
       <div class="popup-right">
         <div class="progress-wrap">
-          <div class="progress-bar" id="progressBar">
+          <div class="progress-bar" id="progressBar" role="slider" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
             <div class="progress-fill" id="progressFill"></div>
             <div class="progress-thumb" id="progressThumb"></div>
-  </div>
+          </div>
         </div>
         <div class="time-row">
           <span id="currentTime">0:00</span>
@@ -2115,46 +2124,132 @@ body {
   setSpeed(1);
 
   const progressThumb = document.getElementById("progressThumb");
+
+  function getAudioDuration() {
+    const d = audio.duration;
+    if (typeof d === "number" && isFinite(d) && d > 0) return d;
+    try {
+      if (audio.seekable && audio.seekable.length > 0) {
+        const end = audio.seekable.end(audio.seekable.length - 1);
+        if (isFinite(end) && end > 0) return end;
+      }
+    } catch (err) {}
+    return 0;
+  }
+
   function updateProgressUI(ratio) {
-    const pct = Math.max(0, Math.min(100, ratio * 100));
+    const r = Math.max(0, Math.min(1, ratio));
+    const pct = r * 100;
     progressFill.style.width = pct + "%";
     if (progressThumb) progressThumb.style.left = pct + "%";
+    progressBar.setAttribute("aria-valuenow", String(Math.round(pct)));
   }
-  function seekFromEvent(e) {
-    if (!audio.duration || !isFinite(audio.duration)) return;
-    const point = e.touches && e.touches[0] ? e.touches[0] : e;
-    if (point.clientX == null) return;
+
+  function clientXFromEvent(e) {
+    if (!e) return null;
+    if (typeof e.clientX === "number" && !isNaN(e.clientX)) return e.clientX;
+    if (e.touches && e.touches.length && typeof e.touches[0].clientX === "number") return e.touches[0].clientX;
+    if (e.changedTouches && e.changedTouches.length && typeof e.changedTouches[0].clientX === "number") {
+      return e.changedTouches[0].clientX;
+    }
+    return null;
+  }
+
+  function ratioFromEvent(e) {
     const rect = progressBar.getBoundingClientRect();
-    if (rect.width <= 0) return;
-    const ratio = Math.max(0, Math.min(1, (point.clientX - rect.left) / rect.width));
-    audio.currentTime = ratio * audio.duration;
-    updateProgressUI(ratio);
-    currentTimeEl.textContent = formatTime(audio.currentTime);
+    const width = rect.width;
+    if (!width || width < 1) return null;
+    const x = clientXFromEvent(e);
+    if (x == null) return null;
+    return Math.max(0, Math.min(1, (x - rect.left) / width));
   }
-  function endDrag() {
+
+  function seekToRatio(ratio) {
+    const dur = getAudioDuration();
+    if (!dur) return false;
+    const r = Math.max(0, Math.min(1, ratio));
+    const t = r * dur;
+    try {
+      if (typeof audio.fastSeek === "function") {
+        try { audio.fastSeek(t); } catch (err) { audio.currentTime = t; }
+      } else {
+        audio.currentTime = t;
+      }
+    } catch (err) {
+      try { audio.currentTime = t; } catch (err2) { return false; }
+    }
+    updateProgressUI(r);
+    currentTimeEl.textContent = formatTime(t);
+    return true;
+  }
+
+  function seekFromEvent(e) {
+    const ratio = ratioFromEvent(e);
+    if (ratio == null) return;
+    seekToRatio(ratio);
+  }
+
+  function endDrag(e) {
     if (!isDragging) return;
+    // final seek on release (important for touch)
+    if (e) seekFromEvent(e);
     isDragging = false;
     progressBar.classList.remove("dragging");
   }
+
   progressBar.addEventListener("pointerdown", e => {
-    if (!audio.duration || !isFinite(audio.duration)) return;
+    const dur = getAudioDuration();
+    if (!dur) return;
     isDragging = true;
     progressBar.classList.add("dragging");
-    progressBar.setPointerCapture(e.pointerId);
+    try { progressBar.setPointerCapture(e.pointerId); } catch (err) {}
     seekFromEvent(e);
     e.preventDefault();
+    e.stopPropagation();
   });
   progressBar.addEventListener("pointermove", e => {
     if (!isDragging) return;
     seekFromEvent(e);
+    e.preventDefault();
   });
-  progressBar.addEventListener("pointerup", endDrag);
-  progressBar.addEventListener("pointercancel", endDrag);
-  document.addEventListener("pointerup", endDrag);
+  progressBar.addEventListener("pointerup", e => { endDrag(e); });
+  progressBar.addEventListener("pointercancel", e => { endDrag(e); });
+
+  // Touch fallbacks (older WebKit)
+  progressBar.addEventListener("touchstart", e => {
+    const dur = getAudioDuration();
+    if (!dur) return;
+    isDragging = true;
+    progressBar.classList.add("dragging");
+    seekFromEvent(e);
+    e.preventDefault();
+  }, { passive: false });
+  progressBar.addEventListener("touchmove", e => {
+    if (!isDragging) return;
+    seekFromEvent(e);
+    e.preventDefault();
+  }, { passive: false });
+  progressBar.addEventListener("touchend", e => { endDrag(e); }, { passive: true });
+  progressBar.addEventListener("touchcancel", e => { endDrag(e); }, { passive: true });
+
+  // Click fallback (desktop)
+  progressBar.addEventListener("click", e => {
+    if (isDragging) return;
+    seekFromEvent(e);
+  });
 
   audio.addEventListener("timeupdate", () => {
-    if (!audio.duration || isDragging) return;
-    updateProgressUI(audio.currentTime / audio.duration);
+    if (isDragging) return;
+    const dur = getAudioDuration();
+    if (!dur) return;
+    updateProgressUI(audio.currentTime / dur);
+    currentTimeEl.textContent = formatTime(audio.currentTime);
+  });
+  audio.addEventListener("seeked", () => {
+    if (isDragging) return;
+    const dur = getAudioDuration();
+    if (!dur) return;
+    updateProgressUI(audio.currentTime / dur);
     currentTimeEl.textContent = formatTime(audio.currentTime);
   });
   audio.addEventListener("loadedmetadata", () => { durationEl.textContent = formatTime(audio.duration); });
