@@ -477,6 +477,12 @@ body {
   color: #041018; outline: none;
 }
 .ctrl-btn.play-btn svg { width: 32px; height: 32px; }
+.ctrl-btn.ctrl-skip { position: relative; }
+.ctrl-btn.ctrl-skip span {
+  position: absolute; top: 54%; left: 50%; transform: translate(-50%, -50%);
+  font-size: 10px; font-weight: 800; line-height: 1;
+  pointer-events: none;
+}
 
 .volume-row, .speed-row {
   display: flex; align-items: center; gap: 10px; margin-top: 14px;
@@ -875,17 +881,27 @@ body {
 
 /* Mini bar */
 .mini-bar {
-  flex-shrink: 0; height: 64px;
+  flex-shrink: 0;
   background: var(--header-bg);
   backdrop-filter: blur(20px);
   border-top: 1px solid var(--border);
-  display: flex; align-items: center; gap: 14px; padding: 0 18px;
+  display: flex; flex-direction: column; gap: 8px;
+  padding: 10px 16px;
   cursor: pointer;
+  position: relative;
   transform: translateY(100%); opacity: 0;
   transition: transform 0.35s cubic-bezier(0.22,1,0.36,1), opacity 0.3s, background 0.25s;
 }
 .mini-bar.show { transform: translateY(0); opacity: 1; }
 .mini-bar:hover { background: color-mix(in srgb, var(--cyan) 6%, var(--header-bg)); }
+.mini-top { display: flex; align-items: center; gap: 8px; }
+.mini-progress-wrap { width: 100%; cursor: default; }
+.mini-progress-bar { height: 12px; }
+.mini-progress-bar:hover, .mini-progress-bar.dragging { height: 14px; }
+.mini-progress-bar .progress-range { height: 26px; }
+.mini-progress-bar .progress-range::-webkit-slider-thumb { width: 16px; height: 16px; }
+.mini-progress-bar .progress-range::-moz-range-thumb { width: 16px; height: 16px; }
+.mini-time-row { font-size: 11px; margin-top: 2px; }
 .mini-art {
   width: 42px; height: 42px; border-radius: 50%; object-fit: cover;
   border: 2px solid color-mix(in srgb, var(--cyan) 30%, transparent);
@@ -903,6 +919,24 @@ body {
   color: #041018; display: grid; place-items: center; cursor: pointer; flex-shrink: 0;
 }
 .mini-play svg { width: 18px; height: 18px; fill: currentColor; }
+.mini-ctrl {
+  width: 36px; height: 36px; border: none; border-radius: 50%;
+  background: transparent; color: var(--text, #fff);
+  display: grid; place-items: center; cursor: pointer; flex-shrink: 0;
+  transition: background 0.2s;
+}
+.mini-ctrl:hover { background: color-mix(in srgb, var(--cyan) 16%, transparent); }
+.mini-ctrl svg { width: 20px; height: 20px; fill: currentColor; }
+.mini-skip {
+  position: relative;
+  width: 34px; height: 34px;
+}
+.mini-skip svg { width: 22px; height: 22px; }
+.mini-skip span {
+  position: absolute; top: 52%; left: 50%; transform: translate(-50%, -50%);
+  font-size: 9px; font-weight: 800; line-height: 1;
+  pointer-events: none;
+}
 
 /* Settings */
 .settings-panel {
@@ -1061,13 +1095,22 @@ body {
   .track-item .move-btns button { width: 28px; height: 22px; }
 
   .mini-bar {
-    height: 60px;
-    padding: 0 12px;
-    padding-bottom: env(safe-area-inset-bottom);
-    height: calc(60px + env(safe-area-inset-bottom));
+    padding: 8px 10px;
+    padding-bottom: calc(8px + env(safe-area-inset-bottom));
+    gap: 6px;
   }
-  .mini-art { width: 40px; height: 40px; }
-  .mini-play { width: 40px; height: 40px; }
+  .mini-top { gap: 4px; }
+  .mini-art { width: 36px; height: 36px; }
+  .mini-sub { display: none; }
+  .mini-play { width: 38px; height: 38px; }
+  .mini-ctrl { width: 30px; height: 30px; }
+  .mini-ctrl svg { width: 17px; height: 17px; }
+  .mini-skip { width: 30px; height: 30px; }
+  .mini-skip svg { width: 20px; height: 20px; }
+  .mini-skip span { font-size: 8px; }
+  .mini-progress-bar { height: 10px; }
+  .mini-progress-bar:hover, .mini-progress-bar.dragging { height: 12px; }
+  .mini-time-row { font-size: 10px; }
 
   /* Player popup — mobile full-ish sheet */
   .popup-overlay {
@@ -1287,15 +1330,42 @@ body {
 </div>
 
 <div class="mini-bar" id="miniBar">
-  <img class="mini-art" src="oisasi music.jpg" alt="">
-  <div class="mini-info">
-    <div class="mini-title" id="miniTitle">—</div>
-    <div class="mini-sub">Oisasi Music</div>
+  <div class="mini-top">
+    <img class="mini-art" src="oisasi music.jpg" alt="">
+    <div class="mini-info">
+      <div class="mini-title" id="miniTitle">—</div>
+      <div class="mini-sub">Oisasi Music</div>
+    </div>
+    <button class="mini-ctrl mini-skip" id="miniBack10Btn" aria-label="10秒戻る" title="10秒戻る">
+      <svg viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
+      <span>10</span>
+    </button>
+    <button class="mini-ctrl" id="miniPrevBtn" aria-label="前の曲" title="前の曲">
+      <svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+    </button>
+    <button class="mini-play" id="miniPlayBtn" aria-label="再生">
+      <svg id="miniPlayIcon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+    </button>
+    <button class="mini-ctrl" id="miniNextBtn" aria-label="次の曲" title="次の曲">
+      <svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+    </button>
+    <button class="mini-ctrl mini-skip" id="miniFwd10Btn" aria-label="10秒進む" title="10秒進む">
+      <svg viewBox="0 0 24 24"><path d="M12 5V1l5 5-5 5V7c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6h2c0 4.42-3.58 8-8 8s-8-3.58-8-8 3.58-8 8-8z"/></svg>
+      <span>10</span>
+    </button>
   </div>
-  <button class="mini-play" id="miniPlayBtn" aria-label="再生">
-    <svg id="miniPlayIcon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-  </button>
+  <div class="mini-progress-wrap">
+    <div class="progress-bar mini-progress-bar" id="miniProgressBar">
+      <div class="progress-fill" id="miniProgressFill"></div>
+      <input type="range" class="progress-range" id="miniProgressRange" min="0" max="1000" value="0" step="1" aria-label="再生位置">
+    </div>
+    <div class="time-row mini-time-row">
+      <span id="miniCurrentTime">0:00</span>
+      <span id="miniDuration">0:00</span>
+    </div>
+  </div>
 </div>
+
 
 <div class="popup-overlay" id="popupOverlay">
   <div class="popup-player" id="popupPlayer" role="dialog" aria-modal="true">
@@ -1334,8 +1404,16 @@ body {
           <button class="ctrl-btn" id="prevBtn" title="前の曲" aria-label="前の曲">
             <svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
           </button>
+          <button class="ctrl-btn ctrl-skip" id="back10Btn" title="10秒戻る" aria-label="10秒戻る">
+            <svg viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
+            <span>10</span>
+          </button>
           <button class="ctrl-btn play-btn" id="playBtn" title="再生 / 一時停止" aria-label="再生">
             <svg id="playIcon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          </button>
+          <button class="ctrl-btn ctrl-skip" id="fwd10Btn" title="10秒進む" aria-label="10秒進む">
+            <svg viewBox="0 0 24 24"><path d="M12 5V1l5 5-5 5V7c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6h2c0 4.42-3.58 8-8 8s-8-3.58-8-8 3.58-8 8-8z"/></svg>
+            <span>10</span>
           </button>
           <button class="ctrl-btn" id="nextBtn" title="次の曲" aria-label="次の曲">
             <svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
@@ -1555,6 +1633,8 @@ body {
   const nextBtn = document.getElementById("nextBtn");
   const shuffleBtn = document.getElementById("shuffleBtn");
   const repeatBtn = document.getElementById("repeatBtn");
+  const back10Btn = document.getElementById("back10Btn");
+  const fwd10Btn = document.getElementById("fwd10Btn");
   const volumeSlider = document.getElementById("volumeSlider");
   const artworkArea = document.getElementById("artworkArea");
   const eq = document.getElementById("eq");
@@ -1563,6 +1643,14 @@ body {
   const miniBar = document.getElementById("miniBar");
   const miniTitle = document.getElementById("miniTitle");
   const miniPlayBtn = document.getElementById("miniPlayBtn");
+  const miniPrevBtn = document.getElementById("miniPrevBtn");
+  const miniNextBtn = document.getElementById("miniNextBtn");
+  const miniProgressFill = document.getElementById("miniProgressFill");
+  const miniProgressBar = document.getElementById("miniProgressBar");
+  const miniCurrentTimeEl = document.getElementById("miniCurrentTime");
+  const miniDurationEl = document.getElementById("miniDuration");
+  const miniBack10Btn = document.getElementById("miniBack10Btn");
+  const miniFwd10Btn = document.getElementById("miniFwd10Btn");
   const miniPlayIcon = document.getElementById("miniPlayIcon");
   const popupTracklist = document.getElementById("popupTracklist");
   const playlistSelect = document.getElementById("playlistSelect");
@@ -1960,7 +2048,7 @@ body {
   }
   document.getElementById("popupClose").addEventListener("click", closePopup);
   popupOverlay.addEventListener("click", e => { if (e.target === popupOverlay) closePopup(); });
-  miniBar.addEventListener("click", e => { if (!e.target.closest("#miniPlayBtn")) openPopup(); });
+  miniBar.addEventListener("click", e => { if (!e.target.closest("#miniPlayBtn, #miniPrevBtn, #miniNextBtn, #miniBack10Btn, #miniFwd10Btn, .mini-progress-wrap")) openPopup(); });
 
   function renderPopupTracklist() {
     if (!popupTracklist) return;
@@ -2112,6 +2200,8 @@ body {
     updateProgressUI(0);
     currentTimeEl.textContent = "0:00";
     durationEl.textContent = "0:00";
+    if (miniCurrentTimeEl) miniCurrentTimeEl.textContent = "0:00";
+    if (miniDurationEl) miniDurationEl.textContent = "0:00";
     audio.play().then(() => { isPlaying = true; updatePlayUI(); }).catch(() => {
       trackTitle.textContent = track.title + " （ファイルなし）";
       isPlaying = false; updatePlayUI();
@@ -2175,8 +2265,14 @@ body {
 
   playBtn.addEventListener("click", togglePlay);
   miniPlayBtn.addEventListener("click", e => { e.stopPropagation(); togglePlay(); });
+  miniPrevBtn.addEventListener("click", e => { e.stopPropagation(); playPrev(); });
+  miniNextBtn.addEventListener("click", e => { e.stopPropagation(); playNext(); });
+  miniBack10Btn.addEventListener("click", e => { e.stopPropagation(); skipBy(-10); });
+  miniFwd10Btn.addEventListener("click", e => { e.stopPropagation(); skipBy(10); });
   nextBtn.addEventListener("click", playNext);
   prevBtn.addEventListener("click", playPrev);
+  back10Btn.addEventListener("click", () => skipBy(-10));
+  fwd10Btn.addEventListener("click", () => skipBy(10));
   shuffleBtn.addEventListener("click", () => {
     isShuffle = !isShuffle;
     shuffleBtn.classList.toggle("active", isShuffle);
@@ -2202,6 +2298,7 @@ body {
   setSpeed(1);
 
   const progressRange = document.getElementById("progressRange");
+  const miniProgressRange = document.getElementById("miniProgressRange");
   const SEEK_MAX = 1000;
   let isSeeking = false;
 
@@ -2217,16 +2314,24 @@ body {
     return 0;
   }
 
+  function setTimeLabels(t) {
+    const text = formatTime(t);
+    currentTimeEl.textContent = text;
+    if (miniCurrentTimeEl) miniCurrentTimeEl.textContent = text;
+  }
+
   function updateProgressUI(ratio) {
     const r = Math.max(0, Math.min(1, Number(ratio) || 0));
     const pct = r * 100;
     progressFill.style.width = pct + "%";
-    if (progressRange && !isSeeking) {
-      progressRange.value = String(Math.round(r * SEEK_MAX));
+    if (miniProgressFill) miniProgressFill.style.width = pct + "%";
+    if (!isSeeking) {
+      if (progressRange) progressRange.value = String(Math.round(r * SEEK_MAX));
+      if (miniProgressRange) miniProgressRange.value = String(Math.round(r * SEEK_MAX));
     }
   }
 
-  function applyRangeSeek(value) {
+  function applyRangeSeek(value, sourceEl) {
     const dur = getAudioDuration();
     if (!dur) return;
     const r = Math.max(0, Math.min(SEEK_MAX, Number(value) || 0)) / SEEK_MAX;
@@ -2234,38 +2339,62 @@ body {
     try {
       audio.currentTime = t;
     } catch (err) {}
-    progressFill.style.width = (r * 100) + "%";
-    currentTimeEl.textContent = formatTime(t);
+    const pct = (r * 100) + "%";
+    progressFill.style.width = pct;
+    if (miniProgressFill) miniProgressFill.style.width = pct;
+    const rounded = String(Math.round(r * SEEK_MAX));
+    if (progressRange && sourceEl !== progressRange) progressRange.value = rounded;
+    if (miniProgressRange && sourceEl !== miniProgressRange) miniProgressRange.value = rounded;
+    setTimeLabels(t);
   }
 
-  if (progressRange) {
+  function skipBy(seconds) {
+    const dur = getAudioDuration();
+    const cur = audio.currentTime || 0;
+    let t = cur + seconds;
+    if (t < 0) t = 0;
+    if (dur && t > dur) t = dur;
+    try {
+      audio.currentTime = t;
+    } catch (err) {}
+    if (dur) {
+      updateProgressUI(t / dur);
+    }
+    setTimeLabels(t);
+  }
+
+  function attachSeekHandlers(rangeEl, barEl) {
+    if (!rangeEl) return;
     const startSeek = () => {
       isSeeking = true;
       isDragging = true;
-      if (progressBar) progressBar.classList.add("dragging");
+      if (barEl) barEl.classList.add("dragging");
     };
-    progressRange.addEventListener("pointerdown", startSeek);
-    progressRange.addEventListener("mousedown", startSeek);
-    progressRange.addEventListener("touchstart", startSeek, { passive: true });
+    rangeEl.addEventListener("pointerdown", startSeek);
+    rangeEl.addEventListener("mousedown", startSeek);
+    rangeEl.addEventListener("touchstart", startSeek, { passive: true });
 
-    progressRange.addEventListener("input", () => {
+    rangeEl.addEventListener("input", () => {
       isSeeking = true;
       isDragging = true;
-      applyRangeSeek(progressRange.value);
+      applyRangeSeek(rangeEl.value, rangeEl);
     });
 
     const endSeek = () => {
       if (!isSeeking) return;
-      applyRangeSeek(progressRange.value);
+      applyRangeSeek(rangeEl.value, rangeEl);
       isSeeking = false;
       isDragging = false;
-      if (progressBar) progressBar.classList.remove("dragging");
+      if (barEl) barEl.classList.remove("dragging");
     };
-    progressRange.addEventListener("change", endSeek);
-    progressRange.addEventListener("pointerup", endSeek);
-    progressRange.addEventListener("mouseup", endSeek);
-    progressRange.addEventListener("touchend", endSeek, { passive: true });
+    rangeEl.addEventListener("change", endSeek);
+    rangeEl.addEventListener("pointerup", endSeek);
+    rangeEl.addEventListener("mouseup", endSeek);
+    rangeEl.addEventListener("touchend", endSeek, { passive: true });
   }
+
+  attachSeekHandlers(progressRange, progressBar);
+  attachSeekHandlers(miniProgressRange, miniProgressBar);
 
   audio.addEventListener("timeupdate", () => {
     if (isSeeking) return;
@@ -2273,16 +2402,20 @@ body {
     if (!dur) return;
     const r = audio.currentTime / dur;
     updateProgressUI(r);
-    currentTimeEl.textContent = formatTime(audio.currentTime);
+    setTimeLabels(audio.currentTime);
   });
   audio.addEventListener("seeked", () => {
     if (isSeeking) return;
     const dur = getAudioDuration();
     if (!dur) return;
     updateProgressUI(audio.currentTime / dur);
-    currentTimeEl.textContent = formatTime(audio.currentTime);
+    setTimeLabels(audio.currentTime);
   });
-  audio.addEventListener("loadedmetadata", () => { durationEl.textContent = formatTime(audio.duration); });
+  audio.addEventListener("loadedmetadata", () => {
+    const text = formatTime(audio.duration);
+    durationEl.textContent = text;
+    if (miniDurationEl) miniDurationEl.textContent = text;
+  });
   audio.addEventListener("ended", () => {
     if (repeatMode === 2) { audio.currentTime = 0; audio.play(); }
     else playNext();
