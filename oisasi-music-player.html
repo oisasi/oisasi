@@ -1433,6 +1433,23 @@ body {
 <audio id="audio" preload="metadata"></audio>
 
 <script>
+  // 過去のバージョンで登録された古いService Workerが残っていると、
+  // 音声のシーク(Rangeリクエスト/206応答)をキャッシュしようとして
+  // "Partial response (206) is unsupported" エラーを出し続けるため、
+  // 見つけ次第すべて解除してキャッシュも削除する。
+  (function cleanupStaleServiceWorkers() {
+    if (!('serviceWorker' in navigator)) return;
+    navigator.serviceWorker.getRegistrations().then(regs => {
+      regs.forEach(reg => reg.unregister());
+    }).catch(() => {});
+    if (window.caches && caches.keys) {
+      caches.keys().then(keys => {
+        keys.forEach(key => caches.delete(key));
+      }).catch(() => {});
+    }
+  })();
+</script>
+<script>
 (function () {
   const html = document.documentElement;
   const i18n = {
