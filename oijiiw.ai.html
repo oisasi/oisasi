@@ -934,7 +934,8 @@ footer { display: none; }
         throw new Error(`AIから正しいデータが届きませんでした。詳細: ${JSON.stringify(data)}`);
       }
 
-      const majoReply = data.choices[0].message.content;
+      // 【修正箇所】nullが来た場合のエラー回避
+      const majoReply = data.choices[0].message.content || "（ぐあっ！AIから文字の無い返答が来たぞぃ…もう一度試してほしいのぞぃ）";
       
       conversationMessages.push({ role: "user", content: text });
       conversationMessages.push({ role: "assistant", content: majoReply });
@@ -955,16 +956,20 @@ footer { display: none; }
     }
   }
 
+  // 【修正箇所】引数がnullの時のクラッシュ回避
   function linkify(text) {
+    if (!text) return "";
     const urlRegex = /(https?:\/\/[^\s\(\)\<\>]+)/g;
-    return text.replace(urlRegex, function (url) {
+    return String(text).replace(urlRegex, function (url) {
       let cleanUrl = url.replace(/[\.\,\;\:]$/, '');
       return `<a href="${cleanUrl}" target="_blank" rel="noopener noreferrer">${cleanUrl}</a>`;
     });
   }
 
+  // 【修正箇所】引数がnullの時のクラッシュ回避
   function escapeHTML(str) {
-    return str
+    if (!str) return "";
+    return String(str)
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
@@ -976,7 +981,7 @@ footer { display: none; }
     if (!text || !('speechSynthesis' in window)) return;
     try {
       window.speechSynthesis.cancel();
-      const clean = text.replace(/https?:\/\/[^\s\(\)\<\>]+/g, '').replace(/[#*_`>~]/g, '');
+      const clean = String(text).replace(/https?:\/\/[^\s\(\)\<\>]+/g, '').replace(/[#*_`>~]/g, '');
       if (!clean.trim()) return;
       const utter = new SpeechSynthesisUtterance(clean);
       const lang = (localStorage.getItem('oisasi-lang') || 'auto');
@@ -1016,7 +1021,7 @@ footer { display: none; }
     } else if (isMajo) {
       bubble.innerHTML = linkify(escapeHTML(text));
     } else {
-      bubble.textContent = text;
+      bubble.textContent = text || "";
     }
 
     const col = document.createElement("div");
