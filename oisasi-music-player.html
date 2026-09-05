@@ -416,6 +416,110 @@ body {
   display: flex; align-items: center; gap: 10px; margin-top: 18px;
   width: min(280px, 70vw);
 }
+
+/* Playlist bar + track cards */
+.popup-playlist-bar {
+  width: 100%;
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.playlist-select {
+  flex: 1;
+  min-width: 120px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 9px 12px;
+  outline: none;
+  cursor: pointer;
+}
+.playlist-select:focus {
+  border-color: color-mix(in srgb, var(--cyan) 45%, transparent);
+}
+.playlist-bar-btn {
+  height: 38px;
+  padding: 0 12px;
+  border-radius: 11px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.playlist-bar-btn:hover {
+  background: var(--surface-hover);
+  border-color: color-mix(in srgb, var(--cyan) 40%, transparent);
+  color: var(--cyan);
+}
+.playlist-bar-btn.primary {
+  background: linear-gradient(135deg, var(--cyan), var(--teal));
+  border-color: transparent;
+  color: #041018;
+}
+.playlist-bar-btn.primary:hover {
+  filter: brightness(1.08);
+  color: #041018;
+}
+
+/* Popup track list — horizontal 5 cards (lower) */
+.popup-tracklist {
+  width: 100%;
+  margin-top: 28px;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+.popup-track-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 10px 6px;
+  min-height: 64px;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  text-align: center;
+  overflow: hidden;
+}
+.popup-track-item:hover {
+  background: var(--surface-hover);
+  border-color: color-mix(in srgb, var(--cyan) 40%, transparent);
+  transform: translateY(-2px);
+}
+.popup-track-item.active {
+  background: linear-gradient(145deg, color-mix(in srgb, var(--cyan) 22%, transparent), color-mix(in srgb, var(--teal) 12%, transparent));
+  border-color: color-mix(in srgb, var(--cyan) 55%, transparent);
+  color: var(--cyan);
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--cyan) 20%, transparent);
+}
+.popup-track-item .pt-num {
+  font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; font-weight: 700;
+}
+.popup-track-item.active .pt-num { color: var(--cyan); }
+.popup-track-item .pt-name {
+  font-size: 11.5px; font-weight: 600; line-height: 1.25;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  width: 100%;
+  word-break: break-all;
+}
 .volume-row svg { width: 20px; height: 20px; fill: var(--muted); flex-shrink: 0; }
 .volume-slider {
   flex: 1; height: 6px; -webkit-appearance: none; appearance: none;
@@ -537,8 +641,17 @@ body {
   .ctrl-btn { width: 54px; height: 54px; }
   .ctrl-btn.play-btn { width: 80px; height: 80px; border-radius: 26px; }
   .ctrl-btn.play-btn svg { width: 34px; height: 34px; }
-  .volume-row { width: 260px; margin-top: 18px; margin-left: auto; margin-right: auto; }
+  .volume-row { width: 260px; margin-top: 14px; margin-left: auto; margin-right: auto; }
   .eq { margin-top: 14px; }
+  .popup-right {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+  .popup-playlist-bar { margin-top: 18px; }
+  .popup-tracklist {
+    margin-top: 24px;
+  }
 }
 
 /* Large TV */
@@ -551,6 +664,19 @@ body {
   .ctrl-btn.play-btn { width: 88px; height: 88px; }
   .ctrl-btn { width: 58px; height: 58px; }
   .progress-bar { height: 16px; }
+}
+
+@media (max-width: 560px) {
+  .popup-tracklist {
+    grid-template-columns: repeat(5, 1fr);
+    gap: 5px;
+  }
+  .popup-track-item {
+    min-height: 52px;
+    padding: 7px 3px;
+  }
+  .popup-track-item .pt-name { font-size: 10px; }
+  .popup-track-item .pt-num { font-size: 10px; }
 }
 
 @media (max-height: 600px) and (min-width: 800px) {
@@ -676,6 +802,13 @@ body {
           <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
           <input type="range" class="volume-slider" id="volumeSlider" min="0" max="1" step="0.01" value="0.85" aria-label="音量">
         </div>
+        <div class="popup-playlist-bar">
+          <select class="playlist-select" id="playlistSelect" title="プレイリスト"></select>
+          <button class="playlist-bar-btn" id="addToPlaylistBtn" title="再生中の曲を追加">＋ 追加</button>
+          <button class="playlist-bar-btn" id="newPlaylistBtn" title="新規プレイリスト">新規</button>
+          <button class="playlist-bar-btn" id="removeFromPlaylistBtn" title="再生中の曲を削除">削除</button>
+        </div>
+        <div class="popup-tracklist" id="popupTracklist"></div>
       </div>
     </div>
   </div>
@@ -798,9 +931,60 @@ body {
   const miniTitle = document.getElementById("miniTitle");
   const miniPlayBtn = document.getElementById("miniPlayBtn");
   const miniPlayIcon = document.getElementById("miniPlayIcon");
+  const popupTracklist = document.getElementById("popupTracklist");
+  const playlistSelect = document.getElementById("playlistSelect");
+  const addToPlaylistBtn = document.getElementById("addToPlaylistBtn");
+  const newPlaylistBtn = document.getElementById("newPlaylistBtn");
+  const removeFromPlaylistBtn = document.getElementById("removeFromPlaylistBtn");
 
   let currentIndex = -1, isPlaying = false, isShuffle = false, repeatMode = 0;
   let filteredTracks = [...tracks], playOrder = [], isDragging = false;
+  let activePlaylistId = "all";
+
+  // ===== Custom playlists (localStorage) =====
+  function loadPlaylists() {
+    try {
+      const raw = localStorage.getItem("oisasi-playlists");
+      return raw ? JSON.parse(raw) : {};
+    } catch { return {}; }
+  }
+  function savePlaylists(obj) {
+    localStorage.setItem("oisasi-playlists", JSON.stringify(obj));
+  }
+  function getPlaylistTrackIndexes(id) {
+    if (id === "all") return tracks.map((_, i) => i);
+    const pls = loadPlaylists();
+    const arr = pls[id] || [];
+    // keep only valid indexes
+    return arr.filter(i => i >= 0 && i < tracks.length);
+  }
+  function refreshPlaylistSelect() {
+    const pls = loadPlaylists();
+    const current = activePlaylistId;
+    playlistSelect.innerHTML = "";
+    const optAll = document.createElement("option");
+    optAll.value = "all";
+    optAll.textContent = "すべて (" + tracks.length + ")";
+    playlistSelect.appendChild(optAll);
+    Object.keys(pls).forEach(name => {
+      const opt = document.createElement("option");
+      opt.value = name;
+      opt.textContent = name + " (" + (pls[name] || []).length + ")";
+      playlistSelect.appendChild(opt);
+    });
+    playlistSelect.value = pls[current] !== undefined || current === "all" ? current : "all";
+    activePlaylistId = playlistSelect.value;
+  }
+  function applyActivePlaylist() {
+    const indexes = getPlaylistTrackIndexes(activePlaylistId);
+    filteredTracks = indexes.map(i => tracks[i]);
+    const q = (searchBox.value || "").trim().toLowerCase();
+    if (q) {
+      filteredTracks = filteredTracks.filter(t => t.title.toLowerCase().includes(q));
+    }
+    playOrder = [];
+    renderPlaylist();
+  }
 
   window.updateTrackCount = function () {
     const lang = resolveLang(localStorage.getItem('oisasi-lang') || 'auto');
@@ -822,10 +1006,43 @@ body {
   popupOverlay.addEventListener("click", e => { if (e.target === popupOverlay) closePopup(); });
   miniBar.addEventListener("click", e => { if (!e.target.closest("#miniPlayBtn")) openPopup(); });
 
+  function renderPopupTracklist() {
+    if (!popupTracklist) return;
+    popupTracklist.innerHTML = "";
+    const indexes = getPlaylistTrackIndexes(activePlaylistId);
+    const total = indexes.length;
+    if (!total) {
+      const empty = document.createElement("div");
+      empty.className = "popup-track-item";
+      empty.style.gridColumn = "1 / -1";
+      empty.innerHTML = '<span class="pt-name">プレイリストに曲がありません</span>';
+      popupTracklist.appendChild(empty);
+      return;
+    }
+
+    // position of current track within playlist
+    let centerPos = indexes.indexOf(currentIndex);
+    if (centerPos < 0) centerPos = 0;
+    let start = centerPos - 2;
+    if (start < 0) start = 0;
+    if (start + 5 > total) start = Math.max(0, total - 5);
+
+    for (let i = 0; i < 5 && start + i < total; i++) {
+      const idx = indexes[start + i];
+      const track = tracks[idx];
+      const item = document.createElement("div");
+      item.className = "popup-track-item" + (idx === currentIndex ? " active" : "");
+      item.innerHTML = '<span class="pt-num">' + String(start + i + 1).padStart(2, "0") + '</span><span class="pt-name">' + track.title + '</span>';
+      item.addEventListener("click", () => { playTrack(idx); });
+      popupTracklist.appendChild(item);
+    }
+  }
+
   function renderPlaylist() {
     playlistEl.innerHTML = "";
     if (!filteredTracks.length) {
       playlistEl.innerHTML = '<div class="empty-state">該当する曲がありません</div>';
+      renderPopupTracklist();
       return;
     }
     filteredTracks.forEach((track, i) => {
@@ -839,6 +1056,7 @@ body {
       item.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); activate(); } });
       playlistEl.appendChild(item);
     });
+    renderPopupTracklist();
   }
 
   function playTrack(index) {
@@ -876,19 +1094,23 @@ body {
 
   function getNextIndex() {
     if (repeatMode === 2) return currentIndex;
+    const pool = getPlaylistTrackIndexes(activePlaylistId);
+    if (!pool.length) return -1;
     if (isShuffle) {
       if (!playOrder.length) {
-        playOrder = [...Array(tracks.length).keys()].filter(i => i !== currentIndex);
+        playOrder = pool.filter(i => i !== currentIndex);
         for (let i = playOrder.length - 1; i > 0; i--) {
           const j = Math.floor(Math.random() * (i + 1));
           [playOrder[i], playOrder[j]] = [playOrder[j], playOrder[i]];
         }
       }
-      return playOrder.length ? playOrder.shift() : currentIndex;
+      return playOrder.length ? playOrder.shift() : (repeatMode === 1 ? pool[0] : -1);
     }
-    const next = currentIndex + 1;
-    if (next >= tracks.length) return repeatMode === 1 ? 0 : -1;
-    return next;
+    const pos = pool.indexOf(currentIndex);
+    if (pos < 0) return pool[0];
+    const nextPos = pos + 1;
+    if (nextPos >= pool.length) return repeatMode === 1 ? pool[0] : -1;
+    return pool[nextPos];
   }
   function playNext() {
     if (currentIndex === -1) { playTrack(0); openPopup(); return; }
@@ -899,7 +1121,11 @@ body {
   function playPrev() {
     if (currentIndex === -1) { playTrack(0); openPopup(); return; }
     if (audio.currentTime > 3) { audio.currentTime = 0; return; }
-    playTrack((currentIndex - 1 + tracks.length) % tracks.length);
+    const pool = getPlaylistTrackIndexes(activePlaylistId);
+    if (!pool.length) return;
+    const pos = pool.indexOf(currentIndex);
+    const prevPos = pos <= 0 ? pool.length - 1 : pos - 1;
+    playTrack(pool[prevPos]);
   }
 
   playBtn.addEventListener("click", togglePlay);
@@ -948,9 +1174,71 @@ body {
   audio.addEventListener("pause", () => { isPlaying = false; updatePlayUI(); });
 
   searchBox.addEventListener("input", () => {
-    const q = searchBox.value.trim().toLowerCase();
-    filteredTracks = q ? tracks.filter(t => t.title.toLowerCase().includes(q)) : [...tracks];
-    renderPlaylist();
+    applyActivePlaylist();
+  });
+
+  // Playlist controls
+  refreshPlaylistSelect();
+  applyActivePlaylist();
+
+  playlistSelect.addEventListener("change", () => {
+    activePlaylistId = playlistSelect.value;
+    applyActivePlaylist();
+  });
+
+  newPlaylistBtn.addEventListener("click", () => {
+    const name = prompt("新しいプレイリスト名");
+    if (!name || !name.trim()) return;
+    const key = name.trim();
+    const pls = loadPlaylists();
+    if (pls[key] || key === "all") {
+      alert("同じ名前のプレイリストがあります");
+      return;
+    }
+    pls[key] = [];
+    savePlaylists(pls);
+    activePlaylistId = key;
+    refreshPlaylistSelect();
+    applyActivePlaylist();
+  });
+
+  addToPlaylistBtn.addEventListener("click", () => {
+    if (currentIndex < 0) { alert("先に曲を再生してください"); return; }
+    if (activePlaylistId === "all") {
+      const name = prompt("追加先のプレイリスト名（新規可）");
+      if (!name || !name.trim()) return;
+      const key = name.trim();
+      const pls = loadPlaylists();
+      if (!pls[key]) pls[key] = [];
+      if (!pls[key].includes(currentIndex)) pls[key].push(currentIndex);
+      savePlaylists(pls);
+      activePlaylistId = key;
+      refreshPlaylistSelect();
+      applyActivePlaylist();
+      return;
+    }
+    const pls = loadPlaylists();
+    if (!pls[activePlaylistId]) pls[activePlaylistId] = [];
+    if (!pls[activePlaylistId].includes(currentIndex)) {
+      pls[activePlaylistId].push(currentIndex);
+      savePlaylists(pls);
+      refreshPlaylistSelect();
+      applyActivePlaylist();
+    }
+  });
+
+  removeFromPlaylistBtn.addEventListener("click", () => {
+    if (activePlaylistId === "all") {
+      alert("「すべて」からは削除できません");
+      return;
+    }
+    if (currentIndex < 0) return;
+    const pls = loadPlaylists();
+    if (!pls[activePlaylistId]) return;
+    pls[activePlaylistId] = pls[activePlaylistId].filter(i => i !== currentIndex);
+    savePlaylists(pls);
+    refreshPlaylistSelect();
+    applyActivePlaylist();
   });
 
   document.addEventListener("keydown", e => {
