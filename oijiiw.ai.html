@@ -421,14 +421,14 @@ h1 span {
 .chat-input-row input:focus { outline: none; border-color: color-mix(in srgb, var(--purple) 55%, var(--border)); }
 .chat-input-row input::placeholder { color: var(--muted); }
 
-/* ネット検索トグルボタン */
-.search-toggle-btn {
+/* 強力処理トグルボタン */
+.power-toggle-btn {
   display: inline-flex; align-items: center; gap: 5px; padding: 8px 12px; border-radius: 20px;
   border: 1px solid var(--border); background: var(--surface); color: var(--muted);
   font-size: 12px; font-weight: 700; user-select: none; transition: all 0.3s; flex-shrink: 0;
 }
-.search-toggle-btn input { display: none; }
-.search-toggle-btn:has(input:checked) {
+.power-toggle-btn input { display: none; }
+.power-toggle-btn:has(input:checked) {
   background: color-mix(in srgb, var(--green) 18%, transparent);
   border-color: var(--green); color: var(--green);
   box-shadow: 0 0 12px color-mix(in srgb, var(--green) 30%, transparent);
@@ -507,7 +507,7 @@ footer { display: none; }
 @media (max-width: 520px) {
   .hero-call-btn span.label { display: none; }
   .hero-call-btn { padding: 10px 12px; }
-  .search-toggle-btn span.lbl-text { display: none; }
+  .power-toggle-btn span.lbl-text { display: none; }
 }
 </style>
 </head>
@@ -625,11 +625,11 @@ footer { display: none; }
         </div>
       </div>
       <div class="chat-input-row">
-        <!-- ネット検索ON/OFF切り替えスイッチ -->
-        <label class="search-toggle-btn" title="ネット検索を有効にする">
-          <input type="checkbox" id="web-search-toggle" checked>
-          <span>🌐</span>
-          <span class="lbl-text">検索</span>
+        <!-- 強力処理 ON/OFF切り替えスイッチ -->
+        <label class="power-toggle-btn" title="強力処理を有効にする">
+          <input type="checkbox" id="power-mode-toggle" checked>
+          <span>⚡</span>
+          <span class="lbl-text">強力処理</span>
         </label>
         <input type="text" id="user-input" data-i18n-placeholder="chat_placeholder" placeholder="ここに入力するのぞぃ...">
         <button class="chat-send-btn" id="send-btn" aria-label="送信">
@@ -825,27 +825,53 @@ footer { display: none; }
     }
   ];
 
-  // 🌐 DuckDuckGo Web検索APIを利用した無料リアルタイム検索機能
-  async function searchDuckDuckGo(query) {
+  // ⚡ 強力処理用の外部情報取得関数（複数プロキシフォールバック対応）
+  async function fetchExtraContext(query) {
+    const targetUrl = `https://html.duckduckgo.com/html/?q=${encodeURIComponent(query)}`;
+    
+    // プロキシ候補リスト
+    const proxyList = [
+      url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+      url => `https://corsproxy.io/?${encodeURIComponent(url)}`,
+      url => `https://thingproxy.freeboard.io/fetch/${url}`
+    ];
+
+    let htmlText = null;
+
+    for (const makeProxyUrl of proxyList) {
+      try {
+        const proxyUrl = makeProxyUrl(targetUrl);
+        const res = await fetch(proxyUrl, { method: "GET" });
+        if (res.ok) {
+          htmlText = await res.text();
+          if (htmlText && htmlText.length > 200) break;
+        }
+      } catch (err) {
+        console.warn("強力処理プロキシ接続失敗、次のプロキシを試します:", err);
+      }
+    }
+
+    if (!htmlText) {
+      console.warn("すべての強力処理プロキシで取得に失敗したため、通常モデル処理へ移行します。");
+      return null;
+    }
+
     try {
-      const res = await fetch(`https://html.duckduckgo.com/html/?q=${encodeURIComponent(query)}`);
-      if (!res.ok) return null;
-      const htmlText = await res.text();
       const parser = new DOMParser();
       const doc = parser.parseFromString(htmlText, "text/html");
       const results = doc.querySelectorAll('.result__body');
       
       let snippets = [];
       results.forEach((el, index) => {
-        if (index < 4) { // 上位4件の検索結果を取得
+        if (index < 4) {
           const title = el.querySelector('.result__title')?.textContent?.trim() || "";
           const snippet = el.querySelector('.result__snippet')?.textContent?.trim() || "";
-          if (title && snippet) snippets.push(`【タイトル】${title}\n【概要】${snippet}`);
+          if (title && snippet) snippets.push(`【参照情報】${title}\n【詳細】${snippet}`);
         }
       });
       return snippets.join("\n\n");
     } catch (err) {
-      console.warn("Web検索エラー:", err);
+      console.warn("解析エラー:", err);
       return null;
     }
   }
@@ -858,7 +884,7 @@ footer { display: none; }
   async function sendMessage() {
     const inputField = document.getElementById("user-input");
     const sendBtn = document.getElementById("send-btn");
-    const searchToggle = document.getElementById("web-search-toggle");
+    const powerToggle = document.getElementById("power-mode-toggle");
     const text = inputField.value.trim();
 
     if (text === "") return;
@@ -872,15 +898,14 @@ footer { display: none; }
     const thinkingId = "thinking-" + Date.now();
     addMessage(t('chat_thinking', 'むむっ…魔力を練っているのぞぃ…'), "majo thinking", thinkingId, true);
 
-    // AIへ送るメッセージ（検索結果の合成用）
     let payloadMessages = [...conversationMessages];
     let userPromptWithContext = text;
 
-    // Web検索がオンの場合、ネットから最新情報を取得
-    if (searchToggle && searchToggle.checked) {
-      const searchResults = await searchDuckDuckGo(text);
-      if (searchResults && searchResults.length > 0) {
-        userPromptWithContext = `[Web検索結果]\n${searchResults}\n\n[お主の質問]\n${text}\n\n上記Web検索結果を参考にして、最新情報を含めて回答してください。`;
+    // 強力処理がONの場合、外部コンテキストを補足
+    if (powerToggle && powerToggle.checked) {
+      const extraContext = await fetchExtraContext(text);
+      if (extraContext && extraContext.length > 0) {
+        userPromptWithContext = `[補足情報]\n${extraContext}\n\n[お主の質問]\n${text}\n\n上記情報を参考にして、最新・詳細な内容を含めて回答してください。`;
       }
     }
 
@@ -902,7 +927,6 @@ footer { display: none; }
 
       const majoReply = data.choices[0].message.content;
       
-      // 会話履歴には検索結果のプロンプトではなくオリジナルの質問を蓄積
       conversationMessages.push({ role: "user", content: text });
       conversationMessages.push({ role: "assistant", content: majoReply });
 
