@@ -2222,9 +2222,14 @@ body {
   }
 
   if (progressRange) {
-    progressRange.addEventListener("pointerdown", () => { isSeeking = true; isDragging = true; });
-    progressRange.addEventListener("mousedown", () => { isSeeking = true; isDragging = true; });
-    progressRange.addEventListener("touchstart", () => { isSeeking = true; isDragging = true; }, { passive: true });
+    const startSeek = () => {
+      isSeeking = true;
+      isDragging = true;
+      if (progressBar) progressBar.classList.add("dragging");
+    };
+    progressRange.addEventListener("pointerdown", startSeek);
+    progressRange.addEventListener("mousedown", startSeek);
+    progressRange.addEventListener("touchstart", startSeek, { passive: true });
 
     progressRange.addEventListener("input", () => {
       isSeeking = true;
@@ -2237,6 +2242,7 @@ body {
       applyRangeSeek(progressRange.value);
       isSeeking = false;
       isDragging = false;
+      if (progressBar) progressBar.classList.remove("dragging");
     };
     progressRange.addEventListener("change", endSeek);
     progressRange.addEventListener("pointerup", endSeek);
