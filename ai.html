@@ -310,6 +310,36 @@ a.ask-icon-btn { text-decoration: none; color: inherit; }
   cursor: not-allowed;
 }
 
+.mode-switch-wrap {
+  display: flex; align-items: center; gap: 7px; flex-shrink: 0; padding-left: 2px; cursor: pointer; user-select: none;
+}
+.mode-switch {
+  position: relative; width: 40px; height: 22px; border-radius: 999px; flex-shrink: 0;
+  border: 1px solid var(--border); background: var(--surface); padding: 0; cursor: pointer;
+  transition: background 0.25s, border-color 0.25s, box-shadow 0.25s;
+}
+.mode-switch .thumb {
+  position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%;
+  background: var(--muted); transition: transform 0.25s cubic-bezier(0.22,1,0.36,1), background 0.25s;
+}
+.mode-switch.search {
+  background: color-mix(in srgb, var(--cyan) 22%, transparent);
+  border-color: var(--cyan);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--cyan) 35%, transparent);
+}
+.mode-switch.search .thumb {
+  transform: translateX(18px);
+  background: var(--cyan);
+  box-shadow: 0 0 6px color-mix(in srgb, var(--cyan) 60%, transparent);
+}
+.mode-switch-label {
+  font-size: 11px; font-weight: 700; color: var(--muted); white-space: nowrap; transition: color 0.25s;
+}
+.mode-switch-label.search { color: var(--cyan); }
+@media (max-width: 480px) {
+  .mode-switch-label { display: none; }
+}
+
 
 .ask-icon-btn.talk-btn.active,
 .ask-icon-btn.talk-btn.listening {
@@ -1173,6 +1203,10 @@ a.talk-btn.start-talk-label { text-decoration: none; }
     <span class="start-sub" data-i18n-html="start_help">何かお手伝いできることはありますか？</span>
   </h1>
   <div class="ask-bar" id="startAskBar">
+    <div class="mode-switch-wrap" title="通常モード / 検索モード切り替え">
+      <button type="button" class="mode-switch search" id="startModeSwitch" role="switch" aria-checked="true" aria-label="モード切り替え"><span class="thumb"></span></button>
+      <span class="mode-switch-label search" id="startModeLabel">検索モード</span>
+    </div>
     <input type="text" id="start-input" data-i18n-placeholder="ask_placeholder" placeholder="おいさしAI に相談">
     <button class="ask-icon-btn mic" id="startMicBtn" type="button" aria-label="音声入力" title="音声入力">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
@@ -1220,6 +1254,10 @@ a.talk-btn.start-talk-label { text-decoration: none; }
       <a href="phone.html" class="ask-icon-btn talk-btn" id="talkModeBtn" aria-label="会話モード" title="会話モード" style="text-decoration:none">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
       </a>
+      <div class="mode-switch-wrap" title="通常モード / 検索モード切り替え">
+        <button type="button" class="mode-switch search" id="chatModeSwitch" role="switch" aria-checked="true" aria-label="モード切り替え"><span class="thumb"></span></button>
+        <span class="mode-switch-label search" id="chatModeLabel">検索モード</span>
+      </div>
       <input type="text" id="user-input" data-i18n-placeholder="ask_placeholder" placeholder="おいさしAI に相談">
       <button class="ask-icon-btn mic" id="chatMicBtn" type="button" aria-label="音声入力" title="音声入力">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
@@ -1286,6 +1324,8 @@ a.talk-btn.start-talk-label { text-decoration: none; }
       settings: '設定', theme: 'テーマ', language: '言語',
       auto: '自動', dark: 'ダーク', light: 'ライト',
       pronunciation: '発音（読み上げ）', speech_on: 'オン', speech_off: 'オフ',
+      mode_normal: '通常モード', mode_search: '検索モード',
+      power_searching: '調べています…',
       nav_oijiiw: 'おいじぃ魔女のホームページ', nav_logo: 'おいさしのロゴページ',
       nav_ai: 'おいさしAIページ', nav_character: 'キャラクターページ', nav_faq: 'FAQページ',
       start_help: '何かお手伝いできることはありますか？',
@@ -1300,6 +1340,8 @@ a.talk-btn.start-talk-label { text-decoration: none; }
       settings: 'Settings', theme: 'Theme', language: 'Language',
       auto: 'Auto', dark: 'Dark', light: 'Light',
       pronunciation: 'Read Aloud', speech_on: 'On', speech_off: 'Off',
+      mode_normal: 'Normal Mode', mode_search: 'Search Mode',
+      power_searching: 'Searching…',
       nav_oijiiw: 'Oijii Witch Homepage', nav_logo: 'Oisasi Logo Page',
       nav_ai: 'Oisasi AI Page', nav_character: 'Character Page', nav_faq: 'FAQ Page',
       start_help: 'How can I help you today?',
@@ -1327,6 +1369,7 @@ a.talk-btn.start-talk-label { text-decoration: none; }
     document.querySelectorAll('[data-i18n-placeholder]').forEach(el => { const k = el.getAttribute('data-i18n-placeholder'); if (t[k] != null) el.placeholder = t[k]; });
     window.__oisasiChatI18n = t;
     if (typeof updateGreeting === 'function') updateGreeting();
+    if (typeof applyPower === 'function') applyPower(localStorage.getItem('oisasi-power') || 'on');
   }
   function applyTheme(theme) {
     html.setAttribute('data-theme', theme);
@@ -1363,6 +1406,23 @@ a.talk-btn.start-talk-label { text-decoration: none; }
     window.__oisasiSpeechOn = pref === 'on';
     if (pref !== 'on' && window.speechSynthesis) window.speechSynthesis.cancel();
   }
+  function applyPower(pref) {
+    localStorage.setItem('oisasi-power', pref);
+    window.__oisasiPowerOn = pref === 'on';
+    const isSearch = pref === 'on';
+    const dict = window.__oisasiChatI18n || {};
+    document.querySelectorAll('.mode-switch').forEach(sw => {
+      sw.classList.toggle('search', isSearch);
+      sw.setAttribute('aria-checked', String(isSearch));
+    });
+    document.querySelectorAll('.mode-switch-label').forEach(lbl => {
+      lbl.classList.toggle('search', isSearch);
+      lbl.textContent = isSearch ? (dict.mode_search || '検索モード') : (dict.mode_normal || '通常モード');
+    });
+  }
+  function toggleMode() {
+    applyPower((localStorage.getItem('oisasi-power') || 'on') === 'on' ? 'off' : 'on');
+  }
   function speakNow(text) {
     if (!text || !('speechSynthesis' in window)) return;
     try {
@@ -1383,6 +1443,7 @@ a.talk-btn.start-talk-label { text-decoration: none; }
   applyTheme(localStorage.getItem('oisasi-theme') || 'auto');
   applyLang(localStorage.getItem('oisasi-lang') || 'auto');
   applySpeech(localStorage.getItem('oisasi-speech') || 'off');
+  applyPower(localStorage.getItem('oisasi-power') || 'on');
   updateGreeting();
 
 
@@ -1400,6 +1461,10 @@ a.talk-btn.start-talk-label { text-decoration: none; }
   document.getElementById('themeOptions').addEventListener('click', e => { const b = e.target.closest('button'); if (b) applyTheme(b.dataset.value); });
   document.getElementById('langOptions').addEventListener('click', e => { const b = e.target.closest('button'); if (b) applyLang(b.dataset.value); });
   document.getElementById('speechOptions').addEventListener('click', e => { const b = e.target.closest('button'); if (b) applySpeech(b.dataset.value); });
+  document.addEventListener('click', e => {
+    const sw = e.target.closest('.mode-switch, .mode-switch-wrap');
+    if (sw) toggleMode();
+  });
   hamburger.addEventListener('click', () => {
     const isOpen = navMobile.classList.toggle('open');
     hamburger.classList.toggle('active', isOpen);
@@ -1458,6 +1523,63 @@ a.talk-btn.start-talk-label { text-decoration: none; }
   function t(key, fallback) {
     const dict = window.__oisasiChatI18n;
     return (dict && dict[key] != null) ? dict[key] : fallback;
+  }
+
+  // 強力処理：外部情報取得関数（DuckDuckGo + Wikipediaフォールバック）
+  async function fetchExtraContext(query) {
+    const targetUrl = `https://html.duckduckgo.com/html/?q=${encodeURIComponent(query)}`;
+    const proxyList = [
+      url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+      url => `https://corsproxy.io/?${encodeURIComponent(url)}`
+    ];
+
+    let htmlText = null;
+
+    // 1. DuckDuckGo検索を試みる
+    for (const makeProxyUrl of proxyList) {
+      try {
+        const res = await fetch(makeProxyUrl(targetUrl));
+        if (res.ok) {
+          htmlText = await res.text();
+          if (htmlText && htmlText.includes('.result__body')) break;
+        }
+      } catch (err) { console.warn("プロキシ失敗:", err); }
+    }
+
+    if (htmlText && htmlText.includes('.result__body')) {
+      try {
+        const doc = new DOMParser().parseFromString(htmlText, "text/html");
+        let snippets = [];
+        doc.querySelectorAll('.result__body').forEach((el, i) => {
+          if (i < 3) {
+            const tt = el.querySelector('.result__title')?.textContent?.trim();
+            const s = el.querySelector('.result__snippet')?.textContent?.trim();
+            if (tt && s) snippets.push(`【${tt}】\n${s}`);
+          }
+        });
+        if (snippets.length > 0) return snippets.join("\n\n");
+      } catch (e) { console.warn("解析エラー:", e); }
+    }
+
+    // 2. DuckDuckGoが弾かれた場合、Wikipedia API（公式）で検索
+    console.warn("検索プロキシがブロックされたため、Wikipedia検索に切り替えます。");
+    try {
+      const isJa = (document.documentElement.lang || 'ja').startsWith('ja');
+      const wikiHost = isJa ? 'ja.wikipedia.org' : 'en.wikipedia.org';
+      const wikiUrl = `https://${wikiHost}/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(query)}&utf8=&format=json&origin=*`;
+      const res = await fetch(wikiUrl);
+      const data = await res.json();
+      if (data.query && data.query.search && data.query.search.length > 0) {
+        let snippets = [];
+        data.query.search.slice(0, 3).forEach(item => {
+          const cleanSnippet = item.snippet.replace(/<[^>]+>/g, '');
+          snippets.push(`【Wikipedia: ${item.title}】\n${cleanSnippet}`);
+        });
+        return snippets.join("\n\n");
+      }
+    } catch (e) { console.warn("Wikipedia検索失敗:", e); }
+
+    return null;
   }
 
   const startView = document.getElementById('startView');
@@ -1972,16 +2094,31 @@ a.talk-btn.start-talk-label { text-decoration: none; }
     setSendingUI(true);
     showLoadingMessage();
     try {
+      let extraContext = null;
+      if (window.__oisasiPowerOn) {
+        if (loadingEl) {
+          const label = loadingEl.querySelector('.win-spinner-label');
+          if (label) label.textContent = t('power_searching', '調べています…');
+        }
+        try { extraContext = await fetchExtraContext(plain); } catch (e) { extraContext = null; }
+      }
       const nowJst = new Date().toLocaleString('ja-JP', {
         timeZone: 'Asia/Tokyo',
         year: 'numeric', month: 'long', day: 'numeric', weekday: 'long',
         hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
       });
+      const lastIdx = conversationMessages.length - 1;
       const msgsForApi = conversationMessages.map((m, idx) => {
         if (idx === 0 && m.role === 'system') {
           return {
             role: 'system',
             content: m.content + '\n\n【現在の日時（日本時間）】' + nowJst + '\n質問に「今何時」「今日の日付」「何年」などが含まれたら、この日時を正確に使って答えてください。'
+          };
+        }
+        if (idx === lastIdx && m.role === 'user' && extraContext) {
+          return {
+            role: 'user',
+            content: `[検索による補足情報]\n${extraContext}\n\n[質問]\n${plain}\n\n上記の情報を参考にしつつ、正確で分かりやすい説明を日本語で答えてください。参考情報が質問と無関係な場合は無視してください。`
           };
         }
         return { role: m.role, content: typeof m.content === 'string' ? m.content : extractTextContent(m.content) };
