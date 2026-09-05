@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>おいじぃ魔女とお話し | Oijii Witch AI Chat</title>
-<meta name="description" content="おいじぃ魔女とおしゃべりできるAIチャット　Oijii Witch AI Chat @oijiiw">
+<meta name="description" content="おいじぃ魔女とおしゃべりできるAIチャット Oijii Witch AI Chat @oijiiw">
 <meta name="theme-color" content="#1a0a2e">
 <link rel="icon" type="image/png" href="おいじぃ魔女.png">
 <link rel="apple-touch-icon" href="おいじぃ魔女.png">
@@ -88,7 +88,7 @@ body {
   padding-top: var(--header-h); cursor: var(--cursor);
   transition: background 0.45s, color 0.35s;
 }
-a, button, .card, .pill, .sns, .icon-btn, .hamburger, .settings-options button, details, summary {
+a, button, .card, .pill, .sns, .icon-btn, .hamburger, .settings-options button, details, summary, label {
   cursor: var(--cursor-hover);
 }
 
@@ -340,18 +340,11 @@ h1 span {
   background-size: 200% auto; animation: textShine 7s linear infinite;
 }
 .subtitle { font-size: 11px; font-weight: 500; color: var(--muted); letter-spacing: 0.04em; }
-.lead { display: none; }
-.tag {
-  display: inline-block; background: color-mix(in srgb, var(--purple) 18%, transparent);
-  color: var(--purple); font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 99px;
-  margin-left: 4px; border: 1px solid color-mix(in srgb, var(--purple) 30%, transparent);
-}
 
 .section {
   margin-bottom: 0; opacity: 1; transform: none;
   flex: 1; min-height: 0; display: flex; flex-direction: column;
 }
-.section.visible { opacity: 1; transform: none; }
 
 /* Chat */
 .chat-panel {
@@ -381,7 +374,6 @@ h1 span {
 }
 .msg-speak svg { width: 11px; height: 11px; }
 .msg-speak:hover { background: var(--purple); color: #fff; }
-.msg-speak.speaking { background: var(--green); color: #fff; }
 .chat-avatar {
   width: 30px; height: 30px; border-radius: 10px; flex-shrink: 0; display: grid; place-items: center;
   font-size: 15px; background: linear-gradient(145deg, color-mix(in srgb, var(--purple) 32%, transparent), color-mix(in srgb, var(--green) 18%, transparent));
@@ -416,8 +408,9 @@ h1 span {
 .dot-flow span:nth-child(2) { animation-delay: 0.15s; }
 .dot-flow span:nth-child(3) { animation-delay: 0.3s; }
 @keyframes dotPulse { 0%, 100% { transform: scale(0.7); opacity: 0.35; } 50% { transform: scale(1); opacity: 0.9; } }
+
 .chat-input-row {
-  flex-shrink: 0; display: flex; gap: 10px; align-items: center;
+  flex-shrink: 0; display: flex; gap: 8px; align-items: center;
   padding: 10px 14px calc(10px + env(safe-area-inset-bottom));
   background: var(--bg-elevated); border-top: 1px solid var(--border);
 }
@@ -427,6 +420,20 @@ h1 span {
 }
 .chat-input-row input:focus { outline: none; border-color: color-mix(in srgb, var(--purple) 55%, var(--border)); }
 .chat-input-row input::placeholder { color: var(--muted); }
+
+/* ネット検索トグルボタン */
+.search-toggle-btn {
+  display: inline-flex; align-items: center; gap: 5px; padding: 8px 12px; border-radius: 20px;
+  border: 1px solid var(--border); background: var(--surface); color: var(--muted);
+  font-size: 12px; font-weight: 700; user-select: none; transition: all 0.3s; flex-shrink: 0;
+}
+.search-toggle-btn input { display: none; }
+.search-toggle-btn:has(input:checked) {
+  background: color-mix(in srgb, var(--green) 18%, transparent);
+  border-color: var(--green); color: var(--green);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--green) 30%, transparent);
+}
+
 .chat-send-btn {
   width: 44px; height: 44px; flex-shrink: 0; border-radius: 50%; border: none;
   background: linear-gradient(135deg, var(--purple), var(--green)); color: #fff; display: grid; place-items: center;
@@ -442,124 +449,6 @@ h1 span {
   padding: 5px 14px calc(5px + env(safe-area-inset-bottom)); background: var(--bg-elevated);
 }
 footer { display: none; }
-.sec-title {
-  display: flex; align-items: center; gap: 12px; font-size: 12px; font-weight: 700;
-  letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px;
-}
-.sec-title::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, var(--border), transparent); }
-
-.highlight-card {
-  display: flex; align-items: center; justify-content: center; gap: 10px;
-  padding: 18px 22px; border-radius: var(--radius); text-decoration: none; color: #fff;
-  font-weight: 800; font-size: 16px;
-  background: linear-gradient(135deg, var(--purple), var(--green));
-  box-shadow: 0 10px 32px color-mix(in srgb, var(--purple) 35%, transparent);
-  transition: all 0.4s cubic-bezier(0.22,1,0.36,1); margin-bottom: 8px;
-}
-.highlight-card:hover {
-  transform: translateY(-5px) scale(1.02);
-  box-shadow: 0 16px 40px color-mix(in srgb, var(--green) 35%, transparent);
-}
-
-.card-grid { display: grid; gap: 12px; }
-.card {
-  display: flex; align-items: center; gap: 16px; padding: 18px; border-radius: var(--radius);
-  background: var(--surface); border: 1px solid var(--border); text-decoration: none; color: var(--text);
-  position: relative; overflow: hidden; transition: all 0.45s cubic-bezier(0.22,1,0.36,1);
-}
-.card::before {
-  content: ""; position: absolute; inset: 0;
-  background: linear-gradient(135deg, color-mix(in srgb, var(--purple) 14%, transparent), color-mix(in srgb, var(--green) 10%, transparent));
-  opacity: 0; transition: opacity 0.45s;
-}
-.card:hover {
-  transform: translateY(-6px) scale(1.015); background: var(--surface-hover);
-  border-color: color-mix(in srgb, var(--purple) 50%, transparent);
-  box-shadow: var(--card-glow), var(--shadow);
-}
-.card:hover::before { opacity: 1; }
-.card-icon {
-  flex-shrink: 0; width: 48px; height: 48px; border-radius: 14px; display: grid; place-items: center; font-size: 22px;
-  background: linear-gradient(145deg, color-mix(in srgb, var(--purple) 25%, transparent), color-mix(in srgb, var(--green) 15%, transparent));
-  border: 1px solid color-mix(in srgb, var(--text) 8%, transparent); overflow: hidden;
-  transition: all 0.45s;
-}
-.card-icon img { width: 100%; height: 100%; object-fit: cover; border-radius: 12px; }
-.card:hover .card-icon { transform: scale(1.12) rotate(-6deg); }
-.card-body { flex: 1; min-width: 0; }
-.card-title { font-size: 15px; font-weight: 700; margin-bottom: 2px; }
-.card-desc { font-size: 12.5px; color: var(--muted); }
-.card-arrow {
-  flex-shrink: 0; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center;
-  background: color-mix(in srgb, var(--text) 6%, transparent); color: var(--muted); transition: all 0.35s;
-}
-.card:hover .card-arrow {
-  background: var(--purple); color: #fff; transform: translateX(4px);
-  box-shadow: 0 0 14px color-mix(in srgb, var(--purple) 50%, transparent);
-}
-
-.profile-box {
-  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
-  padding: 20px 22px; line-height: 1.8;
-}
-.profile-box b { color: var(--purple); }
-.profile-row { display: flex; flex-wrap: wrap; gap: 8px 20px; margin-top: 10px; font-size: 14px; color: var(--muted); }
-.profile-row span strong { color: var(--text); font-weight: 700; }
-
-.sns-grid {
-  display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px;
-}
-.sns {
-  aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
-  border-radius: 16px; background: var(--surface); border: 1px solid var(--border);
-  text-decoration: none; color: var(--text); transition: all 0.4s; position: relative; overflow: hidden;
-}
-.sns::after { content: ""; position: absolute; inset: 0; opacity: 0; transition: opacity 0.4s; }
-.sns:hover { transform: translateY(-8px) scale(1.06); border-color: transparent; color: #fff; }
-.sns:hover::after { opacity: 1; }
-.sns svg { width: 24px; height: 24px; position: relative; z-index: 1; transition: transform 0.4s; }
-.sns:hover svg { transform: scale(1.2) rotate(-5deg); }
-.sns span { font-size: 10px; font-weight: 700; position: relative; z-index: 1; opacity: 0.9; }
-.sns.yt:hover { box-shadow: 0 14px 32px rgba(255,0,0,0.35); }
-.sns.yt:hover::after { background: linear-gradient(145deg, #ff0000, #cc0000); }
-.sns.ig:hover { box-shadow: 0 14px 32px rgba(225,48,108,0.4); }
-.sns.ig:hover::after { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
-.sns.fb:hover { box-shadow: 0 14px 32px rgba(24,119,242,0.4); }
-.sns.fb:hover::after { background: #1877f2; }
-.sns.x:hover { box-shadow: 0 14px 32px rgba(0,0,0,0.3); }
-.sns.x:hover::after { background: #111; }
-.sns.tk:hover { box-shadow: 0 14px 32px rgba(0,242,234,0.3); }
-.sns.tk:hover::after { background: linear-gradient(135deg, #25f4ee, #fe2c55, #000); }
-
-/* FAQ */
-details {
-  background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
-  padding: 14px 18px; margin: 10px 0; transition: all 0.3s;
-}
-details[open] {
-  border-color: color-mix(in srgb, var(--purple) 40%, transparent);
-  box-shadow: 0 8px 24px color-mix(in srgb, var(--purple) 15%, transparent);
-}
-summary {
-  font-weight: 700; color: var(--text); list-style: none; display: flex; align-items: center; justify-content: space-between;
-}
-summary::-webkit-details-marker { display: none; }
-summary::after {
-  content: "+"; font-size: 20px; font-weight: 400; color: var(--purple);
-  transition: transform 0.3s;
-}
-details[open] summary::after { content: "−"; }
-details p, details a {
-  margin-top: 12px; color: var(--muted); font-size: 14px;
-}
-details a { color: var(--green); font-weight: 600; text-decoration: none; }
-details a:hover { text-decoration: underline; }
-
-footer { margin-top: 48px; text-align: center; }
-.footer-pill {
-  display: inline-flex; align-items: center; gap: 8px; padding: 9px 18px; border-radius: 999px;
-  font-size: 12px; color: var(--muted); background: var(--surface); border: 1px solid var(--border);
-}
 
 /* PC */
 @media (min-width: 768px) {
@@ -570,35 +459,12 @@ footer { margin-top: 48px; text-align: center; }
   h1 { font-size: 18px; }
   .hero-img { width: 52px; height: 52px; }
   .hero { padding: 14px 24px; }
-  .card-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
-  .card {
-    flex-direction: column; align-items: flex-start; min-height: 150px; padding: 22px 20px;
-  }
-  .card-arrow { position: absolute; right: 18px; bottom: 18px; }
-  .sns-grid { max-width: 480px; margin: 0 auto; gap: 14px; }
-  .sns svg { width: 28px; height: 28px; }
   .chat-box { padding: 18px 24px; }
   .chat-input-row { padding: 14px 24px calc(14px + env(safe-area-inset-bottom)); }
 }
 @media (min-width: 1024px) {
   .shell { max-width: 860px; }
   h1 { font-size: 19px; }
-  .card-grid { grid-template-columns: repeat(2, 1fr); gap: 18px; }
-}
-@media (max-width: 420px) {
-  .sns-grid { gap: 8px; }
-  .sns span { font-size: 9px; }
-  .card { padding: 15px; gap: 12px; }
-  .card-icon { width: 44px; height: 44px; }
-  .logo-text { font-size: 14px; }
-}
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-  .section { opacity: 1; transform: none; }
 }
 
 /* Offline / Online top popup */
@@ -607,92 +473,52 @@ footer { margin-top: 48px; text-align: center; }
   transform: translate(-50%, -14px); opacity: 0; visibility: hidden;
   display: flex; align-items: center; gap: 8px; padding: 11px 20px; border-radius: 999px;
   font-size: 13px; font-weight: 700; box-shadow: 0 10px 28px rgba(0,0,0,0.3);
-  transition: all 0.4s cubic-bezier(0.22,1,0.36,1);
-  pointer-events: none;
+  transition: all 0.4s cubic-bezier(0.22,1,0.36,1); pointer-events: none;
 }
-.network-toast.show {
-  transform: translate(-50%, 0); opacity: 1; visibility: visible;
-}
-.network-toast.offline {
-  background: linear-gradient(135deg, #ff5a7a, #e84a9a); color: #fff;
-}
-.network-toast.online {
-  background: linear-gradient(135deg, #21c98a, #00b4d8); color: #fff;
-}
+.network-toast.show { transform: translate(-50%, 0); opacity: 1; visibility: visible; }
+.network-toast.offline { background: linear-gradient(135deg, #ff5a7a, #e84a9a); color: #fff; }
+.network-toast.online { background: linear-gradient(135deg, #21c98a, #00b4d8); color: #fff; }
 .network-toast svg { width: 15px; height: 15px; flex-shrink: 0; }
 
-
-
-
-/* 会話モード — ヒーロー右上の目立つボタン */
-.hero {
-  position: relative;
-}
+/* 会話モードボタン */
+.hero { position: relative; }
 .hero-call-btn {
-  flex-shrink: 0;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  margin-left: auto;
-  padding: 10px 16px;
-  border-radius: 999px;
+  flex-shrink: 0; display: inline-flex; align-items: center; gap: 8px; margin-left: auto;
+  padding: 10px 16px; border-radius: 999px;
   border: 1px solid color-mix(in srgb, var(--green) 35%, var(--border));
-  background: linear-gradient(135deg, var(--purple), var(--green));
-  color: #fff;
-  font-family: inherit;
-  font-size: 13px;
-  font-weight: 800;
-  text-decoration: none;
-  white-space: nowrap;
-  box-shadow: 0 6px 20px color-mix(in srgb, var(--purple) 40%, transparent);
-  transition: transform 0.2s, filter 0.2s, box-shadow 0.2s;
+  background: linear-gradient(135deg, var(--purple), var(--green)); color: #fff;
+  font-family: inherit; font-size: 13px; font-weight: 800; text-decoration: none; white-space: nowrap;
+  box-shadow: 0 6px 20px color-mix(in srgb, var(--purple) 40%, transparent); transition: transform 0.2s, filter 0.2s, box-shadow 0.2s;
 }
-.hero-call-btn svg {
-  width: 18px;
-  height: 18px;
-  flex-shrink: 0;
-}
+.hero-call-btn svg { width: 18px; height: 18px; flex-shrink: 0; }
 .hero-call-btn:hover {
-  transform: translateY(-2px) scale(1.03);
-  filter: brightness(1.08);
-  box-shadow: 0 10px 28px color-mix(in srgb, var(--green) 40%, transparent);
-  color: #fff;
+  transform: translateY(-2px) scale(1.03); filter: brightness(1.08);
+  box-shadow: 0 10px 28px color-mix(in srgb, var(--green) 40%, transparent); color: #fff;
 }
 .hero-call-btn .call-pulse {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #fff;
-  box-shadow: 0 0 0 0 rgba(255,255,255,0.55);
-  animation: callPulse 1.6s ease-out infinite;
+  width: 8px; height: 8px; border-radius: 50%; background: #fff;
+  box-shadow: 0 0 0 0 rgba(255,255,255,0.55); animation: callPulse 1.6s ease-out infinite;
 }
 @keyframes callPulse {
   0% { box-shadow: 0 0 0 0 rgba(255,255,255,0.5); }
   70% { box-shadow: 0 0 0 10px transparent; }
   100% { box-shadow: 0 0 0 0 transparent; }
 }
-@media (max-width: 420px) {
+@media (max-width: 520px) {
   .hero-call-btn span.label { display: none; }
   .hero-call-btn { padding: 10px 12px; }
+  .search-toggle-btn span.lbl-text { display: none; }
 }
-
 </style>
 </head>
 <body>
 
 <div class="network-toast" id="networkToast" role="status" aria-live="polite">
   <svg id="networkToastIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-    <line x1="1" y1="1" x2="23" y2="23"/>
-    <path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/>
-    <path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/>
-    <path d="M10.71 5.05A16 16 0 0 1 22.58 9"/>
-    <path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/>
-    <path d="M8.53 16.11a6 6 0 0 1 6.95 0"/>
-    <line x1="12" y1="20" x2="12.01" y2="20"/>
+    <line x1="1" y1="1" x2="23" y2="23"/><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/><path d="M10.71 5.05A16 16 0 0 1 22.58 9"/><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/>
   </svg>
   <span id="networkToastText">オフラインぞぃ</span>
 </div>
-
 
 <div class="bg"></div>
 <div class="orb orb-1"></div>
@@ -723,8 +549,7 @@ footer { margin-top: 48px; text-align: center; }
     <div class="header-actions">
       <button class="icon-btn" id="settingsBtn" aria-label="設定" title="設定">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="3"/>
-          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+          <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
         </svg>
       </button>
       <button class="hamburger" id="hamburger" aria-label="メニュー" aria-expanded="false">
@@ -800,6 +625,12 @@ footer { margin-top: 48px; text-align: center; }
         </div>
       </div>
       <div class="chat-input-row">
+        <!-- ネット検索ON/OFF切り替えスイッチ -->
+        <label class="search-toggle-btn" title="ネット検索を有効にする">
+          <input type="checkbox" id="web-search-toggle" checked>
+          <span>🌐</span>
+          <span class="lbl-text">検索</span>
+        </label>
         <input type="text" id="user-input" data-i18n-placeholder="chat_placeholder" placeholder="ここに入力するのぞぃ...">
         <button class="chat-send-btn" id="send-btn" aria-label="送信">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/></svg>
@@ -874,10 +705,6 @@ footer { margin-top: 48px; text-align: center; }
       const key = el.getAttribute('data-i18n');
       if (t[key] != null) el.textContent = t[key];
     });
-    document.querySelectorAll('[data-i18n-html]').forEach(el => {
-      const key = el.getAttribute('data-i18n-html');
-      if (t[key] != null) el.innerHTML = t[key];
-    });
     document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
       const key = el.getAttribute('data-i18n-placeholder');
       if (t[key] != null) el.placeholder = t[key];
@@ -911,7 +738,6 @@ footer { margin-top: 48px; text-align: center; }
     window.__oijiiSpeechOn = pref === 'on';
     if (pref !== 'on' && window.speechSynthesis) window.speechSynthesis.cancel();
   }
-  window.__applySpeech = applySpeech;
 
   window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
     if (html.getAttribute('data-theme') === 'auto') applyTheme('auto');
@@ -959,11 +785,6 @@ footer { margin-top: 48px; text-align: center; }
     header.classList.toggle('scrolled', window.scrollY > 20);
   }, { passive: true });
 
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
-  }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
-  document.querySelectorAll('.section').forEach(s => observer.observe(s));
-
   window.closeAll = closeAll;
 })();
 </script>
@@ -982,65 +803,52 @@ footer { margin-top: 48px; text-align: center; }
 ・笑い声：「フォッフォッフォ！」「ヒッヒッヒ…」
 ・性格：少し偉そうですが、親しみやすくユーモアのある老魔女です。
 ・おいじぃ魔女のsns 
-https://www.instagram.com/oijiiw   (Instagram)
-  https://www.youtube.com/@oijiiw  (YouTube)
-  https://www.facebook.com/oijiiw  (Facebook) 
-  https://x.com/oijiiw  (X)
-  https://www.tiktok.com/@oijiiw  (TikTok)
-おいじぃ魔女のホームページは  https://oisasi.f5.si/oijiiw  です
+  https://www.instagram.com/oijiiw (Instagram)
+  https://www.youtube.com/@oijiiw (YouTube)
+  https://www.facebook.com/oijiiw (Facebook) 
+  https://x.com/oijiiw (X)
+  https://www.tiktok.com/@oijiiw (TikTok)
+おいじぃ魔女のホームページは https://oisasi.f5.si/oijiiw です
 おいじぃ魔女雑学snsは
-　https://www.instagram.com/oijiizatu  (Instagram)
-  https://www.youtube.com/@oijiizatu  (YouTube) 
-  https://www.facebook.com/oijiizatu  (Facebook) 
-  https://x.com/oijiizatu  (X)
-  https://www.tiktok.com/@oijiizatu  (TikTok)
-雑学ホームページは  https://oisasi.f5.si/oijiizatu  です
+  https://www.instagram.com/oijiizatu (Instagram)
+  https://www.youtube.com/@oijiizatu (YouTube) 
+  https://www.facebook.com/oijiizatu (Facebook) 
+  https://x.com/oijiizatu (X)
+  https://www.tiktok.com/@oijiizatu (TikTok)
+雑学ホームページは https://oisasi.f5.si/oijiizatu です
 ・おいさしのsns 
-   https://www.youtube.com/@oisasiofficial  (YouTube)
-   https://www.facebook.com/oisasiofficial  (Facebook) 
-   https://x.com/oisasiofficial  (X)
-   https://www.tiktok.com/@oisasiofficial  (TikTok)
-・おいさし公式ホームページは  https://oisasi.f5.si  です。
-・おいじぃ魔女のゲームについて聞かれたら、以下の情報をもとに案内してください。
-おいじぃ魔女のゲーム： https://ojg.netlify.app
-・5種類のミニゲームが遊べる
-・保護者設定あり
-・オンライン対戦対応
-・ユーザーブロック機能あり
-・対応言語：日本語／英語
-・遊び方はゲーム内で確認できる
-・初期セットアップで自分のユーザーを作成（ユーザー名・写真・テーマは自由に設定可能）
-・データの初期化が可能
-・自動バックアップ機能付きのバックアップ機能あり
-・実績（アチーブメント）システムあり
-・1日1回のデイリーチャレンジあり
-・ポイント制度：ゲームで上位に入るとポイントがもらえ、貯まったポイントはショップで買い物に使える
-  デイリーチャレンジ：1位100p／2位60p／3位30p／4位10p
-  通常プレイ：1位20p／2位12p／3位6p／4位2p
-・遊べる5つのミニゲーム
-  1. おいじぃのデス・プレス順位決定戦：4つの足場から1つを選ぶ完全運ゲー。選んだ足場にプレス機が落ちてくるかは運次第で、生き残るのはたった1人。
-  2. おいじぃ魔女大爆発 複雑なる工場：3D工場内で危険なスイッチを避けながらサバイバル。どれが爆発スイッチかは完全ランダムで、10秒以内に選んで運を試す。
-  3. おいじぃ魔女の猛追 DX：魔女に追いかけられる60秒間のサバイバル。迷路を逃げ続ける、唯一の本格アクションゲーム。
-  4. おいじぃ魔女本社入り口運ゲー：3つのドアから1つを選んで本社に入る運ゲー。魔女のドアを引くとハートを1つ失い、3回引かれたら脱落。
-  5. おいじぃ魔女のドッジボール大会：巨大鉄球を避け続ける60秒サバイバル。全方位に動いて鉄球をかわす反射神経ゲーム。
-・ゲーム内の操作方法（設定 → 各種操作）
-  ユーザーのブロック方法：設定（右上の歯車）→ユーザーをブロック→ブロックするユーザーを選択
-  ※ユーザーを一度ブロックすると、ブロック解除はできません。
-  初期化：設定（右上の歯車）→初期化→初期化する内容を選ぶ。一番下の「カスタム初期化」では、消したい項目だけを選んで初期化できます。
-  保護者設定：設定（右上の歯車）→保護者設定→パスワードを設定する（推奨）
-  緊急初期化（保護者パスワードを忘れた場合などの緊急手段）：起動中に Shift+E+B+O を押す、または画面右上をタップ。この操作を行うとデータはすべて消えます。
-  ユーザーを完全に削除：設定（右上の歯車）→ユーザー設定→「このユーザーを丸ごと初期化」
-  ユーザーの記録のみ削除：設定（右上の歯車）→ユーザー設定→「このユーザーの記録のみ初期化」
-  プレイ時間のリセット：設定（右上の歯車）→保護者設定→「今日のプレイ時間をリセット」
-  初期化やバックアップ操作に保護者パスワードを必須にする：設定（右上の歯車）→保護者設定→パスワード保護から、必須にしたい項目をオンにする
-  保護者設定の内容：1日のプレイ上限のほか、「休憩」（休憩を促す間隔と休憩の長さを設定可能）、「夜間ロック」（例：22:00〜7:00のように時間帯を設定すると、その時間帯は遊べなくなる）などが設定できます。
-  保護者設定をオフにする・初期化する：設定（右上の歯車）→保護者設定→「保護者設定を初期化」または「保護者設定を完全にリセット」
-  ユーザーの追加：設定（右上の歯車）→ユーザー切り替え→「新しいユーザーを作成」
-  遊んだ時間の確認：設定（右上の歯車）→「遊んだ時間を見る」
-  詳しい遊び方・操作方法の確認：設定（右上の歯車）→「遊び方」（とてもわかりやすく解説されています）
-・連続ログインボーナスもあります（毎日プレイすると特典があります）。`
+   https://www.youtube.com/@oisasiofficial (YouTube)
+   https://www.facebook.com/oisasiofficial (Facebook) 
+   https://x.com/oisasiofficial (X)
+   https://www.tiktok.com/@oisasiofficial (TikTok)
+・おいさし公式ホームページは https://oisasi.f5.si です。`
     }
   ];
+
+  // 🌐 DuckDuckGo Web検索APIを利用した無料リアルタイム検索機能
+  async function searchDuckDuckGo(query) {
+    try {
+      const res = await fetch(`https://html.duckduckgo.com/html/?q=${encodeURIComponent(query)}`);
+      if (!res.ok) return null;
+      const htmlText = await res.text();
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(htmlText, "text/html");
+      const results = doc.querySelectorAll('.result__body');
+      
+      let snippets = [];
+      results.forEach((el, index) => {
+        if (index < 4) { // 上位4件の検索結果を取得
+          const title = el.querySelector('.result__title')?.textContent?.trim() || "";
+          const snippet = el.querySelector('.result__snippet')?.textContent?.trim() || "";
+          if (title && snippet) snippets.push(`【タイトル】${title}\n【概要】${snippet}`);
+        }
+      });
+      return snippets.join("\n\n");
+    } catch (err) {
+      console.warn("Web検索エラー:", err);
+      return null;
+    }
+  }
 
   function t(key, fallback) {
     const dict = window.__oijiiChatI18n;
@@ -1050,12 +858,12 @@ https://www.instagram.com/oijiiw   (Instagram)
   async function sendMessage() {
     const inputField = document.getElementById("user-input");
     const sendBtn = document.getElementById("send-btn");
+    const searchToggle = document.getElementById("web-search-toggle");
     const text = inputField.value.trim();
 
     if (text === "") return;
 
     addMessage(text, "user");
-    conversationMessages.push({ role: "user", content: text });
 
     inputField.value = "";
     inputField.disabled = true;
@@ -1064,11 +872,25 @@ https://www.instagram.com/oijiiw   (Instagram)
     const thinkingId = "thinking-" + Date.now();
     addMessage(t('chat_thinking', 'むむっ…魔力を練っているのぞぃ…'), "majo thinking", thinkingId, true);
 
+    // AIへ送るメッセージ（検索結果の合成用）
+    let payloadMessages = [...conversationMessages];
+    let userPromptWithContext = text;
+
+    // Web検索がオンの場合、ネットから最新情報を取得
+    if (searchToggle && searchToggle.checked) {
+      const searchResults = await searchDuckDuckGo(text);
+      if (searchResults && searchResults.length > 0) {
+        userPromptWithContext = `[Web検索結果]\n${searchResults}\n\n[お主の質問]\n${text}\n\n上記Web検索結果を参考にして、最新情報を含めて回答してください。`;
+      }
+    }
+
+    payloadMessages.push({ role: "user", content: userPromptWithContext });
+
     try {
       const response = await fetch(API_SERVER_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: conversationMessages })
+        body: JSON.stringify({ messages: payloadMessages })
       });
 
       const data = await response.json();
@@ -1079,6 +901,9 @@ https://www.instagram.com/oijiiw   (Instagram)
       }
 
       const majoReply = data.choices[0].message.content;
+      
+      // 会話履歴には検索結果のプロンプトではなくオリジナルの質問を蓄積
+      conversationMessages.push({ role: "user", content: text });
       conversationMessages.push({ role: "assistant", content: majoReply });
 
       removeMessage(thinkingId);
@@ -1089,7 +914,6 @@ https://www.instagram.com/oijiiw   (Instagram)
       removeMessage(thinkingId);
       addMessage(`${t('chat_error', 'ぐあっ！通信エラーが発生したぞい！')}\n${error.message}`, "error");
       console.error(error);
-      conversationMessages.pop();
     } finally {
       inputField.disabled = false;
       sendBtn.disabled = false;
@@ -1124,7 +948,7 @@ https://www.instagram.com/oijiiw   (Instagram)
       const lang = (localStorage.getItem('oisasi-lang') || 'auto');
       utter.lang = (lang === 'en') ? 'en-US' : 'ja-JP';
       window.speechSynthesis.speak(utter);
-    } catch (e) { /* speech synthesis unavailable */ }
+    } catch (e) { }
   }
   function speakText(text) {
     if (!window.__oijiiSpeechOn) return;
@@ -1215,9 +1039,7 @@ https://www.instagram.com/oijiiw   (Instagram)
 })();
 </script>
 
-
 <script>
-
   /* Offline / Online top popup */
   (function () {
     const networkToast = document.getElementById('networkToast');
@@ -1228,8 +1050,6 @@ https://www.instagram.com/oijiiw   (Instagram)
     let isOfflineShown = false;
     const offlineIconSVG = '<line x1="1" y1="1" x2="23" y2="23"/><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/><path d="M10.71 5.05A16 16 0 0 1 22.58 9"/><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/>';
     const onlineIconSVG = '<path d="M20 6L9 17l-5-5"/>';
-    const offlineText = (document.documentElement.lang || 'ja').startsWith('ja') ? 'オフラインです' : "You're offline";
-    const onlineText = (document.documentElement.lang || 'ja').startsWith('ja') ? 'インターネットに再接続しました' : 'Back online';
 
     function showNetworkToast(type) {
       clearTimeout(toastTimer);
@@ -1257,7 +1077,6 @@ https://www.instagram.com/oijiiw   (Instagram)
     window.addEventListener('online', handleOnline);
     if (!navigator.onLine) handleOffline();
   })();
-
 </script>
 </body>
 </html>
