@@ -837,11 +837,9 @@ footer {
       const key = el.getAttribute('data-i18n-placeholder');
       if (t[key] != null) el.placeholder = t[key];
     });
-    // Update track count unit (safe: only if player is already initialized)
-    const countEl = document.getElementById('trackCount');
-    if (countEl && typeof tracks !== 'undefined') {
-      const unit = t.tracks_unit || '曲';
-      countEl.textContent = `${tracks.length} ${unit}`;
+    // Track count is updated later by updateTrackCount() after player init
+    if (typeof window.updateTrackCount === 'function') {
+      window.updateTrackCount();
     }
   }
 
@@ -980,8 +978,12 @@ footer {
   let playOrder = [];
 
   // Init
-  const lang = resolveLang(localStorage.getItem('oisasi-lang') || 'auto');
-  trackCountEl.textContent = `${tracks.length} ${i18n[lang].tracks_unit}`;
+  window.updateTrackCount = function () {
+    const lang = resolveLang(localStorage.getItem('oisasi-lang') || 'auto');
+    const unit = (i18n[lang] && i18n[lang].tracks_unit) || '曲';
+    trackCountEl.textContent = `${tracks.length} ${unit}`;
+  };
+  window.updateTrackCount();
   audio.volume = 0.85;
   renderPlaylist();
 
