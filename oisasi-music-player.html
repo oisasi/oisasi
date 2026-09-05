@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>おいさし Music Player</title>
+  <style>
+    :root {
+      --bg: #0f0f13;
+      --surface: #1a1a22;
+      --surface2: #242430;
+      --accent: #ff6b9d;
+      --accent2: #c77dff;
+      --text: #f0f0f5;
+      --text-muted: #9898a8;
+      --progress: #ff6b9d;
+      --radius: 16px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "Hiragino Sans", "Noto Sans JP", "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* 背景グラデーション */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 20% 20%, rgba(255, 107, 157, 0.12) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 80%, rgba(199, 125, 255, 0.10) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 50%, rgba(100, 100, 255, 0.05) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .app {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      max-width: 1100px;
+      margin: 0 auto;
+      width: 100%;
+      padding: 20px;
+      gap: 20px;
+    }
+
+    /* ヘッダー */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 4px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-icon {
+      width: 42px;
+      height: 42px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      box-shadow: 0 4px 20px rgba(255, 107, 157, 0.35);
+    }
+
+    .logo h1 {
+      font-size: 1.35rem;
+      font-weight: 700;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .track-count {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      background: var(--surface);
+      padding: 6px 14px;
+      border-radius: 999px;
+    }
+
+    /* メインプレイヤーカード */
+    .player-card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 28px 32px;
+      display: flex;
+      gap: 32px;
+      align-items: center;
+      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .artwork {
+      width: 160px;
+      height: 160px;
+      border-radius: 14px;
+      background: linear-gradient(145deg, #2a2a38, #1e1e28);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 64px;
+      flex-shrink: 0;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .artwork::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255, 107, 157, 0.15), rgba(199, 125, 255, 0.15));
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+
+    .artwork.playing::after {
+      opacity: 1;
+    }
+
+    .artwork .disc {
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      background: conic-gradient(from 0deg, #333, #555, #333, #222, #444, #333);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: inset 0 0 20px rgba(0,0,0,0.6);
+      transition: transform 0.3s;
+    }
+
+    .artwork.playing .disc {
+      animation: spin 8s linear infinite;
+    }
+
+    .disc-center {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--bg);
+      border: 3px solid var(--accent);
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .player-info {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .now-playing-label {
+      font-size: 0.75rem;
+      color: var(--accent);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    .track-title {
+      font-size: 1.55rem;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.3;
+    }
+
+    .track-meta {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    /* プログレスバー */
+    .progress-area {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .progress-bar {
+      height: 6px;
+      background: var(--surface2);
+      border-radius: 999px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      border-radius: 999px;
+      transition: width 0.1s linear;
+    }
+
+    .time-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* コントロール */
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .ctrl-btn {
+      background: transparent;
+      border: none;
+      color: var(--text);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      border-radius: 50%;
+    }
+
+    .ctrl-btn:hover {
+      color: var(--accent);
+      transform: scale(1.08);
+    }
+
+    .ctrl-btn.play-btn {
+      width: 56px;
+      height: 56px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(255, 107, 157, 0.4);
+    }
+
+    .ctrl-btn.play-btn:hover {
+      transform: scale(1.06);
+      box-shadow: 0 6px 28px rgba(255, 107, 157, 0.55);
+      color: #fff;
+    }
+
+    .ctrl-btn svg {
+      width: 22px;
+      height: 22px;
+      fill: currentColor;
+    }
+
+    .ctrl-btn.play-btn svg {
+      width: 26px;
+      height: 26px;
+    }
+
+    .volume-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-left: auto;
+    }
+
+    .volume-wrap svg {
+      width: 18px;
+      height: 18px;
+      fill: var(--text-muted);
+      flex-shrink: 0;
+    }
+
+    .volume-slider {
+      width: 90px;
+      height: 4px;
+      -webkit-appearance: none;
+      appearance: none;
+      background: var(--surface2);
+      border-radius: 999px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .volume-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--accent);
+      cursor: pointer;
+      box-shadow: 0 0 8px rgba(255, 107, 157, 0.5);
+    }
+
+    /* プレイリスト */
+    .playlist-section {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+
+    .playlist-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      padding: 0 4px;
+    }
+
+    .playlist-header h2 {
+      font-size: 1.05rem;
+      font-weight: 600;
+    }
+
+    .search-box {
+      background: var(--surface);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 10px;
+      padding: 8px 14px;
+      color: var(--text);
+      font-size: 0.88rem;
+      width: 200px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .search-box:focus {
+      border-color: var(--accent);
+    }
+
+    .search-box::placeholder {
+      color: var(--text-muted);
+    }
+
+    .playlist {
+      background: var(--surface);
+      border-radius: var(--radius);
+      overflow-y: auto;
+      max-height: calc(100vh - 420px);
+      min-height: 280px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      scrollbar-width: thin;
+      scrollbar-color: var(--surface2) transparent;
+    }
+
+    .playlist::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .playlist::-webkit-scrollbar-thumb {
+      background: var(--surface2);
+      border-radius: 999px;
+    }
+
+    .track-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 18px;
+      cursor: pointer;
+      transition: background 0.15s;
+      border-bottom: 1px solid rgba(255,255,255,0.03);
+    }
+
+    .track-item:last-child {
+      border-bottom: none;
+    }
+
+    .track-item:hover {
+      background: var(--surface2);
+    }
+
+    .track-item.active {
+      background: linear-gradient(90deg, rgba(255, 107, 157, 0.15), transparent);
+      border-left: 3px solid var(--accent);
+    }
+
+    .track-num {
+      width: 28px;
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .track-item.active .track-num {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .track-name {
+      flex: 1;
+      font-size: 0.95rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .track-item.active .track-name {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .track-ext {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      background: var(--surface2);
+      padding: 2px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+    }
+
+    .playing-icon {
+      width: 18px;
+      height: 18px;
+      display: none;
+    }
+
+    .track-item.active .playing-icon {
+      display: block;
+    }
+
+    .track-item.active .track-num {
+      display: none;
+    }
+
+    /* レスポンシブ */
+    @media (max-width: 700px) {
+      .player-card {
+        flex-direction: column;
+        text-align: center;
+        padding: 24px 20px;
+      }
+
+      .artwork {
+        width: 140px;
+        height: 140px;
+      }
+
+      .controls {
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+
+      .volume-wrap {
+        margin-left: 0;
+        width: 100%;
+        justify-content: center;
+      }
+
+      .search-box {
+        width: 140px;
+      }
+
+      .playlist {
+        max-height: 50vh;
+      }
+    }
+
+    /* 空状態 */
+    .empty-state {
+      padding: 40px;
+      text-align: center;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div class="logo">
+        <div class="logo-icon">♪</div>
+        <h1>おいさし Music Player</h1>
+      </div>
+      <div class="track-count" id="trackCount">0 曲</div>
+    </header>
+
+    <div class="player-card">
+      <div class="artwork" id="artwork">
+        <div class="disc">
+          <div class="disc-center"></div>
+        </div>
+      </div>
+
+      <div class="player-info">
+        <div>
+          <div class="now-playing-label">Now Playing</div>
+          <div class="track-title" id="trackTitle">曲を選択してください</div>
+          <div class="track-meta" id="trackMeta">おいさしコレクション</div>
+        </div>
+
+        <div class="progress-area">
+          <div class="progress-bar" id="progressBar">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+          <div class="time-row">
+            <span id="currentTime">0:00</span>
+            <span id="duration">0:00</span>
+          </div>
+        </div>
+
+        <div class="controls">
+          <button class="ctrl-btn" id="prevBtn" title="前の曲">
+            <svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+          </button>
+          <button class="ctrl-btn play-btn" id="playBtn" title="再生 / 一時停止">
+            <svg id="playIcon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          </button>
+          <button class="ctrl-btn" id="nextBtn" title="次の曲">
+            <svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+          </button>
+
+          <div class="volume-wrap">
+            <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+            <input type="range" class="volume-slider" id="volumeSlider" min="0" max="1" step="0.01" value="0.85">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="playlist-section">
+      <div class="playlist-header">
+        <h2>プレイリスト</h2>
+        <input type="text" class="search-box" id="searchBox" placeholder="曲を検索...">
+      </div>
+      <div class="playlist" id="playlist"></div>
+    </div>
+  </div>
+
+  <audio id="audio" preload="metadata"></audio>
+
+  <script>
+    // ===== トラック一覧 =====
+    const tracks = [
+      { title: "oisasi osoj", file: "oisasi osoj.mp3" },
+      { title: "oisasinews", file: "oisasinews.mp3" },
+      { title: "Oi-Spa", file: "Oi-Spa.mp3" },
+      { title: "ONTのホテル", file: "ONTのホテル.m4a" },
+      { title: "ONTの歌", file: "ONTの歌.mp3" },
+      { title: "Orua Shopping Day", file: "Orua Shopping Day.mp3" },
+      { title: "ORUA STORE", file: "ORUA STORE.mp3" },
+      { title: "おいさしCtrl", file: "おいさしCtrl.mp3" },
+      { title: "おいさしPOP", file: "おいさしPOP.mp3" },
+      { title: "おいさしアクセル", file: "おいさしアクセル.mp3" },
+      { title: "おいさしアップデート", file: "おいさしアップデート.mp3" },
+      { title: "おいさしエネルギー", file: "おいさしエネルギー.mp3" },
+      { title: "おいさしクッキング", file: "おいさしクッキング.mp3" },
+      { title: "おいさしサービス", file: "おいさしサービス.mp3" },
+      { title: "おいさしジャンプ", file: "おいさしジャンプ.mp3" },
+      { title: "おいさしシンプル", file: "おいさしシンプル.mp3" },
+      { title: "おいさしタッチパネル", file: "おいさしタッチパネル.mp3" },
+      { title: "おいさしダンス", file: "おいさしダンス.mp3" },
+      { title: "おいさしテレビ", file: "おいさしテレビ.m4a" },
+      { title: "おいさしとおいじい", file: "おいさしとおいじい.mp3" },
+      { title: "おいさしファイナル", file: "おいさしファイナル.mp3" },
+      { title: "おいさしポーズ", file: "おいさしポーズ.mp3" },
+      { title: "おいさし音頭", file: "おいさし音頭.mp3" },
+      { title: "おいさし時代", file: "おいさし時代.mp3" },
+      { title: "おいさし節", file: "おいさし節.mp3" },
+      { title: "おいさし体操", file: "おいさし体操.m4a" },
+      { title: "おいさし大作戦", file: "おいさし大作戦.mp3" },
+      { title: "おいさし大作戦2", file: "おいさし大作戦2.mp3" },
+      { title: "おいさし美味しい", file: "おいさし美味しい.mp3" },
+      { title: "おいじい魔女", file: "おいじい魔女.mp3" },
+      { title: "おいじい魔女のヤバい…", file: "おいじい魔女のヤバい….mp3" },
+      { title: "おいじい魔女音頭", file: "おいじい魔女音頭.mp3" },
+      { title: "きらめきダッシュ", file: "きらめきダッシュ.mp3" },
+      { title: "げんきおいさし", file: "げんきおいさし.mp3" },
+      { title: "ばっくっそん!", file: "ばっくっそん!.mp3" },
+      { title: "ゆきだるまのベル", file: "ゆきだるまのベル.mp3" },
+      { title: "夏おいさし", file: "夏おいさし.mp3" },
+      { title: "急ぐ焦るおいさし", file: "急ぐ焦るおいさし.mp3" },
+      { title: "秋おいさし", file: "秋おいさし.m4a" },
+      { title: "新おいさし", file: "新おいさし.mp3" }
+    ];
+
+    // ===== 要素取得 =====
+    const audio = document.getElementById("audio");
+    const playlistEl = document.getElementById("playlist");
+    const trackTitle = document.getElementById("trackTitle");
+    const trackMeta = document.getElementById("trackMeta");
+    const trackCount = document.getElementById("trackCount");
+    const progressFill = document.getElementById("progressFill");
+    const progressBar = document.getElementById("progressBar");
+    const currentTimeEl = document.getElementById("currentTime");
+    const durationEl = document.getElementById("duration");
+    const playBtn = document.getElementById("playBtn");
+    const playIcon = document.getElementById("playIcon");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const volumeSlider = document.getElementById("volumeSlider");
+    const artwork = document.getElementById("artwork");
+    const searchBox = document.getElementById("searchBox");
+
+    let currentIndex = -1;
+    let isPlaying = false;
+    let filteredTracks = [...tracks];
+
+    // ===== 初期化 =====
+    trackCount.textContent = `${tracks.length} 曲`;
+    audio.volume = 0.85;
+    renderPlaylist();
+
+    // ===== プレイリスト描画 =====
+    function renderPlaylist() {
+      playlistEl.innerHTML = "";
+      if (filteredTracks.length === 0) {
+        playlistEl.innerHTML = `<div class="empty-state">該当する曲がありません</div>`;
+        return;
+      }
+
+      filteredTracks.forEach((track, i) => {
+        const originalIndex = tracks.indexOf(track);
+        const ext = track.file.split(".").pop();
+        const item = document.createElement("div");
+        item.className = "track-item" + (originalIndex === currentIndex ? " active" : "");
+        item.innerHTML = `
+          <div class="track-num">${String(i + 1).padStart(2, "0")}</div>
+          <svg class="playing-icon" viewBox="0 0 24 24" fill="var(--accent)">
+            <rect x="4" y="4" width="4" height="16" rx="1">
+              <animate attributeName="height" values="16;8;16" dur="0.8s" repeatCount="indefinite"/>
+              <animate attributeName="y" values="4;8;4" dur="0.8s" repeatCount="indefinite"/>
+            </rect>
+            <rect x="10" y="2" width="4" height="20" rx="1">
+              <animate attributeName="height" values="20;10;20" dur="0.6s" repeatCount="indefinite"/>
+              <animate attributeName="y" values="2;7;2" dur="0.6s" repeatCount="indefinite"/>
+            </rect>
+            <rect x="16" y="6" width="4" height="12" rx="1">
+              <animate attributeName="height" values="12;18;12" dur="0.7s" repeatCount="indefinite"/>
+              <animate attributeName="y" values="6;3;6" dur="0.7s" repeatCount="indefinite"/>
+            </rect>
+          </svg>
+          <div class="track-name">${track.title}</div>
+          <div class="track-ext">${ext}</div>
+        `;
+        item.addEventListener("click", () => playTrack(originalIndex));
+        playlistEl.appendChild(item);
+      });
+    }
+
+    // ===== 再生 =====
+    function playTrack(index) {
+      if (index < 0 || index >= tracks.length) return;
+      currentIndex = index;
+      const track = tracks[index];
+      audio.src = track.file;
+      trackTitle.textContent = track.title;
+      trackMeta.textContent = track.file;
+      audio.play().then(() => {
+        isPlaying = true;
+        updatePlayButton();
+        artwork.classList.add("playing");
+      }).catch(err => {
+        console.warn("再生エラー:", err);
+        trackTitle.textContent = track.title + " （ファイルが見つかりません）";
+      });
+      renderPlaylist();
+    }
+
+    function togglePlay() {
+      if (currentIndex === -1) {
+        playTrack(0);
+        return;
+      }
+      if (isPlaying) {
+        audio.pause();
+        isPlaying = false;
+        artwork.classList.remove("playing");
+      } else {
+        audio.play();
+        isPlaying = true;
+        artwork.classList.add("playing");
+      }
+      updatePlayButton();
+    }
+
+    function updatePlayButton() {
+      if (isPlaying) {
+        playIcon.innerHTML = `<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>`;
+      } else {
+        playIcon.innerHTML = `<path d="M8 5v14l11-7z"/>`;
+      }
+    }
+
+    function playNext() {
+      if (currentIndex === -1) {
+        playTrack(0);
+        return;
+      }
+      const next = (currentIndex + 1) % tracks.length;
+      playTrack(next);
+    }
+
+    function playPrev() {
+      if (currentIndex === -1) {
+        playTrack(0);
+        return;
+      }
+      const prev = (currentIndex - 1 + tracks.length) % tracks.length;
+      playTrack(prev);
+    }
+
+    // ===== イベント =====
+    playBtn.addEventListener("click", togglePlay);
+    nextBtn.addEventListener("click", playNext);
+    prevBtn.addEventListener("click", playPrev);
+
+    volumeSlider.addEventListener("input", () => {
+      audio.volume = volumeSlider.value;
+    });
+
+    progressBar.addEventListener("click", (e) => {
+      if (!audio.duration) return;
+      const rect = progressBar.getBoundingClientRect();
+      const ratio = (e.clientX - rect.left) / rect.width;
+      audio.currentTime = ratio * audio.duration;
+    });
+
+    audio.addEventListener("timeupdate", () => {
+      if (!audio.duration) return;
+      const percent = (audio.currentTime / audio.duration) * 100;
+      progressFill.style.width = percent + "%";
+      currentTimeEl.textContent = formatTime(audio.currentTime);
+    });
+
+    audio.addEventListener("loadedmetadata", () => {
+      durationEl.textContent = formatTime(audio.duration);
+    });
+
+    audio.addEventListener("ended", playNext);
+
+    searchBox.addEventListener("input", () => {
+      const q = searchBox.value.trim().toLowerCase();
+      filteredTracks = q
+        ? tracks.filter(t => t.title.toLowerCase().includes(q) || t.file.toLowerCase().includes(q))
+        : [...tracks];
+      renderPlaylist();
+    });
+
+    // キーボードショートカット
+    document.addEventListener("keydown", (e) => {
+      if (e.target.tagName === "INPUT") return;
+      if (e.code === "Space") {
+        e.preventDefault();
+        togglePlay();
+      } else if (e.code === "ArrowRight") {
+        playNext();
+      } else if (e.code === "ArrowLeft") {
+        playPrev();
+      }
+    });
+
+    function formatTime(sec) {
+      if (isNaN(sec)) return "0:00";
+      const m = Math.floor(sec / 60);
+      const s = Math.floor(sec % 60);
+      return `${m}:${s.toString().padStart(2, "0")}`;
+    }
+  </script>
+</body>
+</html>
