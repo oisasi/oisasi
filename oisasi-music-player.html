@@ -135,6 +135,35 @@ body {
   max-width: 900px; margin: 0 auto; width: 100%;
 }
 .search-row { flex-shrink: 0; margin-bottom: 12px; }
+.ai-notice {
+  flex-shrink: 0;
+  margin: 0 0 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--cyan) 28%, transparent);
+  background: color-mix(in srgb, var(--cyan) 8%, transparent);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.45;
+}
+.ai-notice strong {
+  color: var(--cyan);
+  font-weight: 800;
+}
+.popup-ai-notice {
+  width: 100%;
+  margin-top: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  text-align: center;
+  line-height: 1.4;
+}
+.popup-ai-notice strong { color: var(--cyan); font-weight: 800; }
+@media (min-width: 800px) {
+  .popup-ai-notice { text-align: left; }
+}
 .search-box {
   width: 100%; background: var(--surface); border: 1px solid var(--border);
   border-radius: 14px; padding: 13px 18px; color: var(--text);
@@ -1219,6 +1248,7 @@ body {
   <div class="search-row">
     <input type="text" class="search-box" id="searchBox" placeholder="曲を検索..." data-i18n-placeholder="search_placeholder">
   </div>
+  <div class="ai-notice" id="aiNotice">注意：<strong>oisasi osoj 以外</strong>はすべて AI 音楽です</div>
   <div class="popup-playlist-bar list-playlist-bar">
     <select class="playlist-select" id="playlistSelect" title="プレイリスト"></select>
     <button class="playlist-bar-btn" id="newPlaylistBtn" title="新規プレイリスト">新規</button>
@@ -1261,6 +1291,7 @@ body {
         <div class="now-label" data-i18n="now_playing">Now Playing</div>
         <div class="track-title" id="trackTitle">—</div>
         <div class="track-meta" id="trackMeta">Oisasi Music Collection</div>
+        <div class="popup-ai-notice" id="popupAiNotice">注意：<strong>oisasi osoj 以外</strong>はすべて AI 音楽です</div>
       </div>
       <div class="popup-right">
         <div class="progress-wrap">
@@ -2029,7 +2060,14 @@ body {
     audio.src = track.file;
     audio.playbackRate = parseFloat(speedSlider && speedSlider.value) || 1;
     trackTitle.textContent = track.title;
-    trackMeta.textContent = "Oisasi Music Collection";
+    const isOriginal = track.title === "oisasi osoj";
+    trackMeta.textContent = isOriginal ? "Original Track" : "AI Music · Oisasi Music";
+    const notice = document.getElementById("popupAiNotice");
+    if (notice) {
+      notice.innerHTML = isOriginal
+        ? "この曲は <strong>オリジナル</strong> です"
+        : "注意：<strong>oisasi osoj 以外</strong>はすべて AI 音楽です";
+    }
     miniTitle.textContent = track.title;
     updateProgressUI(0);
     currentTimeEl.textContent = "0:00";
@@ -2348,7 +2386,26 @@ body {
 
 
   document.addEventListener("keydown", e => {
-    if (e.target.tagName === "INPUT") return;
+    const tag = (e.target && e.target.tagName) || "";
+    const inField = tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || (e.target && e.target.isContentEditable);
+    // ESC always available
+    if (e.code === "Escape") {
+      e.preventDefault();
+      const inputOv = document.getElementById("uiInputOverlay");
+      const msgOv = document.getElementById("uiMsgOverlay");
+      const confOv = document.getElementById("uiConfirmOverlay");
+      const plOv = document.getElementById("plModalOverlay");
+      if (confOv && confOv.classList.contains("open")) { confOv.classList.remove("open"); return; }
+      if (msgOv && msgOv.classList.contains("open")) { msgOv.classList.remove("open"); return; }
+      if (inputOv && inputOv.classList.contains("open")) { inputOv.classList.remove("open"); return; }
+      if (plOv && plOv.classList.contains("open")) { closePlaylistPicker(); return; }
+      if (settingsPanel.classList.contains("open")) { settingsPanel.classList.remove("open"); return; }
+      if (typeof pickMode !== "undefined" && pickMode) { setPickMode(false); return; }
+      if (popupOverlay.classList.contains("open")) { closePopup(); return; }
+      if (inField && e.target.blur) e.target.blur();
+      return;
+    }
+    if (inField) return;
     if (e.code === "Space") { e.preventDefault(); togglePlay(); }
     else if (e.code === "ArrowRight") { e.preventDefault(); playNext(); }
     else if (e.code === "ArrowLeft") { e.preventDefault(); playPrev(); }
@@ -2360,13 +2417,6 @@ body {
       e.preventDefault();
       volumeSlider.value = Math.max(0, +volumeSlider.value - 0.05);
       audio.volume = volumeSlider.value;
-    } else if (e.code === "Escape") {
-      settingsPanel.classList.remove("open");
-      document.getElementById("uiInputOverlay").classList.remove("open");
-      document.getElementById("uiMsgOverlay").classList.remove("open");
-      document.getElementById("uiConfirmOverlay").classList.remove("open");
-      closePlaylistPicker();
-      closePopup();
     }
   });
 
