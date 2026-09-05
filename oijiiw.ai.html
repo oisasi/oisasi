@@ -287,7 +287,7 @@ a, button, .card, .pill, .sns, .icon-btn, .hamburger, .settings-options button, 
   background: linear-gradient(145deg, color-mix(in srgb, var(--purple) 30%, transparent), color-mix(in srgb, var(--green) 18%, transparent));
 }
 
-/* Content — full-screen messaging-app shell */
+/* Content */
 .shell {
   position: fixed; top: var(--header-h); left: 0; right: 0; bottom: 0;
   max-width: 680px; margin: 0 auto; width: 100%;
@@ -825,29 +825,32 @@ footer { display: none; }
     }
   ];
 
-  // ⚡ 強力処理用の外部情報取得関数（複数プロキシフォールバック対応）
+  // ⚡ 新しい強力処理用の外部情報取得関数（Google対応版）
   async function fetchExtraContext(query) {
-    const targetUrl = `https://html.duckduckgo.com/html/?q=${encodeURIComponent(query)}`;
-    
-    // プロキシ候補リスト
-    const proxyList = [
-      url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
-      url => `https://corsproxy.io/?${encodeURIComponent(url)}`,
-      url => `https://thingproxy.freeboard.io/fetch/${url}`
+    const targetUrl = 'https://www.google.com/search?q=' + encodeURIComponent(query);
+    const encodedUrl = encodeURIComponent(targetUrl);
+
+    // 有効なCORSプロキシリスト（Google検索用）
+    const proxies = [
+      `https://api.allorigins.win/raw?url=${encodedUrl}`,
+      `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`
     ];
 
     let htmlText = null;
 
-    for (const makeProxyUrl of proxyList) {
+    // 使えるプロキシが見つかるまで順番に試行
+    for (let i = 0; i < proxies.length; i++) {
       try {
-        const proxyUrl = makeProxyUrl(targetUrl);
-        const res = await fetch(proxyUrl, { method: "GET" });
-        if (res.ok) {
-          htmlText = await res.text();
+        const response = await fetch(proxies[i]);
+        if (response.ok) {
+          console.log(`強力処理成功: プロキシ(${i+1})経由でGoogle検索データの取得に成功しました。`);
+          htmlText = await response.text();
           if (htmlText && htmlText.length > 200) break;
+        } else {
+          console.warn(`強力処理プロキシ接続失敗 (HTTP ${response.status})、次のプロキシを試します。`);
         }
-      } catch (err) {
-        console.warn("強力処理プロキシ接続失敗、次のプロキシを試します:", err);
+      } catch (error) {
+        console.warn(`強力処理プロキシ接続失敗、次のプロキシを試します: ${error.message}`);
       }
     }
 
@@ -856,20 +859,23 @@ footer { display: none; }
       return null;
     }
 
+    // GoogleのHTMLはDOM解析が難しいため、不要なタグを除外してざっくりとテキストを抽出する
     try {
       const parser = new DOMParser();
       const doc = parser.parseFromString(htmlText, "text/html");
-      const results = doc.querySelectorAll('.result__body');
       
-      let snippets = [];
-      results.forEach((el, index) => {
-        if (index < 4) {
-          const title = el.querySelector('.result__title')?.textContent?.trim() || "";
-          const snippet = el.querySelector('.result__snippet')?.textContent?.trim() || "";
-          if (title && snippet) snippets.push(`【参照情報】${title}\n【詳細】${snippet}`);
-        }
-      });
-      return snippets.join("\n\n");
+      // スクリプトやスタイルなどの不要なタグを削除
+      doc.querySelectorAll('script, style, noscript, header, footer').forEach(el => el.remove());
+      
+      // 残ったbody内のテキストを抽出して整形
+      let textContent = doc.body.innerText.replace(/\s+/g, ' ').trim();
+      
+      // AIへ送る情報として長すぎる場合は約1500文字で切り詰める
+      if (textContent.length > 1500) {
+        textContent = textContent.substring(0, 1500) + "...";
+      }
+      
+      return "【Google検索結果から抽出した関連情報】\n" + textContent;
     } catch (err) {
       console.warn("解析エラー:", err);
       return null;
