@@ -374,44 +374,67 @@ body {
 /* Wide progress */
 .progress-wrap { width: 100%; max-width: 640px; margin-bottom: 4px; }
 .progress-bar {
-  height: 12px; background: var(--surface); border-radius: 999px;
-  cursor: pointer; position: relative;
+  height: 16px; background: var(--surface); border-radius: 999px;
+  position: relative;
   border: 1px solid var(--border);
-  touch-action: none;
-  user-select: none;
-  -webkit-user-select: none;
-  transition: box-shadow 0.2s, height 0.15s;
-}
-.progress-bar::before {
-  content: "";
-  position: absolute;
-  left: 0; right: 0;
-  top: -14px; bottom: -14px;
-  z-index: 1;
-}
-.progress-bar:hover, .progress-bar.dragging {
-  height: 14px;
-  box-shadow: 0 0 24px color-mix(in srgb, var(--cyan) 30%, transparent);
+  overflow: visible;
 }
 .progress-fill {
-  height: 100%; width: 0%;
+  position: absolute; left: 0; top: 0; bottom: 0;
+  width: 0%;
   background: linear-gradient(90deg, var(--cyan), var(--sky));
   border-radius: 999px;
   pointer-events: none;
   box-shadow: 0 0 16px color-mix(in srgb, var(--cyan) 40%, transparent);
+  z-index: 0;
 }
-.progress-thumb {
-  position: absolute; left: 0; top: 50%;
-  transform: translate(-50%, -50%);
-  width: 18px; height: 18px; border-radius: 50%;
+.progress-range {
+  position: absolute;
+  left: 0; right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 100%;
+  height: 28px;
+  margin: 0;
+  padding: 0;
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+  z-index: 2;
+  touch-action: none;
+}
+.progress-range:focus { outline: none; }
+.progress-range::-webkit-slider-runnable-track {
+  height: 16px;
+  background: transparent;
+  border-radius: 999px;
+}
+.progress-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px; height: 18px;
+  border-radius: 50%;
   background: #fff;
   box-shadow: 0 0 14px var(--cyan), 0 0 0 3px color-mix(in srgb, var(--cyan) 30%, transparent);
-  opacity: 0; transition: opacity 0.15s;
-  pointer-events: none;
-  z-index: 2;
+  margin-top: -1px;
+  cursor: pointer;
+  position: relative;
+  z-index: 3;
 }
-.progress-bar:hover .progress-thumb,
-.progress-bar.dragging .progress-thumb { opacity: 1; }
+.progress-range::-moz-range-track {
+  height: 16px;
+  background: transparent;
+  border: none;
+  border-radius: 999px;
+}
+.progress-range::-moz-range-thumb {
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  border: none;
+  box-shadow: 0 0 14px var(--cyan), 0 0 0 3px color-mix(in srgb, var(--cyan) 30%, transparent);
+  cursor: pointer;
+}
 
 .time-row {
   display: flex; justify-content: space-between;
@@ -1295,9 +1318,9 @@ body {
       </div>
       <div class="popup-right">
         <div class="progress-wrap">
-          <div class="progress-bar" id="progressBar" role="slider" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <div class="progress-bar" id="progressBar">
             <div class="progress-fill" id="progressFill"></div>
-            <div class="progress-thumb" id="progressThumb"></div>
+            <input type="range" class="progress-range" id="progressRange" min="0" max="1000" value="0" step="1" aria-label="再生位置">
           </div>
         </div>
         <div class="time-row">
@@ -2161,10 +2184,9 @@ body {
   speedValue.addEventListener("click", () => setSpeed(1));
   setSpeed(1);
 
-  const progressThumb = document.getElementById("progressThumb");
-  let seekSuppressClick = false;
-  let activePointerId = null;
-  let lastSeekRatio = 0;
+  const progressRange = document.getElementById("progressRange");
+  const SEEK_MAX = 1000;
+  let isSeeking = false;
 
   function getAudioDuration() {
     const d = audio.duration;
@@ -2180,150 +2202,61 @@ body {
 
   function updateProgressUI(ratio) {
     const r = Math.max(0, Math.min(1, Number(ratio) || 0));
-    lastSeekRatio = r;
     const pct = r * 100;
     progressFill.style.width = pct + "%";
-    if (progressThumb) progressThumb.style.left = pct + "%";
-    progressBar.setAttribute("aria-valuenow", String(Math.round(pct)));
+    if (progressRange && !isSeeking) {
+      progressRange.value = String(Math.round(r * SEEK_MAX));
+    }
   }
 
-  function clientXFromEvent(e) {
-    if (!e) return null;
-    // TouchEvent: prefer touches / changedTouches (do NOT trust event.clientX)
-    if (e.touches && e.touches.length) return e.touches[0].clientX;
-    if (e.changedTouches && e.changedTouches.length) return e.changedTouches[0].clientX;
-    if (typeof e.clientX === "number" && !isNaN(e.clientX)) return e.clientX;
-    return null;
-  }
-
-  function ratioFromClientX(clientX) {
-    const rect = progressBar.getBoundingClientRect();
-    const width = rect.width;
-    if (!width || width < 1) return null;
-    if (typeof clientX !== "number" || isNaN(clientX)) return null;
-    return Math.max(0, Math.min(1, (clientX - rect.left) / width));
-  }
-
-  function ratioFromEvent(e) {
-    return ratioFromClientX(clientXFromEvent(e));
-  }
-
-  function seekToRatio(ratio) {
+  function applyRangeSeek(value) {
     const dur = getAudioDuration();
-    if (!dur) return false;
-    const r = Math.max(0, Math.min(1, ratio));
+    if (!dur) return;
+    const r = Math.max(0, Math.min(SEEK_MAX, Number(value) || 0)) / SEEK_MAX;
     const t = r * dur;
-    // Avoid fastSeek — some browsers snap incorrectly to 0
     try {
       audio.currentTime = t;
-    } catch (err) {
-      return false;
-    }
-    updateProgressUI(r);
+    } catch (err) {}
+    progressFill.style.width = (r * 100) + "%";
     currentTimeEl.textContent = formatTime(t);
-    return true;
   }
 
-  function seekFromEvent(e) {
-    const ratio = ratioFromEvent(e);
-    if (ratio == null) return false;
-    return seekToRatio(ratio);
+  if (progressRange) {
+    progressRange.addEventListener("pointerdown", () => { isSeeking = true; isDragging = true; });
+    progressRange.addEventListener("mousedown", () => { isSeeking = true; isDragging = true; });
+    progressRange.addEventListener("touchstart", () => { isSeeking = true; isDragging = true; }, { passive: true });
+
+    progressRange.addEventListener("input", () => {
+      isSeeking = true;
+      isDragging = true;
+      applyRangeSeek(progressRange.value);
+    });
+
+    const endSeek = () => {
+      if (!isSeeking) return;
+      applyRangeSeek(progressRange.value);
+      isSeeking = false;
+      isDragging = false;
+    };
+    progressRange.addEventListener("change", endSeek);
+    progressRange.addEventListener("pointerup", endSeek);
+    progressRange.addEventListener("mouseup", endSeek);
+    progressRange.addEventListener("touchend", endSeek, { passive: true });
   }
-
-  function endSeekPointer(e) {
-    if (!isDragging) return;
-    if (e && (activePointerId == null || e.pointerId === activePointerId)) {
-      seekFromEvent(e);
-    }
-    isDragging = false;
-    activePointerId = null;
-    progressBar.classList.remove("dragging");
-    // Prevent the trailing synthetic click from seeking to a wrong X (often 0)
-    seekSuppressClick = true;
-    setTimeout(() => { seekSuppressClick = false; }, 400);
-  }
-
-  // ---- Single primary path: Pointer Events ----
-  progressBar.addEventListener("pointerdown", e => {
-    if (e.button != null && e.button !== 0) return;
-    const dur = getAudioDuration();
-    if (!dur) return;
-    isDragging = true;
-    activePointerId = e.pointerId;
-    progressBar.classList.add("dragging");
-    try { progressBar.setPointerCapture(e.pointerId); } catch (err) {}
-    seekFromEvent(e);
-    e.preventDefault();
-    e.stopPropagation();
-  });
-
-  progressBar.addEventListener("pointermove", e => {
-    if (!isDragging) return;
-    if (activePointerId != null && e.pointerId !== activePointerId) return;
-    seekFromEvent(e);
-    e.preventDefault();
-  });
-
-  progressBar.addEventListener("pointerup", endSeekPointer);
-  progressBar.addEventListener("pointercancel", endSeekPointer);
-  progressBar.addEventListener("lostpointercapture", () => {
-    if (!isDragging) return;
-    isDragging = false;
-    activePointerId = null;
-    progressBar.classList.remove("dragging");
-    seekSuppressClick = true;
-    setTimeout(() => { seekSuppressClick = false; }, 400);
-  });
-
-  // Click only when NOT a drag leftover (desktop mouse users without drag)
-  progressBar.addEventListener("click", e => {
-    if (seekSuppressClick || isDragging) {
-      e.preventDefault();
-      e.stopPropagation();
-      return;
-    }
-    seekFromEvent(e);
-  });
-
-  // Keyboard accessibility
-  progressBar.addEventListener("keydown", e => {
-    const dur = getAudioDuration();
-    if (!dur) return;
-    const step = (e.shiftKey ? 0.1 : 0.02);
-    if (e.code === "ArrowRight" || e.code === "ArrowUp") {
-      e.preventDefault();
-      seekToRatio(Math.min(1, (audio.currentTime / dur) + step));
-    } else if (e.code === "ArrowLeft" || e.code === "ArrowDown") {
-      e.preventDefault();
-      seekToRatio(Math.max(0, (audio.currentTime / dur) - step));
-    } else if (e.code === "Home") {
-      e.preventDefault();
-      seekToRatio(0);
-    } else if (e.code === "End") {
-      e.preventDefault();
-      seekToRatio(1);
-    }
-  });
-  if (!progressBar.hasAttribute("tabindex")) progressBar.setAttribute("tabindex", "0");
 
   audio.addEventListener("timeupdate", () => {
-    if (isDragging) return;
+    if (isSeeking) return;
     const dur = getAudioDuration();
     if (!dur) return;
-    updateProgressUI(audio.currentTime / dur);
+    const r = audio.currentTime / dur;
+    updateProgressUI(r);
     currentTimeEl.textContent = formatTime(audio.currentTime);
   });
   audio.addEventListener("seeked", () => {
-    if (isDragging) return;
+    if (isSeeking) return;
     const dur = getAudioDuration();
     if (!dur) return;
-    // If browser snapped near 0 incorrectly right after our seek, re-apply once
-    const now = audio.currentTime / dur;
-    if (lastSeekRatio > 0.05 && now < 0.01) {
-      seekToRatio(lastSeekRatio);
-      return;
-    }
-    updateProgressUI(now);
+    updateProgressUI(audio.currentTime / dur);
     currentTimeEl.textContent = formatTime(audio.currentTime);
   });
   audio.addEventListener("loadedmetadata", () => { durationEl.textContent = formatTime(audio.duration); });
