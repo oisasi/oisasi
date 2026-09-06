@@ -123,7 +123,113 @@ body {
   -webkit-font-smoothing: antialiased;
   position: relative;
 }
+body.intro-active {
+  overflow: hidden;
+}
 a, button, [role="button"] { cursor: var(--cursor-hover); }
+
+/* ================= サイト登場アニメーション ================= */
+.site-intro {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #05050d;
+  transition: opacity 0.9s ease, visibility 0.9s;
+}
+.site-intro.fade-out {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+.site-intro-bg {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 70% 50% at 50% 40%, rgba(139,108,255,0.35), transparent 65%),
+    radial-gradient(ellipse 50% 40% at 30% 70%, rgba(255,107,203,0.2), transparent 60%),
+    radial-gradient(ellipse 50% 40% at 70% 70%, rgba(102,240,255,0.15), transparent 60%);
+  animation: introPulse 2.5s ease-in-out infinite;
+}
+@keyframes introPulse {
+  0%, 100% { opacity: 0.7; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.05); }
+}
+.site-intro-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  animation: introRise 1.2s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes introRise {
+  from { opacity: 0; transform: translateY(30px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.site-intro-logo {
+  width: 72px;
+  height: 72px;
+  border-radius: 18px;
+  border: 2px solid rgba(180,150,255,0.5);
+  box-shadow: 0 0 40px rgba(139,108,255,0.6), 0 0 80px rgba(255,107,203,0.3);
+  margin: 0 auto 20px;
+  object-fit: cover;
+  animation: introLogoGlow 2s ease-in-out infinite;
+}
+@keyframes introLogoGlow {
+  0%, 100% { box-shadow: 0 0 30px rgba(139,108,255,0.5), 0 0 60px rgba(255,107,203,0.25); }
+  50% { box-shadow: 0 0 50px rgba(139,108,255,0.8), 0 0 100px rgba(255,107,203,0.45); }
+}
+.site-intro-title {
+  font-family: 'Cinzel', serif;
+  font-weight: 900;
+  font-size: clamp(22px, 5vw, 36px);
+  letter-spacing: 6px;
+  text-transform: uppercase;
+  background: linear-gradient(120deg, #ff6bcb, #b085ff, #66f0ff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin-bottom: 10px;
+}
+.site-intro-sub {
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  letter-spacing: 8px;
+  color: rgba(160,156,200,0.85);
+  text-transform: uppercase;
+  margin-bottom: 28px;
+}
+.site-intro-ring {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto;
+  border: 2px solid transparent;
+  border-top-color: #ff6bcb;
+  border-right-color: #8b6cff;
+  border-radius: 50%;
+  animation: introSpin 0.9s linear infinite;
+}
+@keyframes introSpin {
+  to { transform: rotate(360deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .site-intro-bg, .site-intro-logo, .site-intro-ring, .site-intro-content {
+    animation: none !important;
+  }
+}
+
+/* 本体のフェードイン */
+.shell, .header {
+  opacity: 0;
+  transition: opacity 1s ease 0.15s;
+}
+body.intro-done .shell,
+body.intro-done .header {
+  opacity: 1;
+}
 
 /* ================= 幻想背景レイヤー ================= */
 .bg-cosmos {
@@ -890,7 +996,18 @@ footer::before {
 .reveal.visible { opacity: 1; transform: translateY(0); }
 </style>
 </head>
-<body>
+<body class="intro-active">
+
+<!-- サイト登場イントロ -->
+<div class="site-intro" id="siteIntro" aria-hidden="true">
+  <div class="site-intro-bg"></div>
+  <div class="site-intro-content">
+    <img class="site-intro-logo" src="おいさしロゴ.png" alt="" width="72" height="72">
+    <div class="site-intro-title">OISASI</div>
+    <div class="site-intro-sub">OFFICIAL · REALM</div>
+    <div class="site-intro-ring" aria-hidden="true"></div>
+  </div>
+</div>
 
 <!-- 幻想背景 -->
 <div class="bg-cosmos" aria-hidden="true"></div>
@@ -1268,7 +1385,7 @@ footer::before {
       <span>✦</span>
       <span data-i18n="footer">OisasiOfficial — 設定からテーマ・言語を変更できます</span>
     </div>
-    <div class="footer-copy"></div>
+    <div class="footer-copy">© OISASI OFFICIAL · ETHEREAL REALM</div>
   </footer>
 </div>
 
@@ -1292,6 +1409,43 @@ footer::before {
   const soundIcon = document.getElementById('soundIcon');
   const bgVideo = document.getElementById('bgVideo');
   const backToTop = document.getElementById('backToTop');
+  const siteIntro = document.getElementById('siteIntro');
+
+  /* ===== サイト登場アニメーション ===== */
+  function finishIntro() {
+    if (!siteIntro) {
+      document.body.classList.remove('intro-active');
+      document.body.classList.add('intro-done');
+      return;
+    }
+    siteIntro.classList.add('fade-out');
+    document.body.classList.add('intro-done');
+    setTimeout(() => {
+      document.body.classList.remove('intro-active');
+      if (siteIntro.parentNode) siteIntro.remove();
+    }, 950);
+  }
+
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduceMotion) {
+    finishIntro();
+  } else {
+    // 最低表示時間 + ページ読み込み完了を待つ
+    const introMinTime = 1600;
+    const introStart = Date.now();
+    function tryFinishIntro() {
+      const elapsed = Date.now() - introStart;
+      const wait = Math.max(0, introMinTime - elapsed);
+      setTimeout(finishIntro, wait);
+    }
+    if (document.readyState === 'complete') {
+      tryFinishIntro();
+    } else {
+      window.addEventListener('load', tryFinishIntro);
+    }
+    // フォールバック（万一 load が遅い場合）
+    setTimeout(finishIntro, 4000);
+  }
 
   /* ===== 背景動画 音声オン/オフ（初期オフ） ===== */
   const muteIconSVG = '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/>';
