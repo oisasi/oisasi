@@ -694,6 +694,79 @@ body.intro-done .hero .hero-sound-btn {
   }
 }
 
+/* ================= お知らせ ================= */
+.announce {
+  position: relative;
+  padding: clamp(22px, 4vw, 34px);
+  background: var(--card-bg);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255,212,138,0.4);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 0 40px rgba(255,212,138,0.18), var(--shadow);
+  overflow: hidden;
+}
+.announce::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(120deg, rgba(255,212,138,0.10), transparent 60%);
+  pointer-events: none;
+}
+.announce-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 6px 16px;
+  background: rgba(10,8,28,0.55);
+  border: 1px solid rgba(255,212,138,0.5);
+  border-radius: 999px;
+  font-family: 'Cinzel', serif; font-size: 11px; font-weight: 700;
+  letter-spacing: 3px; text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 16px;
+}
+.announce-title {
+  font-size: clamp(19px, 3vw, 24px);
+  font-weight: 900;
+  margin-bottom: 16px;
+  letter-spacing: 0.02em;
+}
+.announce-body p { margin-bottom: 14px; color: var(--text); }
+.announce-body p:last-child { margin-bottom: 0; }
+.announce-sub {
+  font-weight: 800;
+  margin: 18px 0 8px;
+  color: var(--gold);
+  font-size: 14px;
+  letter-spacing: 0.5px;
+}
+.announce-list {
+  list-style: none;
+  display: flex; flex-direction: column; gap: 8px;
+  margin-bottom: 4px;
+}
+.announce-list li {
+  position: relative;
+  padding-left: 22px;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.7;
+}
+.announce-list li::before {
+  content: '✦';
+  position: absolute; left: 0; top: 0;
+  color: var(--gold);
+  font-size: 12px;
+}
+.announce-highlight {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 10px 16px;
+  border-radius: 12px;
+  background: var(--surface-2);
+  border: 1px dashed var(--border-strong);
+  font-size: 13px; font-weight: 700;
+  color: var(--text);
+}
+
 /* ================= セクション見出し ================= */
 .section {
   margin: clamp(50px, 8vw, 90px) 0;
@@ -1159,6 +1232,29 @@ footer::before {
         <line x1="17" y1="9" x2="23" y2="15"/>
       </svg>
     </button>
+  </section>
+
+  <!-- ================= お知らせ ================= -->
+  <section class="section" id="news">
+    <div class="announce">
+      <div class="announce-badge">✧ お知らせ ✧</div>
+      <div class="announce-title">活動名変更について</div>
+      <div class="announce-body">
+        <p>いつも応援ありがとうございます！<br>
+        今月9月末までに、活動名を「おいさし」から「<strong>[新しいアルファベット名]</strong>」へ変更いたします。</p>
+
+        <div class="announce-sub">◆ 変更の理由</div>
+        <ul class="announce-list">
+          <li>キャラクター名と活動名を分けて分かりやすくするため</li>
+          <li>検索やタグ付けがしやすい短めのアルファベット表記にするため</li>
+        </ul>
+
+        <div class="announce-sub">◆ キャラクター「おいさし」について</div>
+        <p>キャラクターとしての「おいさし」は今後も変わらずそのまま登場します！</p>
+
+        <div class="announce-highlight">今後は「作者：[新しいアルファベット名]」と「キャラ：おいさし」として活動してまいります。</div>
+      </div>
+    </div>
   </section>
 
   <!-- ================= I. メインメニュー ================= -->
