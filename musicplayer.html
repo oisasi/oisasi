@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
 <title>ZoJeZuミュージック プレイヤー | ZoJeZu Music Player</title>
-<meta name="description" content="oisasimusic公式ミュージックプレイヤー">
+<meta name="description" content="zojezumusic公式ミュージックプレイヤー">
 <meta name="theme-color" content="#061820">
 <link rel="icon" type="image/jpeg" href="oisasi music.jpg">
 <link rel="apple-touch-icon" href="oisasi music.jpg">
@@ -1276,9 +1276,9 @@ body {
 <div class="bg"></div>
 
 <header class="header">
-  <a href="oisasi-music.html" class="logo">
-    <img class="logo-img" src="oisasi music.jpg" alt="oisasimusic" width="36" height="36">
-    <div class="logo-text"><span>oisasimusic</span></div>
+  <a href="zojezu-music.html" class="logo">
+    <img class="logo-img" src="oisasi music.jpg" alt="zojezumusic" width="36" height="36">
+    <div class="logo-text"><span>zojezumusic</span></div>
   </a>
   <div class="header-spacer"></div>
   <div class="track-count-badge" id="trackCount">40 曲</div>
@@ -1334,7 +1334,7 @@ body {
     <img class="mini-art" src="oisasi music.jpg" alt="">
     <div class="mini-info">
       <div class="mini-title" id="miniTitle">—</div>
-      <div class="mini-sub">Oisasi Music</div>
+      <div class="mini-sub">ZoJeZu Music</div>
     </div>
     <button class="mini-ctrl mini-skip" id="miniBack10Btn" aria-label="10秒戻る" title="10秒戻る">
       <svg viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
@@ -1383,7 +1383,7 @@ body {
         </div>
         <div class="now-label" data-i18n="now_playing">Now Playing</div>
         <div class="track-title" id="trackTitle">—</div>
-        <div class="track-meta" id="trackMeta">Oisasi Music Collection</div>
+        <div class="track-meta" id="trackMeta">ZoJeZu Music Collection</div>
         <div class="popup-ai-notice" id="popupAiNotice">注意：<strong>oisasi osoj 以外</strong>はすべて AI 音楽です</div>
       </div>
       <div class="popup-right">
@@ -1539,7 +1539,7 @@ body {
     return (navigator.language || 'ja').toLowerCase().startsWith('ja') ? 'ja' : 'en';
   }
   function applyLang(pref) {
-    localStorage.setItem('oisasi-lang', pref);
+    localStorage.setItem('zojezu-lang', pref);
     const lang = resolveLang(pref);
     html.setAttribute('lang', lang);
     document.querySelectorAll('#langOptions button').forEach(btn => btn.classList.toggle('active', btn.dataset.value === pref));
@@ -1550,7 +1550,7 @@ body {
   }
   function applyTheme(theme) {
     html.setAttribute('data-theme', theme);
-    localStorage.setItem('oisasi-theme', theme);
+    localStorage.setItem('zojezu-theme', theme);
     document.querySelectorAll('#themeOptions button').forEach(btn => btn.classList.toggle('active', btn.dataset.value === theme));
     const meta = document.querySelector('meta[name="theme-color"]');
     if (meta) {
@@ -1559,8 +1559,8 @@ body {
       else meta.content = window.matchMedia('(prefers-color-scheme: light)').matches ? '#eef5f8' : '#050d12';
     }
   }
-  applyTheme(localStorage.getItem('oisasi-theme') || 'auto');
-  applyLang(localStorage.getItem('oisasi-lang') || 'auto');
+  applyTheme(localStorage.getItem('zojezu-theme') || 'auto');
+  applyLang(localStorage.getItem('zojezu-lang') || 'auto');
   window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
     if (html.getAttribute('data-theme') === 'auto') applyTheme('auto');
   });
@@ -1670,12 +1670,12 @@ body {
   // ===== Custom playlists (localStorage) =====
   function loadPlaylists() {
     try {
-      const raw = localStorage.getItem("oisasi-playlists");
+      const raw = localStorage.getItem("zojezu-playlists");
       return raw ? JSON.parse(raw) : {};
     } catch { return {}; }
   }
   function savePlaylists(obj) {
-    localStorage.setItem("oisasi-playlists", JSON.stringify(obj));
+    localStorage.setItem("zojezu-playlists", JSON.stringify(obj));
   }
 
   // Original UI dialogs (replace prompt/alert)
@@ -2031,7 +2031,7 @@ body {
   }
 
   window.updateTrackCount = function () {
-    const lang = resolveLang(localStorage.getItem('oisasi-lang') || 'auto');
+    const lang = resolveLang(localStorage.getItem('zojezu-lang') || 'auto');
     trackCountEl.textContent = tracks.length + ' ' + ((i18n[lang] && i18n[lang].tracks_unit) || '曲');
   };
   window.updateTrackCount();
@@ -2189,7 +2189,7 @@ body {
     audio.playbackRate = parseFloat(speedSlider && speedSlider.value) || 1;
     trackTitle.textContent = track.title;
     const isOriginal = track.title === "oisasi osoj";
-    trackMeta.textContent = isOriginal ? "Original Track" : "AI Music · Oisasi Music";
+    trackMeta.textContent = isOriginal ? "Original Track" : "AI Music · ZoJeZu Music";
     const notice = document.getElementById("popupAiNotice");
     if (notice) {
       notice.innerHTML = isOriginal
