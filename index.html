@@ -1,28 +1,928 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="ja" data-theme="auto">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>トップページ | MySite</title>
-
-<link rel="stylesheet" href="/assets/css/header.css">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>ZOJEZU 公式ホームページ | 星詠みの書斎</title>
+<meta name="description" content="ZOJEZU（ゾジェズ）公式ホームページ — 星と魔法陣が導く創作の書斎">
+<meta name="theme-color" content="#07060f">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;900&family=Zen+Maru+Gothic:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
-  body { margin: 0; font-family: system-ui, sans-serif; }
-  main { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
+/* =====================================================================
+   ZOJEZU OFFICIAL — "星詠みの書斎" (The Star-Reader's Atelier)
+   Concept: an open grimoire / creator's writing-desk, not a video hero.
+   Desktop = vertical dock + flowing atelier bento layout.
+   Mobile  = app-like top bar + bottom tab dock + snap "book page" sections.
+   ===================================================================== */
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root, [data-theme="dark"]{
+  --ink:#07060f; --ink-2:#0c0a1a; --panel:#120e22; --panel-2:#17122b;
+  --line:rgba(178,150,255,.16); --line-strong:rgba(178,150,255,.4);
+  --text:#f3f0ff; --muted:#9d97c6;
+  --pink:#ff5fa8; --violet:#8b6cff; --cyan:#57e8ff; --gold:#ffcf7e;
+  --glass:rgba(255,255,255,.04); --glass-2:rgba(255,255,255,.09);
+  --ring:0 0 0 3px rgba(139,108,255,.35);
+  --shadow:0 24px 60px rgba(0,0,0,.55);
+}
+[data-theme="light"]{
+  --ink:#f4f0ff; --ink-2:#ece3ff; --panel:#ffffff; --panel-2:#f7f1ff;
+  --line:rgba(90,60,200,.16); --line-strong:rgba(90,60,200,.38);
+  --text:#1c1230; --muted:#645892;
+  --pink:#d63d94; --violet:#6a3fe0; --cyan:#0092b3; --gold:#af7a12;
+  --glass:rgba(90,60,200,.05); --glass-2:rgba(90,60,200,.09);
+  --ring:0 0 0 3px rgba(106,63,224,.25);
+  --shadow:0 18px 44px rgba(70,40,140,.16);
+}
+@media (prefers-color-scheme: light){
+  [data-theme="auto"]{
+    --ink:#f4f0ff; --ink-2:#ece3ff; --panel:#ffffff; --panel-2:#f7f1ff;
+    --line:rgba(90,60,200,.16); --line-strong:rgba(90,60,200,.38);
+    --text:#1c1230; --muted:#645892;
+    --pink:#d63d94; --violet:#6a3fe0; --cyan:#0092b3; --gold:#af7a12;
+    --glass:rgba(90,60,200,.05); --glass-2:rgba(90,60,200,.09);
+    --ring:0 0 0 3px rgba(106,63,224,.25);
+    --shadow:0 18px 44px rgba(70,40,140,.16);
+  }
+}
+@media (prefers-color-scheme: dark){
+  [data-theme="auto"]{
+    --ink:#07060f; --ink-2:#0c0a1a; --panel:#120e22; --panel-2:#17122b;
+    --line:rgba(178,150,255,.16); --line-strong:rgba(178,150,255,.4);
+    --text:#f3f0ff; --muted:#9d97c6;
+    --pink:#ff5fa8; --violet:#8b6cff; --cyan:#57e8ff; --gold:#ffcf7e;
+    --glass:rgba(255,255,255,.04); --glass-2:rgba(255,255,255,.09);
+    --ring:0 0 0 3px rgba(139,108,255,.35);
+    --shadow:0 24px 60px rgba(0,0,0,.55);
+  }
+}
+
+html{ scroll-behavior:smooth; background:var(--ink); }
+body{
+  font-family:'Zen Maru Gothic', -apple-system, 'Segoe UI', system-ui, sans-serif;
+  background:var(--ink); color:var(--text); min-height:100dvh; line-height:1.75;
+  overflow-x:hidden; -webkit-font-smoothing:antialiased; position:relative;
+}
+h1,h2,h3,.disp{ font-family:'Cinzel', serif; letter-spacing:.01em; }
+body.lock{ overflow:hidden; }
+a{ color:inherit; text-decoration:none; }
+ul{ list-style:none; }
+button{ font:inherit; color:inherit; background:none; border:0; }
+::selection{ background:var(--violet); color:#fff; }
+:focus-visible{ outline:2px solid var(--cyan); outline-offset:3px; border-radius:6px; }
+
+/* fine-pointer custom cursor (desktop only) */
+@media (hover:hover) and (pointer:fine){
+  html.has-cursor, html.has-cursor a, html.has-cursor button{ cursor:none; }
+}
+.cursor{
+  position:fixed; z-index:9998; top:0; left:0; width:26px; height:26px; border-radius:50%;
+  border:1.5px solid var(--pink); pointer-events:none; transform:translate(-50%,-50%);
+  transition:width .25s,height .25s,border-color .25s,background-color .25s; mix-blend-mode:difference;
+}
+.cursor.big{ width:56px; height:56px; background:rgba(255,95,168,.12); border-color:var(--cyan); }
+.cursor-dot{
+  position:fixed; z-index:9998; top:0; left:0; width:5px; height:5px; border-radius:50%;
+  background:var(--gold); pointer-events:none; transform:translate(-50%,-50%);
+}
+
+/* ---------- ambient canvases ---------- */
+#nebula, #stardust{ position:fixed; inset:0; z-index:0; width:100%; height:100%; pointer-events:none; }
+#stardust{ z-index:1; mix-blend-mode:screen; }
+.grain{
+  position:fixed; inset:0; z-index:2; pointer-events:none; opacity:.035;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ---------- intro loader ---------- */
+.intro{
+  position:fixed; inset:0; z-index:9999; background:var(--ink);
+  display:flex; align-items:center; justify-content:center; flex-direction:column; gap:18px;
+  transition:opacity .6s ease, visibility .6s ease;
+}
+.intro.done{ opacity:0; visibility:hidden; }
+.intro svg{ width:120px; height:120px; }
+.intro circle{ fill:none; stroke:url(#introGrad); stroke-width:1.4; }
+.intro .ring{ stroke-dasharray:340; stroke-dashoffset:340; animation:introRing 1.4s cubic-bezier(.4,0,.2,1) forwards; }
+.intro .ring2{ stroke-dasharray:260; stroke-dashoffset:260; animation:introRing 1.4s .15s cubic-bezier(.4,0,.2,1) forwards; opacity:.6; }
+@keyframes introRing{ to{ stroke-dashoffset:0; } }
+.intro-label{ font-family:'Cinzel',serif; letter-spacing:.35em; font-size:11px; color:var(--muted); text-transform:uppercase; }
+
+/* ================= reveal-on-load stage ================= */
+.stage{ opacity:0; transform:translateY(14px); filter:blur(6px); transition:opacity .9s cubic-bezier(.16,1,.3,1), transform .9s cubic-bezier(.16,1,.3,1), filter .9s cubic-bezier(.16,1,.3,1); position:relative; z-index:3; }
+body.ready .stage{ opacity:1; transform:translateY(0); filter:blur(0); }
+
+/* ================= DESKTOP DOCK ================= */
+.dock{
+  position:fixed; left:18px; top:50%; transform:translateY(-50%); z-index:60;
+  display:flex; flex-direction:column; align-items:center; gap:10px;
+  padding:14px 9px; border-radius:26px; background:var(--glass); backdrop-filter:blur(18px) saturate(160%);
+  border:1px solid var(--line); box-shadow:var(--shadow);
+}
+.dock-mark{ position:relative; width:40px; height:40px; display:grid; place-items:center; margin-bottom:6px; }
+.dock-mark svg.progress{ position:absolute; inset:0; transform:rotate(-90deg); }
+.dock-mark svg.progress circle{ fill:none; stroke:var(--line); stroke-width:2; }
+.dock-mark svg.progress circle.bar{ stroke:url(#dockGrad); stroke-linecap:round; transition:stroke-dashoffset .1s linear; }
+.dock-mark .rune{ font-family:'Cinzel',serif; font-weight:900; font-size:13px; background:linear-gradient(120deg,var(--pink),var(--violet),var(--cyan)); -webkit-background-clip:text; background-clip:text; color:transparent; }
+.dock-item{
+  width:42px; height:42px; border-radius:14px; display:grid; place-items:center; position:relative;
+  color:var(--muted); transition:color .25s, background .25s, transform .25s;
+}
+.dock-item svg{ width:18px; height:18px; }
+.dock-item:hover, .dock-item.active{ color:var(--text); background:var(--glass-2); transform:translateX(3px); }
+.dock-item.active::before{ content:''; position:absolute; left:-9px; width:4px; height:16px; border-radius:3px; background:linear-gradient(var(--pink),var(--cyan)); }
+.dock-tip{
+  position:absolute; left:56px; top:50%; transform:translateY(-50%) translateX(-6px); white-space:nowrap;
+  background:var(--panel-2); border:1px solid var(--line); padding:6px 12px; border-radius:10px; font-size:12.5px;
+  opacity:0; pointer-events:none; transition:opacity .2s, transform .2s; box-shadow:var(--shadow);
+}
+.dock-item:hover .dock-tip{ opacity:1; transform:translateY(-50%) translateX(0); }
+.dock-sep{ width:22px; height:1px; background:var(--line); margin:4px 0; }
+.dock-btn{ width:42px; height:42px; border-radius:14px; display:grid; place-items:center; color:var(--muted); }
+.dock-btn:hover{ color:var(--text); background:var(--glass-2); }
+.dock-btn svg{ width:17px; height:17px; }
+
+@media (max-width:900px){ .dock{ display:none; } }
+@media (min-width:901px){
+  .mbar, .tabbar, .fab{ display:none !important; }
+}
+
+/* ================= MOBILE TOP BAR + TAB DOCK ================= */
+.mbar{
+  position:fixed; top:0; left:0; right:0; z-index:55; height:58px; padding:0 14px;
+  display:flex; align-items:center; justify-content:space-between;
+  background:var(--glass); backdrop-filter:blur(16px) saturate(160%); border-bottom:1px solid var(--line);
+}
+.mbar .brand{ display:flex; align-items:center; gap:8px; font-family:'Cinzel',serif; font-weight:700; font-size:14px; letter-spacing:.06em; }
+.mbar .brand .dot{ width:9px; height:9px; border-radius:50%; background:linear-gradient(135deg,var(--pink),var(--cyan)); box-shadow:0 0 10px var(--pink); }
+.mbar .acts{ display:flex; gap:6px; }
+.mbar button{ width:36px; height:36px; border-radius:11px; display:grid; place-items:center; color:var(--muted); }
+.mbar button svg{ width:17px; height:17px; }
+.mbar button:active{ background:var(--glass-2); color:var(--text); }
+
+.tabbar{
+  position:fixed; left:12px; right:12px; bottom:12px; z-index:55; height:64px; border-radius:22px;
+  background:var(--glass); backdrop-filter:blur(18px) saturate(160%); border:1px solid var(--line);
+  display:flex; align-items:center; justify-content:space-around; box-shadow:var(--shadow);
+}
+.tab-item{ display:flex; flex-direction:column; align-items:center; gap:3px; color:var(--muted); font-size:10px; width:20%; padding:8px 0; position:relative; }
+.tab-item svg{ width:19px; height:19px; }
+.tab-item.active{ color:var(--text); }
+.tab-item.active::after{ content:''; position:absolute; top:2px; width:4px; height:4px; border-radius:50%; background:var(--pink); box-shadow:0 0 8px var(--pink); }
+
+/* ================= HEADER-LESS HERO (no video file) ================= */
+.hero{
+  position:relative; min-height:100dvh; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  text-align:center; padding:120px 20px 80px; overflow:hidden;
+}
+.hero-seal{ position:relative; width:min(78vw,420px); aspect-ratio:1; margin-bottom:8px; }
+.hero-seal svg{ width:100%; height:100%; animation:sealSpin 90s linear infinite; }
+@keyframes sealSpin{ to{ transform:rotate(360deg); } }
+.hero-seal .core{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; flex-direction:column; animation:none; }
+.hero-badge{
+  display:inline-flex; align-items:center; gap:8px; font-size:12.5px; padding:7px 16px; border-radius:999px;
+  border:1px solid var(--line-strong); background:var(--glass); color:var(--muted); margin-bottom:26px;
+}
+.hero-badge .dot{ width:6px; height:6px; border-radius:50%; background:var(--pink); box-shadow:0 0 8px var(--pink); }
+.hero h1{ font-size:clamp(2.3rem,7vw,4.6rem); font-weight:700; line-height:1.12; margin-bottom:18px; }
+.hero h1 .glow{ background:linear-gradient(120deg,var(--pink),var(--violet) 45%,var(--cyan)); -webkit-background-clip:text; background-clip:text; color:transparent; }
+.hero .lead{ max-width:520px; color:var(--muted); font-size:16px; margin-bottom:34px; }
+.hero-cta{ display:flex; gap:14px; flex-wrap:wrap; justify-content:center; }
+.btn{ display:inline-flex; align-items:center; gap:9px; padding:14px 26px; border-radius:15px; font-weight:700; font-size:14.5px; position:relative; }
+.btn svg{ width:16px; height:16px; }
+.btn-primary{ background:linear-gradient(120deg,var(--pink),var(--violet)); color:#fff; box-shadow:0 14px 34px -10px rgba(139,108,255,.65); }
+.btn-ghost{ border:1px solid var(--line-strong); color:var(--text); background:var(--glass); }
+.hero-scroll{ position:absolute; bottom:28px; display:flex; flex-direction:column; align-items:center; gap:8px; color:var(--muted); font-size:10.5px; letter-spacing:.3em; }
+.hero-scroll .wheel{ width:1px; height:34px; background:linear-gradient(var(--line-strong),transparent); position:relative; overflow:hidden; }
+.hero-scroll .wheel::after{ content:''; position:absolute; top:-34px; left:0; width:100%; height:12px; background:linear-gradient(var(--cyan),transparent); animation:scrollDrip 1.8s ease-in-out infinite; }
+@keyframes scrollDrip{ to{ top:34px; } }
+
+/* ================= SECTIONS ================= */
+.stagewrap{ max-width:1180px; margin:0 auto; padding:0 24px; }
+.section{ padding:100px 0 30px; opacity:0; transform:translateY(30px); transition:opacity .8s cubic-bezier(.16,1,.3,1), transform .8s cubic-bezier(.16,1,.3,1); }
+.section.visible{ opacity:1; transform:translateY(0); }
+.sec-head{ display:flex; align-items:flex-end; gap:18px; margin-bottom:36px; }
+.sec-num{ font-family:'Cinzel',serif; font-size:13px; color:var(--muted); border:1px solid var(--line); width:34px; height:34px; border-radius:10px; display:grid; place-items:center; flex-shrink:0; }
+.sec-eyebrow{ font-size:12px; color:var(--pink); letter-spacing:.08em; margin-bottom:3px; }
+.sec-title{ font-size:clamp(1.5rem,3vw,2.1rem); font-weight:700; }
+.sec-line{ flex:1; height:1px; background:linear-gradient(90deg,var(--line-strong),transparent); }
+
+/* announcement */
+.announce{ border:1px solid var(--line); border-radius:22px; padding:32px; background:var(--glass); position:relative; overflow:hidden; }
+.announce::before{ content:''; position:absolute; top:-40%; right:-10%; width:280px; height:280px; background:radial-gradient(circle,rgba(255,95,168,.18),transparent 70%); }
+.announce-badge{ font-size:12px; color:var(--gold); margin-bottom:10px; letter-spacing:.06em; }
+.announce-title{ font-family:'Cinzel',serif; font-size:20px; font-weight:700; margin-bottom:14px; }
+.announce p{ color:var(--muted); margin-bottom:10px; font-size:14.5px; }
+.announce-sub{ font-weight:700; margin:14px 0 8px; font-size:14.5px; }
+.announce-list li{ position:relative; padding-left:18px; color:var(--muted); font-size:14px; margin-bottom:5px; }
+.announce-list li::before{ content:'✦'; position:absolute; left:0; color:var(--violet); font-size:11px; top:3px; }
+.announce-highlight{ margin-top:16px; padding:14px 16px; border-radius:13px; border:1px solid var(--line-strong); background:var(--glass-2); font-size:13.5px; font-weight:700; }
+
+/* bento main menu */
+.bento{ display:grid; grid-template-columns:repeat(6,1fr); gap:16px; }
+.card{
+  --mx:50%; --my:50%;
+  grid-column:span 3; border-radius:22px; padding:26px; border:1px solid var(--line); background:var(--panel);
+  position:relative; overflow:hidden; display:flex; flex-direction:column; gap:14px; min-height:170px;
+  transform-style:preserve-3d; transition:transform .12s ease, border-color .3s;
+  will-change:transform;
+}
+.card.big{ grid-column:span 4; }
+.card.small{ grid-column:span 2; }
+.card::before{
+  content:''; position:absolute; inset:0; opacity:0; transition:opacity .35s;
+  background:radial-gradient(240px circle at var(--mx) var(--my), rgba(178,150,255,.22), transparent 60%);
+}
+.card:hover::before{ opacity:1; }
+.card:hover{ border-color:var(--line-strong); }
+.card-icon{ width:46px; height:46px; border-radius:14px; display:grid; place-items:center; font-size:21px; background:var(--glass-2); border:1px solid var(--line); }
+.card-title{ font-weight:700; font-size:16px; margin-bottom:4px; }
+.card-desc{ color:var(--muted); font-size:13px; }
+.card-arrow{ margin-top:auto; display:flex; align-items:center; justify-content:space-between; color:var(--muted); font-size:11px; letter-spacing:.08em; }
+.card-arrow svg{ width:14px; height:14px; transition:transform .3s; }
+.card:hover .card-arrow svg{ transform:translateX(4px); }
+
+/* witch duo */
+.duo{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+.duo .card{ grid-column:auto; min-height:190px; background:linear-gradient(160deg, rgba(139,108,255,.14), var(--panel)); }
+
+/* pills row */
+.pillrow{ display:flex; gap:12px; overflow-x:auto; padding-bottom:6px; scrollbar-width:none; }
+.pillrow::-webkit-scrollbar{ display:none; }
+.pill{
+  flex:0 0 auto; display:flex; align-items:center; gap:9px; padding:13px 20px; border-radius:999px;
+  border:1px solid var(--line); background:var(--glass); font-size:13.5px; font-weight:700; white-space:nowrap;
+  transition:transform .25s, border-color .25s, background .25s;
+}
+.pill svg{ width:16px; height:16px; }
+.pill:hover{ transform:translateY(-3px); border-color:var(--line-strong); background:var(--glass-2); }
+
+/* constellation */
+.constellation{ position:relative; padding:34px 10px 10px; }
+.const-svg{ position:absolute; inset:0; width:100%; height:100%; z-index:0; pointer-events:none; }
+.const-svg line{ stroke:var(--line-strong); stroke-width:1; stroke-dasharray:3 6; opacity:.6; }
+.const-nodes{ position:relative; z-index:1; display:flex; flex-wrap:wrap; gap:20px; justify-content:center; }
+.node{
+  display:flex; flex-direction:column; align-items:center; gap:9px; width:104px; padding:16px 8px; border-radius:18px;
+  background:var(--panel); border:1px solid var(--line); transition:transform .3s, border-color .3s;
+}
+.node:hover{ transform:translateY(-6px) scale(1.04); border-color:var(--line-strong); }
+.node .ic{ width:38px; height:38px; border-radius:50%; display:grid; place-items:center; }
+.node svg{ width:18px; height:18px; }
+.node span{ font-size:12px; color:var(--muted); }
+.node.hub{ background:linear-gradient(135deg,var(--pink),var(--violet)); color:#fff; }
+.node.hub span{ color:rgba(255,255,255,.85); font-weight:700; }
+.sns-note{ text-align:center; margin-top:22px; font-size:13px; color:var(--muted); }
+.sns-note a{ color:var(--cyan); font-weight:700; }
+
+/* grimoire embed tabs */
+.grimoire{ border:1px solid var(--line); border-radius:24px; background:var(--panel); overflow:hidden; }
+.grim-tabs{ display:flex; border-bottom:1px solid var(--line); overflow-x:auto; }
+.grim-tab{ flex:1; min-width:110px; padding:15px 10px; text-align:center; font-size:13px; font-weight:700; color:var(--muted); display:flex; align-items:center; justify-content:center; gap:7px; position:relative; }
+.grim-tab svg{ width:15px; height:15px; }
+.grim-tab.active{ color:var(--text); }
+.grim-tab.active::after{ content:''; position:absolute; bottom:-1px; left:14px; right:14px; height:2px; background:linear-gradient(90deg,var(--pink),var(--cyan)); }
+.grim-page{ display:none; padding:26px; min-height:420px; align-items:center; justify-content:center; animation:pageFlip .5s cubic-bezier(.16,1,.3,1); }
+.grim-page.active{ display:flex; }
+@keyframes pageFlip{ from{ opacity:0; transform:rotateY(-6deg) scale(.98); } to{ opacity:1; transform:none; } }
+.grim-page iframe, .grim-page blockquote{ max-width:100%; }
+.grim-loading{ color:var(--muted); font-size:13px; display:flex; flex-direction:column; align-items:center; gap:10px; }
+.grim-loading .spin{ width:26px; height:26px; border-radius:50%; border:2px solid var(--line); border-top-color:var(--pink); animation:spin 1s linear infinite; }
+@keyframes spin{ to{ transform:rotate(360deg); } }
+
+/* footer */
+footer{ text-align:center; padding:70px 24px 130px; }
+.footer-runes{ letter-spacing:.6em; color:var(--line-strong); font-size:12px; margin-bottom:16px; }
+.footer-pill{ display:inline-flex; align-items:center; gap:8px; padding:9px 18px; border-radius:999px; border:1px solid var(--line); font-size:12.5px; color:var(--muted); margin-bottom:10px; }
+.footer-copy{ font-size:11.5px; color:var(--muted); opacity:.6; }
+@media (min-width:901px){ footer{ padding-bottom:60px; } }
+
+/* ================= COMMAND PALETTE ================= */
+.palette-veil{ position:fixed; inset:0; z-index:200; background:rgba(4,3,10,.6); backdrop-filter:blur(6px); opacity:0; pointer-events:none; transition:opacity .25s; }
+.palette-veil.open{ opacity:1; pointer-events:auto; }
+.palette{
+  position:fixed; top:14%; left:50%; transform:translateX(-50%) translateY(-14px); width:min(560px,92vw); z-index:201;
+  background:var(--panel-2); border:1px solid var(--line-strong); border-radius:20px; box-shadow:var(--shadow);
+  opacity:0; pointer-events:none; transition:opacity .25s, transform .25s;
+}
+.palette-veil.open + .palette, .palette.open{ opacity:1; pointer-events:auto; transform:translateX(-50%) translateY(0); }
+.palette-input{ display:flex; align-items:center; gap:12px; padding:16px 18px; border-bottom:1px solid var(--line); }
+.palette-input svg{ width:17px; height:17px; color:var(--muted); flex-shrink:0; }
+.palette-input input{ flex:1; background:none; border:0; color:var(--text); font-size:15px; font-family:inherit; }
+.palette-input input:focus{ outline:none; }
+.palette-input kbd{ font-size:10.5px; color:var(--muted); border:1px solid var(--line); padding:2px 6px; border-radius:6px; }
+.palette-list{ max-height:340px; overflow-y:auto; padding:8px; }
+.palette-item{ display:flex; align-items:center; gap:12px; padding:11px 12px; border-radius:12px; font-size:14px; color:var(--muted); }
+.palette-item svg{ width:15px; height:15px; }
+.palette-item b{ color:var(--text); font-weight:700; }
+.palette-item.active{ background:var(--glass-2); color:var(--text); }
+.palette-empty{ padding:26px; text-align:center; color:var(--muted); font-size:13px; }
+
+/* ================= SETTINGS PANEL ================= */
+.settings-panel{
+  position:fixed; top:70px; right:16px; z-index:120; width:250px; background:var(--panel-2); border:1px solid var(--line);
+  border-radius:18px; padding:18px; box-shadow:var(--shadow); opacity:0; visibility:hidden; transform:translateY(-8px);
+  transition:opacity .25s, transform .25s, visibility .25s;
+}
+@media (min-width:901px){ .settings-panel{ top:auto; right:auto; left:74px; bottom:18px; } }
+.settings-panel.open{ opacity:1; visibility:visible; transform:translateY(0); }
+.settings-title{ display:flex; justify-content:space-between; align-items:center; font-weight:700; margin-bottom:14px; font-size:14px; }
+.settings-close{ font-size:18px; color:var(--muted); }
+.settings-group{ margin-bottom:14px; }
+.settings-label{ display:block; font-size:11.5px; color:var(--muted); margin-bottom:8px; letter-spacing:.05em; }
+.settings-options{ display:flex; gap:6px; }
+.settings-options button{ flex:1; padding:8px 0; border-radius:10px; border:1px solid var(--line); font-size:12px; }
+.settings-options button.active{ background:linear-gradient(120deg,var(--pink),var(--violet)); color:#fff; border-color:transparent; }
+
+/* ================= TOAST ================= */
+.toast{
+  position:fixed; left:50%; bottom:24px; transform:translateX(-50%) translateY(120%); z-index:150;
+  display:flex; align-items:center; gap:10px; padding:12px 20px; border-radius:14px; background:var(--panel-2);
+  border:1px solid var(--line-strong); box-shadow:var(--shadow); font-size:13px; transition:transform .4s cubic-bezier(.16,1,.3,1);
+}
+@media (min-width:901px){ .toast{ bottom:24px; } }
+@media (max-width:900px){ .toast{ bottom:92px; } }
+.toast.show{ transform:translateX(-50%) translateY(0); }
+.toast svg{ width:16px; height:16px; }
+.toast.offline svg{ color:var(--pink); }
+.toast.online svg{ color:var(--cyan); }
+
+/* ================= RUNE EASTER EGG ================= */
+.rune-burst{ position:fixed; inset:0; z-index:300; pointer-events:none; display:flex; align-items:center; justify-content:center; opacity:0; transition:opacity .5s; }
+.rune-burst.show{ opacity:1; }
+.rune-burst svg{ width:min(70vw,480px); transform:scale(.6); transition:transform .8s cubic-bezier(.16,1,.3,1); }
+.rune-burst.show svg{ transform:scale(1); }
+.rune-burst-label{ position:absolute; bottom:18%; font-family:'Cinzel',serif; letter-spacing:.3em; font-size:13px; color:var(--gold); text-transform:uppercase; }
+
+/* ================= RESPONSIVE: layout truly differs ================= */
+@media (min-width:901px){
+  .hero{ padding-top:60px; }
+  body{ padding-left:0; }
+}
+@media (max-width:900px){
+  body{ padding-top:58px; padding-bottom:88px; }
+  .stagewrap{ padding:0 18px; }
+  .bento{ grid-template-columns:1fr; }
+  .card, .card.big, .card.small{ grid-column:1/-1; }
+  .duo{ grid-template-columns:1fr; }
+  .section{ padding:64px 0 10px; scroll-margin-top:70px; }
+  .sec-head{ align-items:center; }
+  .hero{ min-height:calc(100dvh - 58px); padding-top:40px; }
+  .const-nodes{ gap:14px; }
+  .node{ width:88px; padding:13px 6px; }
+}
+@media (prefers-reduced-motion: reduce){
+  *{ animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important; }
+}
 </style>
 </head>
 <body>
 
-<!-- ヘッダーの挿入先。中身は空でOK（header.jsが埋める） -->
-<div id="header-placeholder"></div>
+<!-- SVG gradients used across the page -->
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <linearGradient id="introGrad" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#ff5fa8"/><stop offset="50%" stop-color="#8b6cff"/><stop offset="100%" stop-color="#57e8ff"/>
+    </linearGradient>
+    <linearGradient id="dockGrad" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#ff5fa8"/><stop offset="100%" stop-color="#57e8ff"/>
+    </linearGradient>
+    <radialGradient id="sealCore" cx="0" cy="0" r="0.5">
+      <stop offset="0%" stop-color="rgba(255,95,168,.5)"/><stop offset="60%" stop-color="rgba(139,108,255,.14)"/><stop offset="100%" stop-color="rgba(0,0,0,0)"/>
+    </radialGradient>
+    <linearGradient id="ringGrad" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#ff5fa8"/><stop offset="50%" stop-color="#8b6cff"/><stop offset="100%" stop-color="#57e8ff"/>
+    </linearGradient>
+  </defs>
+</svg>
 
-<main>
-  <h1>トップページ</h1>
-  <p>ここにページ固有のコンテンツを書きます。ヘッダーは header.html / header.js によって共通化されています。</p>
+<!-- Intro loader -->
+<div class="intro" id="intro" aria-hidden="true">
+  <svg viewBox="0 0 120 120"><circle class="ring" cx="60" cy="60" r="54"/><circle class="ring2" cx="60" cy="60" r="42"/></svg>
+  <div class="intro-label">ZOJEZU · OFFICIAL</div>
+</div>
+
+<canvas id="nebula" aria-hidden="true"></canvas>
+<canvas id="stardust" aria-hidden="true"></canvas>
+<div class="grain" aria-hidden="true"></div>
+<div class="cursor" id="cursor" aria-hidden="true"></div>
+<div class="cursor-dot" id="cursorDot" aria-hidden="true"></div>
+
+<!-- ============ Toast ============ -->
+<div class="toast" id="toast">
+  <svg id="toastIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"></svg>
+  <span id="toastText"></span>
+</div>
+
+<!-- ============ Rune easter-egg overlay ============ -->
+<div class="rune-burst" id="runeBurst" aria-hidden="true">
+  <svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" fill="url(#sealCore)"/>
+    <g fill="none" stroke="url(#ringGrad)" stroke-width="1">
+      <circle cx="100" cy="100" r="86"/><circle cx="100" cy="100" r="66" stroke-dasharray="4 6"/>
+      <polygon points="100,24 156,132 44,132"/><polygon points="100,176 44,68 156,68"/>
+    </g>
+  </svg>
+  <div class="rune-burst-label" data-i18n="egg_found">隠しルーンを発見！</div>
+</div>
+
+<!-- ============ Command palette ============ -->
+<div class="palette-veil" id="paletteVeil"></div>
+<div class="palette" id="palette" role="dialog" aria-label="Command palette">
+  <div class="palette-input">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+    <input type="text" id="paletteInput" placeholder="呪文を唱える（ページ / 設定を検索）…" autocomplete="off">
+    <kbd>ESC</kbd>
+  </div>
+  <div class="palette-list" id="paletteList"></div>
+</div>
+
+<!-- ============ Desktop dock ============ -->
+<aside class="dock" id="dock">
+  <button class="dock-mark" id="dockMark" aria-label="トップへ / 進捗">
+    <svg class="progress" viewBox="0 0 40 40"><circle cx="20" cy="20" r="17"></circle><circle class="bar" id="progressBar" cx="20" cy="20" r="17" stroke-dasharray="106.8" stroke-dashoffset="106.8"></circle></svg>
+    <span class="rune">Z</span>
+  </button>
+  <div class="dock-sep"></div>
+  <a class="dock-item" data-target="hero" href="#hero"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12 12 3l9 9"/><path d="M5 10v10h14V10"/></svg><span class="dock-tip">扉</span></a>
+  <a class="dock-item" data-target="main" href="#main"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span class="dock-tip" data-i18n="sec_main">宝物庫</span></a>
+  <a class="dock-item" data-target="witch" href="#witch"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M6 6l2.5 2.5M18 6l-2.5 2.5M4 14c0-3 3-5 8-5s8 2 8 5-3 8-8 8-8-5-8-8Z"/></svg><span class="dock-tip" data-i18n="sec_witch">魔女の館</span></a>
+  <a class="dock-item" data-target="contents" href="#contents"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg><span class="dock-tip" data-i18n="sec_contents">目録</span></a>
+  <a class="dock-item" data-target="sns" href="#sns"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="2"/><circle cx="5" cy="19" r="2"/><circle cx="19" cy="19" r="2"/><path d="M12 7v6M12 13 5 17M12 13l7 4"/></svg><span class="dock-tip" data-i18n="sec_sns">星座</span></a>
+  <a class="dock-item" data-target="embeds" href="#embeds"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="M9 4v16M4 9h5"/></svg><span class="dock-tip" data-i18n="sec_embed">魔法書</span></a>
+  <div class="dock-sep"></div>
+  <button class="dock-btn" id="paletteBtn" aria-label="検索"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></button>
+  <button class="dock-btn" id="settingsBtnD" aria-label="設定"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+</aside>
+
+<!-- ============ Mobile top bar ============ -->
+<header class="mbar" id="mbar">
+  <div class="brand"><span class="dot"></span> ZOJEZU</div>
+  <div class="acts">
+    <button id="paletteBtnM" aria-label="検索"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></button>
+    <button id="settingsBtnM" aria-label="設定"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+  </div>
+</header>
+
+<!-- ============ Mobile bottom tab dock ============ -->
+<nav class="tabbar" id="tabbar">
+  <a class="tab-item" data-target="hero" href="#hero"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12 12 3l9 9"/><path d="M5 10v10h14V10"/></svg>扉</a>
+  <a class="tab-item" data-target="main" href="#main"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>宝物庫</a>
+  <a class="tab-item" data-target="witch" href="#witch"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M6 6l2.5 2.5M18 6l-2.5 2.5M4 14c0-3 3-5 8-5s8 2 8 5-3 8-8 8-8-5-8-8Z"/></svg>魔女</a>
+  <a class="tab-item" data-target="sns" href="#sns"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="2"/><circle cx="5" cy="19" r="2"/><circle cx="19" cy="19" r="2"/><path d="M12 7v6M12 13 5 17M12 13l7 4"/></svg>星座</a>
+  <a class="tab-item" data-target="embeds" href="#embeds"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="M9 4v16M4 9h5"/></svg>魔法書</a>
+</nav>
+
+<!-- ============ Settings panel ============ -->
+<div class="settings-panel" id="settingsPanel" role="dialog" aria-label="設定">
+  <div class="settings-title"><span data-i18n="settings">設定</span><button class="settings-close" id="settingsClose">×</button></div>
+  <div class="settings-group">
+    <span class="settings-label" data-i18n="theme">テーマ</span>
+    <div class="settings-options" id="themeOptions">
+      <button data-value="auto" class="active" data-i18n="auto">自動</button>
+      <button data-value="dark" data-i18n="dark">ダーク</button>
+      <button data-value="light" data-i18n="light">ライト</button>
+    </div>
+  </div>
+  <div class="settings-group">
+    <span class="settings-label" data-i18n="language">言語</span>
+    <div class="settings-options" id="langOptions">
+      <button data-value="auto" class="active" data-i18n="auto">自動</button>
+      <button data-value="ja">日本語</button>
+      <button data-value="en">English</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================= MAIN STAGE ============================= -->
+<main class="stage" id="stage">
+
+  <!-- HERO -->
+  <section class="hero" id="hero">
+    <div class="hero-badge"><span class="dot"></span><span data-i18n="badge_realm">幻想世界へようこそ</span></div>
+    <div class="hero-seal" aria-hidden="true">
+      <svg viewBox="-200 -200 400 400">
+        <circle r="150" fill="url(#sealCore)"/>
+        <g fill="none" stroke="url(#ringGrad)" stroke-width="1">
+          <circle r="180" opacity=".7"/><circle r="168" opacity=".3" stroke-dasharray="2 7"/>
+          <circle r="128" stroke-dasharray="9 8" opacity=".7"/>
+          <polygon points="0,-118 102,59 -102,59" opacity=".55"/>
+          <polygon points="0,118 -102,-59 102,-59" opacity=".55"/>
+          <circle r="86" stroke-dasharray="1 5"/><circle r="56"/>
+        </g>
+        <g fill="url(#ringGrad)"><circle cx="180" cy="0" r="3"/><circle cx="-180" cy="0" r="3"/><circle cx="0" cy="180" r="3"/><circle cx="0" cy="-180" r="3"/></g>
+      </svg>
+    </div>
+    <h1><span data-i18n-html="hero_title">ZOJEZU 公式<br><span class="glow">星詠みの書斎</span></span></h1>
+    <p class="lead" data-i18n="hero_lead">ZOJEZU（ゾジェズ）公式サイトです。星と魔法陣が導く、少し不思議な創作の世界へ。</p>
+    <div class="hero-cta">
+      <a class="btn btn-primary magnetic" data-target="main" href="#main"><span data-i18n="cta_enter">世界を巡る</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      <a class="btn btn-ghost magnetic" href="https://zojezu.f5.si/ai"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2a4 4 0 0 1 4 4v1a4 4 0 0 1-8 0V6a4 4 0 0 1 4-4z"/><path d="M6 10v1a6 6 0 0 0 12 0v-1"/><path d="M9 18h6"/><path d="M10 21h4"/></svg><span data-i18n="cta_ai">AIと話す</span></a>
+    </div>
+    <div class="hero-scroll"><span data-i18n="scroll">SCROLL</span><div class="wheel"></div></div>
+  </section>
+
+  <div class="stagewrap">
+
+  <!-- NEWS -->
+  <section class="section" id="news">
+    <div class="announce">
+      <div class="announce-badge">✧ お知らせ ✧</div>
+      <div class="announce-title">活動名変更について</div>
+      <div class="announce-body">
+        <p>いつも応援ありがとうございます！<br>9月7日に、活動名を「おいさし」から「<strong>ZOJEZU（ゾジェズ）</strong>」へ変更いたしました。</p>
+        <div class="announce-sub">◆ 変更の理由</div>
+        <ul class="announce-list">
+          <li>キャラクター名と活動名を分けて分かりやすくするため</li>
+          <li>検索やタグ付けがしやすい短めのアルファベット表記にするため</li>
+        </ul>
+        <div class="announce-sub">◆ キャラクター「おいさし」について</div>
+        <p>キャラクターとしての「おいさし」は今後も変わらずそのまま登場します！</p>
+        <div class="announce-highlight">今後は「作者：ZOJEZU（ゾジェズ）」と「キャラ：おいさし」として活動してまいります。</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MAIN MENU (bento) -->
+  <section class="section" id="main">
+    <div class="sec-head"><div class="sec-num">Ⅰ</div><div><div class="sec-eyebrow" data-i18n="eyebrow_main">THE VAULT · 宝物庫</div><div class="sec-title" data-i18n="sec_main">メインメニュー</div></div><div class="sec-line"></div></div>
+    <div class="bento">
+      <a class="card big" href="https://zojezu.f5.si/music"><div class="card-icon">🎵</div><div class="card-title" data-i18n="card_music">ゾジェズミュージック</div><div class="card-desc" data-i18n="card_music_desc">公式音楽チャンネル・試聴</div><div class="card-arrow"><span>OPEN</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div></a>
+      <a class="card big" href="https://zojezu.f5.si/ai"><div class="card-icon">🤖</div><div class="card-title" data-i18n="card_ai">ゾジェズAI</div><div class="card-desc" data-i18n="card_ai_desc">AIとおしゃべりしよう</div><div class="card-arrow"><span>OPEN</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div></a>
+      <a class="card small" href="https://zojezu.f5.si/logo"><div class="card-icon">🎀</div><div class="card-title" data-i18n="card_logo">ロゴページ</div><div class="card-desc" data-i18n="card_logo_desc">公式ロゴ・ビジュアル</div><div class="card-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div></a>
+      <a class="card small" href="https://zojezu.f5.si/character"><div class="card-icon">👤</div><div class="card-title" data-i18n="card_char">キャラクター紹介</div><div class="card-desc" data-i18n="card_char_desc">メンバー・キャラ一覧</div><div class="card-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div></a>
+      <a class="card small" href="faq.html"><div class="card-icon">💬</div><div class="card-title" data-i18n="card_faq">FAQ</div><div class="card-desc" data-i18n="card_faq_desc">疑問をサクッと解決</div><div class="card-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div></a>
+    </div>
+  </section>
+
+  <!-- WITCH -->
+  <section class="section" id="witch">
+    <div class="sec-head"><div class="sec-num">Ⅱ</div><div><div class="sec-eyebrow" data-i18n="eyebrow_witch">THE WITCH · 魔女の館</div><div class="sec-title" data-i18n="sec_witch">おいじぃ魔女</div></div><div class="sec-line"></div></div>
+    <div class="duo">
+      <a class="card" href="oijiiw.html"><div class="card-icon">🔮</div><div class="card-title" data-i18n="card_witch">おいじぃ魔女のホームページ</div><div class="card-desc" data-i18n="card_witch_desc">魔女の世界へようこそ</div><div class="card-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div></a>
+      <a class="card" href="oijiizatu.html"><div class="card-icon">📖</div><div class="card-title" data-i18n="card_trivia">おいじぃ魔女のヤバい雑学</div><div class="card-desc" data-i18n="card_trivia_desc">衝撃の知識が満載</div><div class="card-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div></a>
+    </div>
+  </section>
+
+  <!-- CONTENTS -->
+  <section class="section" id="contents">
+    <div class="sec-head"><div class="sec-num">Ⅲ</div><div><div class="sec-eyebrow" data-i18n="eyebrow_contents">THE CATALOG · 目録</div><div class="sec-title" data-i18n="sec_contents">コンテンツ</div></div><div class="sec-line"></div></div>
+    <div class="pillrow">
+      <a class="pill" href="https://zojezu.f5.si/music"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg><span data-i18n="music">音楽</span></a>
+      <a class="pill" href="https://zojezu.f5.si/ai"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a4 4 0 0 1 4 4v1a4 4 0 0 1-8 0V6a4 4 0 0 1 4-4z"/><path d="M6 10v1a6 6 0 0 0 12 0v-1"/><path d="M9 18h6"/><path d="M10 21h4"/></svg><span data-i18n="ai_pill">AI</span></a>
+      <a class="pill" href="https://zojezu.f5.si/oijiiw.game"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 12h4M14 10v4M18 12h.01"/></svg><span data-i18n="game">ゲーム</span></a>
+      <a class="pill" href="https://oisasi.hatenablog.com"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg><span data-i18n="blog">ブログ</span></a>
+    </div>
+  </section>
+
+  <!-- SNS constellation -->
+  <section class="section" id="sns">
+    <div class="sec-head"><div class="sec-num">Ⅳ</div><div><div class="sec-eyebrow" data-i18n="eyebrow_sns">THE CONSTELLATION · 星座</div><div class="sec-title" data-i18n="sec_sns">SNS（ゾジェズ公式）</div></div><div class="sec-line"></div></div>
+    <div class="constellation">
+      <svg class="const-svg" id="constSvg"></svg>
+      <div class="const-nodes" id="constNodes">
+        <div class="node hub"><div class="ic">✦</div><span>ZOJEZU</span></div>
+        <a class="node" href="https://www.youtube.com/@zojezu" target="_blank" rel="noopener"><div class="ic" style="background:rgba(255,0,0,.15);color:#ff5252"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.5 31.5 0 0 0 0 12a31.5 31.5 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.5 31.5 0 0 0 24 12a31.5 31.5 0 0 0-.5-5.8zM9.75 15.5v-7l6.5 3.5-6.5 3.5z"/></svg></div><span>YouTube</span></a>
+        <a class="node" href="https://www.instagram.com/zojezu/" target="_blank" rel="noopener"><div class="ic" style="background:rgba(214,61,148,.15);color:var(--pink)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.2c3.2 0 3.6 0 4.9.1 3.3.1 4.8 1.7 4.9 4.9.1 1.3.1 1.7.1 4.9s0 3.6-.1 4.9c-.1 3.2-1.7 4.8-4.9 4.9-1.3.1-1.7.1-4.9.1s-3.6 0-4.9-.1c-3.3-.1-4.8-1.7-4.9-4.9-.1-1.3-.1-1.7-.1-4.9s0-3.6.1-4.9c.1-3.2 1.7-4.8 4.9-4.9 1.3-.1 1.7-.1 4.9-.1zM12 0C8.7 0 8.3 0 7 .1 2.7.3.3 2.7.1 7 0 8.3 0 8.7 0 12s0 3.7.1 5c.2 4.3 2.6 6.7 6.9 6.9 1.3.1 1.7.1 5 .1s3.7 0 5-.1c4.3-.2 6.7-2.6 6.9-6.9.1-1.3.1-1.7.1-5s0-3.7-.1-5c-.2-4.3-2.6-6.7-6.9-6.9C15.7 0 15.3 0 12 0zm0 5.8a6.2 6.2 0 1 0 0 12.4 6.2 6.2 0 0 0 0-12.4zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.4-10.5a1.4 1.4 0 1 1-2.9 0 1.4 1.4 0 0 1 2.9 0z"/></svg></div><span>Instagram</span></a>
+        <a class="node" href="https://www.facebook.com/zojez" target="_blank" rel="noopener"><div class="ic" style="background:rgba(66,103,178,.18);color:#7a9ee8"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.07C24 5.41 18.63 0 12 0S0 5.41 0 12.07C0 18.1 4.39 23.1 10.13 24v-8.44H7.08v-3.49h3.04V9.41c0-3.02 1.8-4.7 4.54-4.7 1.31 0 2.68.24 2.68.24v2.97h-1.5c-1.5 0-1.96.93-1.96 1.89v2.26h3.32l-.53 3.5h-2.8V24C19.62 23.1 24 18.1 24 12.07z"/></svg></div><span>Facebook</span></a>
+        <a class="node" href="https://x.com/zojezu" target="_blank" rel="noopener"><div class="ic" style="background:var(--glass-2)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.24 2.25h3.31l-7.23 8.26 8.5 11.24h-6.66l-5.21-6.82-5.97 6.82H1.67l7.73-8.84L1.25 2.25h6.83l4.71 6.23 5.45-6.23zm-1.16 17.52h1.83L7.03 4.13H5.05l12.03 15.64z"/></svg></div><span>X</span></a>
+        <a class="node" href="https://www.tiktok.com/@zojezu" target="_blank" rel="noopener"><div class="ic" style="background:rgba(87,232,255,.15);color:var(--cyan)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .56.04.83.11v-3.5a6.37 6.37 0 0 0-.83-.05A6.34 6.34 0 0 0 3.15 15.3a6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.34-6.34V8.73a8.18 8.18 0 0 0 4.76 1.52V6.79a4.84 4.84 0 0 1-1-.1z"/></svg></div><span>TikTok</span></a>
+      </div>
+    </div>
+    <p class="sns-note"><span data-i18n="sns_note">おいじぃ魔女・雑学のSNSはこちら</span> → <a href="https://lit.link/zojepu">lit.link/zojepu</a></p>
+  </section>
+
+  <!-- EMBEDS grimoire -->
+  <section class="section" id="embeds">
+    <div class="sec-head"><div class="sec-num">Ⅴ</div><div><div class="sec-eyebrow" data-i18n="eyebrow_embed">THE GRIMOIRE · 魔法の書</div><div class="sec-title" data-i18n="sec_embed">埋め込み投稿</div></div><div class="sec-line"></div></div>
+    <div class="grimoire">
+      <div class="grim-tabs" id="grimTabs">
+        <button class="grim-tab active" data-page="note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>note</button>
+        <button class="grim-tab" data-page="ig"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.2c3.2 0 3.6 0 4.9.1 3.3.1 4.8 1.7 4.9 4.9.1 1.3.1 1.7.1 4.9s0 3.6-.1 4.9c-.1 3.2-1.7 4.8-4.9 4.9-1.3.1-1.7.1-4.9.1s-3.6 0-4.9-.1c-3.3-.1-4.8-1.7-4.9-4.9-.1-1.3-.1-1.7-.1-4.9s0-3.6.1-4.9c.1-3.2 1.7-4.8 4.9-4.9 1.3-.1 1.7-.1 4.9-.1zM12 0C8.7 0 8.3 0 7 .1 2.7.3.3 2.7.1 7 0 8.3 0 8.7 0 12s0 3.7.1 5c.2 4.3 2.6 6.7 6.9 6.9 1.3.1 1.7.1 5 .1s3.7 0 5-.1c4.3-.2 6.7-2.6 6.9-6.9.1-1.3.1-1.7.1-5s0-3.7-.1-5c-.2-4.3-2.6-6.7-6.9-6.9C15.7 0 15.3 0 12 0zm0 5.8a6.2 6.2 0 1 0 0 12.4 6.2 6.2 0 0 0 0-12.4zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.4-10.5a1.4 1.4 0 1 1-2.9 0 1.4 1.4 0 0 1 2.9 0z"/></svg>Instagram</button>
+        <button class="grim-tab" data-page="fb"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.07C24 5.41 18.63 0 12 0S0 5.41 0 12.07C0 18.1 4.39 23.1 10.13 24v-8.44H7.08v-3.49h3.04V9.41c0-3.02 1.8-4.7 4.54-4.7 1.31 0 2.68.24 2.68.24v2.97h-1.5c-1.5 0-1.96.93-1.96 1.89v2.26h3.32l-.53 3.5h-2.8V24C19.62 23.1 24 18.1 24 12.07z"/></svg>Facebook</button>
+        <button class="grim-tab" data-page="yt"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.5 31.5 0 0 0 0 12a31.5 31.5 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.5 31.5 0 0 0 24 12a31.5 31.5 0 0 0-.5-5.8zM9.75 15.5v-7l6.5 3.5-6.5 3.5z"/></svg>YouTube</button>
+      </div>
+      <div class="grim-page active" data-page="note" data-loaded="0"></div>
+      <div class="grim-page" data-page="ig" data-loaded="0"></div>
+      <div class="grim-page" data-page="fb" data-loaded="0"></div>
+      <div class="grim-page" data-page="yt" data-loaded="0"></div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-runes">✦ ✧ ✦ ✧ ✦</div>
+    <div class="footer-pill"><span>✦</span><span data-i18n="footer">設定からテーマ・言語を変更できます</span></div>
+    <div class="footer-copy">© ZOJEZU Official</div>
+  </footer>
+
+  </div>
 </main>
 
-<!-- ヘッダー読み込み用スクリプト。body末尾に置けばOK（defer不要）。
-     head内に置く場合は defer 属性を付ける。 -->
-<script src="/assets/js/header.js"></script>
+<script>
+(function(){
+  "use strict";
+  var html = document.documentElement;
+  var body = document.body;
+
+  /* ---------------- i18n ---------------- */
+  var i18n = {
+    ja:{ settings:'設定', theme:'テーマ', language:'言語', auto:'自動', dark:'ダーク', light:'ライト',
+      badge_realm:'幻想世界へようこそ', hero_title:'ZOJEZU 公式<br><span class="glow">星詠みの書斎</span>',
+      hero_lead:'ZOJEZU（ゾジェズ）公式サイトです。星と魔法陣が導く、少し不思議な創作の世界へ。',
+      cta_enter:'世界を巡る', cta_ai:'AIと話す', scroll:'SCROLL',
+      eyebrow_main:'THE VAULT · 宝物庫', eyebrow_witch:'THE WITCH · 魔女の館', eyebrow_contents:'THE CATALOG · 目録',
+      eyebrow_sns:'THE CONSTELLATION · 星座', eyebrow_embed:'THE GRIMOIRE · 魔法の書',
+      sec_main:'メインメニュー', sec_witch:'おいじぃ魔女', sec_contents:'コンテンツ', sec_sns:'SNS（ゾジェズ公式）', sec_embed:'埋め込み投稿',
+      card_logo:'ロゴページ', card_logo_desc:'公式ロゴ・ビジュアル', card_char:'キャラクター紹介', card_char_desc:'メンバー・キャラ一覧',
+      card_faq:'FAQ', card_faq_desc:'疑問をサクッと解決', card_music:'ゾジェズミュージック', card_music_desc:'公式音楽チャンネル・試聴',
+      card_ai:'ゾジェズAI', card_ai_desc:'AIとおしゃべりしよう', card_witch:'おいじぃ魔女のホームページ', card_witch_desc:'魔女の世界へようこそ',
+      card_trivia:'おいじぃ魔女のヤバい雑学', card_trivia_desc:'衝撃の知識が満載',
+      music:'音楽', ai_pill:'AI', game:'ゲーム', blog:'ブログ', sns_note:'おいじぃ魔女・雑学のSNSはこちら',
+      footer:'ZOJEZU Official — 設定からテーマ・言語を変更できます',
+      offline_title:'オフラインです', online_desc:'インターネットに再接続しました', egg_found:'隠しルーンを発見！' },
+    en:{ settings:'Settings', theme:'Theme', language:'Language', auto:'Auto', dark:'Dark', light:'Light',
+      badge_realm:'Welcome to the Realm', hero_title:'ZOJEZU Official<br><span class="glow">Star-Reader\u2019s Atelier</span>',
+      hero_lead:'Welcome to the official ZOJEZU website — a realm guided by stars and runes.',
+      cta_enter:'Enter the Realm', cta_ai:'Talk to the AI', scroll:'SCROLL',
+      eyebrow_main:'THE VAULT', eyebrow_witch:'THE WITCH', eyebrow_contents:'THE CATALOG',
+      eyebrow_sns:'THE CONSTELLATION', eyebrow_embed:'THE GRIMOIRE',
+      sec_main:'Main Menu', sec_witch:'Oijii Witch', sec_contents:'Contents', sec_sns:'SNS (ZOJEZU Official)', sec_embed:'Featured Posts',
+      card_logo:'Logo Page', card_logo_desc:'Official logo & visuals', card_char:'Characters', card_char_desc:'Members & character list',
+      card_faq:'FAQ', card_faq_desc:'Quick answers', card_music:'ZOJEZU Music', card_music_desc:'Official music channel',
+      card_ai:'ZOJEZU AI', card_ai_desc:'Chat with the AI', card_witch:'Oijii Witch Homepage', card_witch_desc:'Welcome to the witch world',
+      card_trivia:'Oijii Witch Trivia', card_trivia_desc:'Shocking knowledge awaits',
+      music:'Music', ai_pill:'AI', game:'Games', blog:'Blog', sns_note:'Oijii Witch & trivia SNS',
+      footer:'ZOJEZU Official — Change theme & language in Settings',
+      offline_title:'You\u2019re offline', online_desc:'Your connection has been restored', egg_found:'Hidden rune discovered!' }
+  };
+  function resolveLang(pref){ if(pref==='ja'||pref==='en') return pref; var n=(navigator.language||'ja').toLowerCase(); return n.indexOf('ja')===0?'ja':'en'; }
+  var currentLangPref='auto';
+  function applyLang(pref){
+    currentLangPref=pref; try{localStorage.setItem('zojezu-lang',pref);}catch(e){}
+    var lang=resolveLang(pref); html.setAttribute('lang',lang);
+    document.querySelectorAll('#langOptions button').forEach(function(b){ b.classList.toggle('active', b.dataset.value===pref); });
+    var t=i18n[lang];
+    document.querySelectorAll('[data-i18n]').forEach(function(el){ var k=el.getAttribute('data-i18n'); if(t[k]!=null) el.textContent=t[k]; });
+    document.querySelectorAll('[data-i18n-html]').forEach(function(el){ var k=el.getAttribute('data-i18n-html'); if(t[k]!=null) el.innerHTML=t[k]; });
+  }
+  function tOf(key){ return i18n[resolveLang(currentLangPref)][key] || key; }
+
+  var savedTheme='auto', savedLang='auto';
+  try{ savedTheme=localStorage.getItem('zojezu-theme')||'auto'; savedLang=localStorage.getItem('zojezu-lang')||'auto'; }catch(e){}
+
+  function updateThemeColor(theme){
+    var meta=document.querySelector('meta[name="theme-color"]'); if(!meta) return;
+    if(theme==='light') meta.content='#f4f0ff';
+    else if(theme==='dark') meta.content='#07060f';
+    else meta.content = window.matchMedia('(prefers-color-scheme: light)').matches ? '#f4f0ff' : '#07060f';
+  }
+  function applyTheme(theme){
+    html.setAttribute('data-theme', theme); try{localStorage.setItem('zojezu-theme',theme);}catch(e){}
+    document.querySelectorAll('#themeOptions button').forEach(function(b){ b.classList.toggle('active', b.dataset.value===theme); });
+    updateThemeColor(theme);
+  }
+  applyTheme(savedTheme); applyLang(savedLang);
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(){ if(html.getAttribute('data-theme')==='auto') updateThemeColor('auto'); });
+
+  /* ---------------- settings panel ---------------- */
+  var settingsPanel=document.getElementById('settingsPanel');
+  function openSettings(){ settingsPanel.classList.add('open'); }
+  function closeSettings(){ settingsPanel.classList.remove('open'); }
+  function toggleSettings(){ settingsPanel.classList.contains('open')?closeSettings():openSettings(); }
+  ['settingsBtnD','settingsBtnM'].forEach(function(id){ var b=document.getElementById(id); if(b) b.addEventListener('click', function(e){ e.stopPropagation(); toggleSettings(); }); });
+  document.getElementById('settingsClose').addEventListener('click', closeSettings);
+  document.getElementById('themeOptions').addEventListener('click', function(e){ var b=e.target.closest('button'); if(b) applyTheme(b.dataset.value); });
+  document.getElementById('langOptions').addEventListener('click', function(e){ var b=e.target.closest('button'); if(b) applyLang(b.dataset.value); });
+  document.addEventListener('click', function(e){
+    if(settingsPanel.classList.contains('open') && !settingsPanel.contains(e.target) && e.target.id!=='settingsBtnD' && e.target.id!=='settingsBtnM' && !e.target.closest('#settingsBtnD') && !e.target.closest('#settingsBtnM')){ closeSettings(); }
+  });
+
+  /* ---------------- intro loader ---------------- */
+  window.addEventListener('load', function(){
+    setTimeout(function(){
+      document.getElementById('intro').classList.add('done');
+      body.classList.add('ready');
+    }, 900);
+  });
+  setTimeout(function(){ document.getElementById('intro').classList.add('done'); body.classList.add('ready'); }, 2600);
+
+  /* ---------------- smooth section navigation (custom easing) ---------------- */
+  function easeInOutQuint(t){ return t<0.5 ? 16*t*t*t*t*t : 1-Math.pow(-2*t+2,5)/2; }
+  function scrollToId(id){
+    var el=document.getElementById(id); if(!el) return;
+    var headerOffset = window.innerWidth<=900 ? 66 : 24;
+    var startY=window.pageYOffset, targetY=el.getBoundingClientRect().top+startY-headerOffset;
+    var dist=targetY-startY, duration=Math.min(900, 350+Math.abs(dist)*0.25), startTime=null;
+    function step(ts){ if(!startTime) startTime=ts; var p=Math.min((ts-startTime)/duration,1);
+      window.scrollTo(0, startY+dist*easeInOutQuint(p)); if(p<1) requestAnimationFrame(step); }
+    requestAnimationFrame(step);
+  }
+  document.querySelectorAll('[data-target]').forEach(function(a){
+    a.addEventListener('click', function(e){ e.preventDefault(); scrollToId(a.getAttribute('data-target')); });
+  });
+  document.getElementById('dockMark').addEventListener('click', function(){ scrollToId('hero'); });
+
+  /* ---------------- scrollspy + progress ring ---------------- */
+  var sectionIds=['hero','main','witch','contents','sns','embeds'];
+  var dockItems=document.querySelectorAll('.dock-item'); var tabItems=document.querySelectorAll('.tab-item');
+  var progressBar=document.getElementById('progressBar'); var CIRC=106.8;
+  function onScroll(){
+    var doc=document.documentElement; var max=doc.scrollHeight-doc.clientHeight;
+    var pct = max>0 ? window.scrollY/max : 0;
+    progressBar.style.strokeDashoffset = String(CIRC - CIRC*pct);
+    var current='hero'; var mid=window.scrollY+window.innerHeight*0.35;
+    sectionIds.forEach(function(id){ var el=document.getElementById(id); if(el && el.offsetTop<=mid) current=id; });
+    dockItems.forEach(function(d){ d.classList.toggle('active', d.dataset.target===current); });
+    tabItems.forEach(function(t){ t.classList.toggle('active', t.dataset.target===current); });
+  }
+  window.addEventListener('scroll', onScroll, {passive:true}); onScroll();
+
+  /* ---------------- reveal on scroll ---------------- */
+  var io=new IntersectionObserver(function(entries){ entries.forEach(function(en){ if(en.isIntersecting) en.target.classList.add('visible'); }); }, {threshold:.1, rootMargin:'0px 0px -60px 0px'});
+  document.querySelectorAll('.section').forEach(function(s){ io.observe(s); });
+
+  /* ---------------- fine-pointer cursor + magnetic + tilt ---------------- */
+  var fine = window.matchMedia('(hover:hover) and (pointer:fine)').matches;
+  if(fine){
+    html.classList.add('has-cursor');
+    var cur=document.getElementById('cursor'), dot=document.getElementById('cursorDot');
+    var cx=innerWidth/2, cy=innerHeight/2, dx=cx, dy=cy;
+    window.addEventListener('pointermove', function(e){ dx=e.clientX; dy=e.clientY; dot.style.left=dx+'px'; dot.style.top=dy+'px'; });
+    (function loop(){ cx+=(dx-cx)*0.18; cy+=(dy-cy)*0.18; cur.style.left=cx+'px'; cur.style.top=cy+'px'; requestAnimationFrame(loop); })();
+    document.querySelectorAll('a,button,.card,.pill,.node').forEach(function(el){
+      el.addEventListener('pointerenter', function(){ cur.classList.add('big'); });
+      el.addEventListener('pointerleave', function(){ cur.classList.remove('big'); });
+    });
+    document.querySelectorAll('.magnetic').forEach(function(el){
+      el.addEventListener('pointermove', function(e){ var r=el.getBoundingClientRect(); var mx=(e.clientX-r.left-r.width/2)*0.28; var my=(e.clientY-r.top-r.height/2)*0.35; el.style.transform='translate('+mx+'px,'+my+'px)'; });
+      el.addEventListener('pointerleave', function(){ el.style.transform=''; });
+    });
+    document.querySelectorAll('.card').forEach(function(card){
+      card.addEventListener('pointermove', function(e){
+        var r=card.getBoundingClientRect(); var px=(e.clientX-r.left)/r.width, py=(e.clientY-r.top)/r.height;
+        card.style.setProperty('--mx', (px*100)+'%'); card.style.setProperty('--my', (py*100)+'%');
+        var rx=(0.5-py)*7, ry=(px-0.5)*8;
+        card.style.transform='perspective(700px) rotateX('+rx+'deg) rotateY('+ry+'deg) translateY(-2px)';
+      });
+      card.addEventListener('pointerleave', function(){ card.style.transform=''; });
+    });
+  }
+
+  /* ---------------- command palette ---------------- */
+  var paletteItems=[
+    {icon:'⌂', label:'扉（トップ）', en:'Hero', target:'hero'},
+    {icon:'✦', label:'宝物庫（メインメニュー）', en:'Main Menu', target:'main'},
+    {icon:'🔮', label:'魔女の館（おいじぃ魔女）', en:'Oijii Witch', target:'witch'},
+    {icon:'☰', label:'目録（コンテンツ）', en:'Contents', target:'contents'},
+    {icon:'☆', label:'星座（SNS）', en:'SNS', target:'sns'},
+    {icon:'▤', label:'魔法の書（埋め込み投稿）', en:'Grimoire', target:'embeds'},
+    {icon:'♪', label:'ゾジェズミュージックを開く', en:'Open ZOJEZU Music', href:'https://zojezu.f5.si/music'},
+    {icon:'⚙', label:'ゾジェズAIと話す', en:'Talk to ZOJEZU AI', href:'https://zojezu.f5.si/ai'},
+    {icon:'✎', label:'設定を開く', en:'Open Settings', action:'settings'}
+  ];
+  var paletteVeil=document.getElementById('paletteVeil'), palette=document.getElementById('palette'), paletteInput=document.getElementById('paletteInput'), paletteList=document.getElementById('paletteList');
+  var pActive=0, pFiltered=paletteItems.slice();
+  function renderPalette(){
+    var q=paletteInput.value.trim().toLowerCase();
+    pFiltered=paletteItems.filter(function(it){ return !q || it.label.toLowerCase().indexOf(q)>-1 || it.en.toLowerCase().indexOf(q)>-1; });
+    pActive=0;
+    if(!pFiltered.length){ paletteList.innerHTML='<div class="palette-empty">見つかりませんでした</div>'; return; }
+    paletteList.innerHTML=pFiltered.map(function(it,i){ return '<div class="palette-item'+(i===0?' active':'')+'" data-i="'+i+'"><span>'+it.icon+'</span><b>'+it.label+'</b></div>'; }).join('');
+  }
+  function openPalette(){ paletteVeil.classList.add('open'); palette.classList.add('open'); paletteInput.value=''; renderPalette(); setTimeout(function(){ paletteInput.focus(); },50); }
+  function closePalette(){ paletteVeil.classList.remove('open'); palette.classList.remove('open'); }
+  function choose(i){
+    var it=pFiltered[i]; if(!it) return; closePalette();
+    if(it.target) scrollToId(it.target);
+    else if(it.href) window.open(it.href,'_blank');
+    else if(it.action==='settings') openSettings();
+  }
+  ['paletteBtn','paletteBtnM'].forEach(function(id){ var b=document.getElementById(id); if(b) b.addEventListener('click', openPalette); });
+  paletteVeil.addEventListener('click', closePalette);
+  paletteInput.addEventListener('input', renderPalette);
+  paletteList.addEventListener('click', function(e){ var el=e.target.closest('.palette-item'); if(el) choose(parseInt(el.dataset.i,10)); });
+  document.addEventListener('keydown', function(e){
+    if((e.metaKey||e.ctrlKey) && e.key.toLowerCase()==='k'){ e.preventDefault(); palette.classList.contains('open')?closePalette():openPalette(); return; }
+    if(e.key==='/' && document.activeElement.tagName!=='INPUT'){ e.preventDefault(); openPalette(); return; }
+    if(!palette.classList.contains('open')){ if(e.key==='Escape') closeSettings(); return; }
+    if(e.key==='Escape'){ closePalette(); }
+    else if(e.key==='ArrowDown'){ e.preventDefault(); pActive=Math.min(pActive+1,pFiltered.length-1); updateActive(); }
+    else if(e.key==='ArrowUp'){ e.preventDefault(); pActive=Math.max(pActive-1,0); updateActive(); }
+    else if(e.key==='Enter'){ e.preventDefault(); choose(pActive); }
+  });
+  function updateActive(){ paletteList.querySelectorAll('.palette-item').forEach(function(el,i){ el.classList.toggle('active', i===pActive); }); var act=paletteList.querySelector('.active'); if(act) act.scrollIntoView({block:'nearest'}); }
+
+  /* ---------------- lazy grimoire tabs ---------------- */
+  var grimTabs=document.getElementById('grimTabs');
+  var pageSources={
+    note:'<iframe class="note-embed" src="https://note.com/embed/notes/nacc6adb6d4e5" style="border:0;display:block;max-width:99%;width:494px;padding:0;margin:0;" height="400"></iframe>',
+    ig:'<blockquote class="instagram-media" data-instgrm-captioned data-instgrm-permalink="https://www.instagram.com/reel/DcUmkTwj5ND/?utm_source=ig_embed" data-instgrm-version="14" style="background:#FFF;border:0;border-radius:3px;box-shadow:0 0 1px 0 rgba(0,0,0,.5),0 1px 10px 0 rgba(0,0,0,.15);margin:1px;max-width:540px;min-width:280px;padding:0;width:99.375%;"><div style="padding:16px;"><a href="https://www.instagram.com/reel/DcUmkTwj5ND/?utm_source=ig_embed" style="background:#FFF;line-height:0;padding:0;text-align:center;text-decoration:none;width:100%;" target="_blank">この投稿をInstagramで見る</a></div></blockquote>',
+    fb:'<iframe src="https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2Fzojepu%2Fposts%2Fpfbid0v9dcWexQZPNZpBeLtUS7gREUAXPmT3KK7JDfBccAMLx5KQQqsLToXtqkgccoy4V4l&show_text=true&width=500" width="500" height="500" style="border:none;overflow:hidden;max-width:100%" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"></iframe>',
+    yt:'<iframe width="100%" height="400" style="max-width:640px;border-radius:14px" src="https://www.youtube.com/embed/53po8361bYA?si=HYPaG8YlupnQ_pGm" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>'
+  };
+  var scriptsLoaded={ig:false, note:false};
+  function ensureScript(src){ var s=document.createElement('script'); s.async=true; s.src=src; document.body.appendChild(s); }
+  function activateGrimPage(name){
+    document.querySelectorAll('.grim-tab').forEach(function(t){ t.classList.toggle('active', t.dataset.page===name); });
+    document.querySelectorAll('.grim-page').forEach(function(p){ p.classList.toggle('active', p.dataset.page===name); });
+    var pg=document.querySelector('.grim-page[data-page="'+name+'"]');
+    if(pg && pg.dataset.loaded==='0'){
+      pg.innerHTML='<div class="grim-loading"><div class="spin"></div><span>読み込み中…</span></div>';
+      setTimeout(function(){ pg.innerHTML=pageSources[name]; pg.dataset.loaded='1';
+        if(name==='ig' && !scriptsLoaded.ig){ scriptsLoaded.ig=true; ensureScript('https://www.instagram.com/embed.js'); }
+        else if(name==='ig' && window.instgrm){ window.instgrm.Embeds.process(); }
+        if(name==='note' && !scriptsLoaded.note){ scriptsLoaded.note=true; ensureScript('https://note.com/scripts/embed.js'); }
+      }, 260);
+    }
+  }
+  grimTabs.addEventListener('click', function(e){ var b=e.target.closest('.grim-tab'); if(b) activateGrimPage(b.dataset.page); });
+  activateGrimPage('note');
+
+  /* ---------------- constellation lines ---------------- */
+  function drawConstellation(){
+    var svg=document.getElementById('constSvg'); var wrap=document.getElementById('constNodes');
+    var hub=wrap.querySelector('.hub'); var nodes=wrap.querySelectorAll('.node:not(.hub)');
+    var wr=wrap.getBoundingClientRect(); svg.setAttribute('width', wr.width); svg.setAttribute('height', wr.height);
+    var hr=hub.getBoundingClientRect(); var hx=hr.left-wr.left+hr.width/2, hy=hr.top-wr.top+hr.height/2;
+    var lines='';
+    nodes.forEach(function(n){ var r=n.getBoundingClientRect(); var nx=r.left-wr.left+r.width/2, ny=r.top-wr.top+r.height/2;
+      lines+='<line x1="'+hx+'" y1="'+hy+'" x2="'+nx+'" y2="'+ny+'"></line>'; });
+    svg.innerHTML=lines;
+  }
+  window.addEventListener('resize', drawConstellation);
+  window.addEventListener('load', drawConstellation);
+  setTimeout(drawConstellation, 1200);
+  var constObs=new IntersectionObserver(function(entries){ entries.forEach(function(en){ if(en.isIntersecting) setTimeout(drawConstellation,50); }); }, {threshold:.2});
+  constObs.observe(document.getElementById('sns'));
+
+  /* ---------------- hidden rune easter egg ---------------- */
+  var buf=''; var burst=document.getElementById('runeBurst');
+  document.addEventListener('keydown', function(e){
+    if(e.key.length===1){ buf=(buf+e.key).slice(-6).toLowerCase(); if(buf==='zojezu'){ burst.classList.add('show'); setTimeout(function(){ burst.classList.remove('show'); }, 2200); } }
+  });
+  var logoTaps=0, logoTapTimer=null;
+  document.getElementById('dockMark').addEventListener('dblclick', function(){ burst.classList.add('show'); setTimeout(function(){ burst.classList.remove('show'); }, 2200); });
+
+  /* ---------------- network toast ---------------- */
+  var toast=document.getElementById('toast'), toastText=document.getElementById('toastText'), toastIcon=document.getElementById('toastIcon');
+  var offlineSVG='<line x1="1" y1="1" x2="23" y2="23"/><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/><path d="M10.71 5.05A16 16 0 0 1 22.58 9"/><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/>';
+  var onlineSVG='<path d="M20 6L9 17l-5-5"/>';
+  var isOfflineShown=false, toastTimer=null;
+  function showToast(type){
+    clearTimeout(toastTimer); toast.classList.remove('offline','online','show'); void toast.offsetWidth;
+    if(type==='offline'){ isOfflineShown=true; toast.classList.add('offline'); toastText.textContent=tOf('offline_title'); toastIcon.innerHTML=offlineSVG; toast.classList.add('show'); }
+    else { isOfflineShown=false; toast.classList.add('online'); toastText.textContent=tOf('online_desc'); toastIcon.innerHTML=onlineSVG; toast.classList.add('show'); toastTimer=setTimeout(function(){ toast.classList.remove('show'); }, 3200); }
+  }
+  window.addEventListener('offline', function(){ showToast('offline'); });
+  window.addEventListener('online', function(){ if(isOfflineShown) showToast('online'); });
+  if(navigator.onLine===false) showToast('offline');
+
+  /* ---------------- ambient nebula + stardust canvases ---------------- */
+  (function(){
+    var reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var neb=document.getElementById('nebula'), nctx=neb.getContext('2d');
+    var star=document.getElementById('stardust'), sctx=star.getContext('2d');
+    var w,h,dpr,blobs,particles, px=0.5, py=0.4;
+    function isDark(){ return getComputedStyle(html).getPropertyValue('--ink').trim().toLowerCase()!=='#f4f0ff'; }
+    function resize(){
+      dpr=Math.min(devicePixelRatio||1,2);
+      w=neb.width=star.width=innerWidth*dpr; h=neb.height=star.height=innerHeight*dpr;
+      neb.style.width=star.style.width=innerWidth+'px'; neb.style.height=star.style.height=innerHeight+'px';
+      blobs=[
+        {x:w*0.25,y:h*0.3,r:w*0.28,c:'99,89,255',s:0.00018,p:0},
+        {x:w*0.75,y:h*0.6,r:w*0.24,c:'255,95,168',s:0.00022,p:2},
+        {x:w*0.5,y:h*0.85,r:w*0.22,c:'87,232,255',s:0.00015,p:4}
+      ];
+      var mobile=innerWidth<700;
+      var count = reduce ? 0 : (mobile?36:80);
+      particles=Array.from({length:count},function(){ return { x:Math.random()*w, y:Math.random()*h, r:(Math.random()*1.3+.3)*dpr, vx:(Math.random()-.5)*.1*dpr, vy:(Math.random()-.5)*.1*dpr, hue:[330,265,190][Math.floor(Math.random()*3)], a:Math.random()*.6+.2, p:Math.random()*6.28 }; });
+    }
+    window.addEventListener('pointermove', function(e){ px=e.clientX/innerWidth; py=e.clientY/innerHeight; });
+    function draw(t){
+      nctx.clearRect(0,0,w,h);
+      var dark=isDark(); nctx.globalCompositeOperation = dark ? 'lighter' : 'source-over';
+      blobs.forEach(function(b,i){
+        var bx=b.x+Math.sin(t*b.s+b.p)*w*0.05+(px-0.5)*w*0.05;
+        var by=b.y+Math.cos(t*b.s*1.3+b.p)*h*0.05+(py-0.5)*h*0.05;
+        var g=nctx.createRadialGradient(bx,by,0,bx,by,b.r);
+        var alpha = dark ? 0.16 : 0.10;
+        g.addColorStop(0,'rgba('+b.c+','+alpha+')'); g.addColorStop(1,'rgba('+b.c+',0)');
+        nctx.fillStyle=g; nctx.beginPath(); nctx.arc(bx,by,b.r,0,6.28); nctx.fill();
+      });
+      sctx.clearRect(0,0,w,h);
+      particles.forEach(function(p){
+        p.x+=p.vx; p.y+=p.vy; if(p.x<0)p.x=w; if(p.x>w)p.x=0; if(p.y<0)p.y=h; if(p.y>h)p.y=0;
+        var tw=0.55+0.45*Math.sin(t*0.001+p.p);
+        sctx.beginPath(); sctx.fillStyle='hsla('+p.hue+',90%,75%,'+(p.a*tw)+')'; sctx.arc(p.x,p.y,p.r,0,6.28); sctx.fill();
+      });
+      requestAnimationFrame(draw);
+    }
+    resize(); addEventListener('resize', resize); requestAnimationFrame(draw);
+  })();
+
+})();
+</script>
 </body>
 </html>
