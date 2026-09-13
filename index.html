@@ -3,18 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>ZOJEZU 公式ホームページ | 星詠みの書斎</title>
-<meta name="description" content="ZOJEZU（ゾジェズ）公式ホームページ — 星と魔法陣が導く創作の書斎">
+<title>ZoJeZu 公式ホームページ | 星詠みの書斎</title>
+<meta name="description" content="ZoJeZu（ゾジェズ）公式ホームページ — 星と魔法陣が導く創作の書斎">
 <meta name="theme-color" content="#07060f">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;900&family=Zen+Maru+Gothic:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
 /* =====================================================================
-   ZOJEZU OFFICIAL — "星詠みの書斎" (The Star-Reader's Atelier)
+   ZoJeZu OFFICIAL — "星詠みの書斎" (The Star-Reader's Atelier)
    Concept: an open grimoire / creator's writing-desk, not a video hero.
-   Desktop = vertical dock + flowing atelier bento layout.
-   Mobile  = app-like top bar + bottom tab dock + snap "book page" sections.
+   Shared fixed header (see header.html) + flowing atelier bento layout,
+   with a slide-down mobile menu on small screens.
    ===================================================================== */
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -115,63 +115,9 @@ button{ font:inherit; color:inherit; background:none; border:0; }
 .stage{ opacity:0; transform:translateY(14px); filter:blur(6px); transition:opacity .9s cubic-bezier(.16,1,.3,1), transform .9s cubic-bezier(.16,1,.3,1), filter .9s cubic-bezier(.16,1,.3,1); position:relative; z-index:3; }
 body.ready .stage{ opacity:1; transform:translateY(0); filter:blur(0); }
 
-/* ================= DESKTOP DOCK ================= */
-.dock{
-  position:fixed; left:18px; top:50%; transform:translateY(-50%); z-index:60;
-  display:flex; flex-direction:column; align-items:center; gap:10px;
-  padding:14px 9px; border-radius:26px; background:var(--glass); backdrop-filter:blur(18px) saturate(160%);
-  border:1px solid var(--line); box-shadow:var(--shadow);
-}
-.dock-mark{ position:relative; width:40px; height:40px; display:grid; place-items:center; margin-bottom:6px; }
-.dock-mark svg.progress{ position:absolute; inset:0; transform:rotate(-90deg); }
-.dock-mark svg.progress circle{ fill:none; stroke:var(--line); stroke-width:2; }
-.dock-mark svg.progress circle.bar{ stroke:url(#dockGrad); stroke-linecap:round; transition:stroke-dashoffset .1s linear; }
-.dock-mark .rune{ font-family:'Cinzel',serif; font-weight:900; font-size:13px; background:linear-gradient(120deg,var(--pink),var(--violet),var(--cyan)); -webkit-background-clip:text; background-clip:text; color:transparent; }
-.dock-item{
-  width:42px; height:42px; border-radius:14px; display:grid; place-items:center; position:relative;
-  color:var(--muted); transition:color .25s, background .25s, transform .25s;
-}
-.dock-item svg{ width:18px; height:18px; }
-.dock-item:hover, .dock-item.active{ color:var(--text); background:var(--glass-2); transform:translateX(3px); }
-.dock-item.active::before{ content:''; position:absolute; left:-9px; width:4px; height:16px; border-radius:3px; background:linear-gradient(var(--pink),var(--cyan)); }
-.dock-tip{
-  position:absolute; left:56px; top:50%; transform:translateY(-50%) translateX(-6px); white-space:nowrap;
-  background:var(--panel-2); border:1px solid var(--line); padding:6px 12px; border-radius:10px; font-size:12.5px;
-  opacity:0; pointer-events:none; transition:opacity .2s, transform .2s; box-shadow:var(--shadow);
-}
-.dock-item:hover .dock-tip{ opacity:1; transform:translateY(-50%) translateX(0); }
-.dock-sep{ width:22px; height:1px; background:var(--line); margin:4px 0; }
-.dock-btn{ width:42px; height:42px; border-radius:14px; display:grid; place-items:center; color:var(--muted); }
-.dock-btn:hover{ color:var(--text); background:var(--glass-2); }
-.dock-btn svg{ width:17px; height:17px; }
-
-@media (max-width:900px){ .dock{ display:none; } }
-@media (min-width:901px){
-  .mbar, .tabbar, .fab{ display:none !important; }
-}
-
-/* ================= MOBILE TOP BAR + TAB DOCK ================= */
-.mbar{
-  position:fixed; top:0; left:0; right:0; z-index:55; height:58px; padding:0 14px;
-  display:flex; align-items:center; justify-content:space-between;
-  background:var(--glass); backdrop-filter:blur(16px) saturate(160%); border-bottom:1px solid var(--line);
-}
-.mbar .brand{ display:flex; align-items:center; gap:8px; font-family:'Cinzel',serif; font-weight:700; font-size:14px; letter-spacing:.06em; }
-.mbar .brand .dot{ width:9px; height:9px; border-radius:50%; background:linear-gradient(135deg,var(--pink),var(--cyan)); box-shadow:0 0 10px var(--pink); }
-.mbar .acts{ display:flex; gap:6px; }
-.mbar button{ width:36px; height:36px; border-radius:11px; display:grid; place-items:center; color:var(--muted); }
-.mbar button svg{ width:17px; height:17px; }
-.mbar button:active{ background:var(--glass-2); color:var(--text); }
-
-.tabbar{
-  position:fixed; left:12px; right:12px; bottom:12px; z-index:55; height:64px; border-radius:22px;
-  background:var(--glass); backdrop-filter:blur(18px) saturate(160%); border:1px solid var(--line);
-  display:flex; align-items:center; justify-content:space-around; box-shadow:var(--shadow);
-}
-.tab-item{ display:flex; flex-direction:column; align-items:center; gap:3px; color:var(--muted); font-size:10px; width:20%; padding:8px 0; position:relative; }
-.tab-item svg{ width:19px; height:19px; }
-.tab-item.active{ color:var(--text); }
-.tab-item.active::after{ content:''; position:absolute; top:2px; width:4px; height:4px; border-radius:50%; background:var(--pink); box-shadow:0 0 8px var(--pink); }
+/* ================= COMMON HEADER (loaded from header.html) ================= */
+/* NOTE: .header / .logo / .nav-desktop / .icon-btn / .hamburger / .nav-mobile styles
+   now live in header.html, which is fetched and injected into #headerRoot at runtime. */
 
 /* ================= HEADER-LESS HERO (no video file) ================= */
 .hero{
@@ -323,11 +269,10 @@ footer{ text-align:center; padding:70px 24px 130px; }
 
 /* ================= SETTINGS PANEL ================= */
 .settings-panel{
-  position:fixed; top:70px; right:16px; z-index:120; width:250px; background:var(--panel-2); border:1px solid var(--line);
+  position:fixed; top:calc(var(--header-h, 64px) + 12px); right:16px; z-index:1100; width:250px; background:var(--panel-2); border:1px solid var(--line);
   border-radius:18px; padding:18px; box-shadow:var(--shadow); opacity:0; visibility:hidden; transform:translateY(-8px);
   transition:opacity .25s, transform .25s, visibility .25s;
 }
-@media (min-width:901px){ .settings-panel{ top:auto; right:auto; left:74px; bottom:18px; } }
 .settings-panel.open{ opacity:1; visibility:visible; transform:translateY(0); }
 .settings-title{ display:flex; justify-content:space-between; align-items:center; font-weight:700; margin-bottom:14px; font-size:14px; }
 .settings-close{ font-size:18px; color:var(--muted); }
@@ -343,8 +288,6 @@ footer{ text-align:center; padding:70px 24px 130px; }
   display:flex; align-items:center; gap:10px; padding:12px 20px; border-radius:14px; background:var(--panel-2);
   border:1px solid var(--line-strong); box-shadow:var(--shadow); font-size:13px; transition:transform .4s cubic-bezier(.16,1,.3,1);
 }
-@media (min-width:901px){ .toast{ bottom:24px; } }
-@media (max-width:900px){ .toast{ bottom:92px; } }
 .toast.show{ transform:translateX(-50%) translateY(0); }
 .toast svg{ width:16px; height:16px; }
 .toast.offline svg{ color:var(--pink); }
@@ -358,19 +301,15 @@ footer{ text-align:center; padding:70px 24px 130px; }
 .rune-burst-label{ position:absolute; bottom:18%; font-family:'Cinzel',serif; letter-spacing:.3em; font-size:13px; color:var(--gold); text-transform:uppercase; }
 
 /* ================= RESPONSIVE: layout truly differs ================= */
-@media (min-width:901px){
-  .hero{ padding-top:60px; }
-  body{ padding-left:0; }
-}
+body{ padding-top:var(--header-h, 64px); }
 @media (max-width:900px){
-  body{ padding-top:58px; padding-bottom:88px; }
   .stagewrap{ padding:0 18px; }
   .bento{ grid-template-columns:1fr; }
   .card, .card.big, .card.small{ grid-column:1/-1; }
   .duo{ grid-template-columns:1fr; }
   .section{ padding:64px 0 10px; scroll-margin-top:70px; }
   .sec-head{ align-items:center; }
-  .hero{ min-height:calc(100dvh - 58px); padding-top:40px; }
+  .hero{ min-height:calc(100dvh - var(--header-h, 64px)); padding-top:40px; }
   .const-nodes{ gap:14px; }
   .node{ width:88px; padding:13px 6px; }
 }
@@ -387,9 +326,6 @@ footer{ text-align:center; padding:70px 24px 130px; }
     <linearGradient id="introGrad" x1="0" x2="1" y1="0" y2="1">
       <stop offset="0%" stop-color="#ff5fa8"/><stop offset="50%" stop-color="#8b6cff"/><stop offset="100%" stop-color="#57e8ff"/>
     </linearGradient>
-    <linearGradient id="dockGrad" x1="0" x2="1" y1="0" y2="1">
-      <stop offset="0%" stop-color="#ff5fa8"/><stop offset="100%" stop-color="#57e8ff"/>
-    </linearGradient>
     <radialGradient id="sealCore" cx="0" cy="0" r="0.5">
       <stop offset="0%" stop-color="rgba(255,95,168,.5)"/><stop offset="60%" stop-color="rgba(139,108,255,.14)"/><stop offset="100%" stop-color="rgba(0,0,0,0)"/>
     </radialGradient>
@@ -402,7 +338,7 @@ footer{ text-align:center; padding:70px 24px 130px; }
 <!-- Intro loader -->
 <div class="intro" id="intro" aria-hidden="true">
   <svg viewBox="0 0 120 120"><circle class="ring" cx="60" cy="60" r="54"/><circle class="ring2" cx="60" cy="60" r="42"/></svg>
-  <div class="intro-label">ZOJEZU · OFFICIAL</div>
+  <div class="intro-label">ZoJeZu · OFFICIAL</div>
 </div>
 
 <canvas id="nebula" aria-hidden="true"></canvas>
@@ -439,41 +375,8 @@ footer{ text-align:center; padding:70px 24px 130px; }
   <div class="palette-list" id="paletteList"></div>
 </div>
 
-<!-- ============ Desktop dock ============ -->
-<aside class="dock" id="dock">
-  <button class="dock-mark" id="dockMark" aria-label="トップへ / 進捗">
-    <svg class="progress" viewBox="0 0 40 40"><circle cx="20" cy="20" r="17"></circle><circle class="bar" id="progressBar" cx="20" cy="20" r="17" stroke-dasharray="106.8" stroke-dashoffset="106.8"></circle></svg>
-    <span class="rune">Z</span>
-  </button>
-  <div class="dock-sep"></div>
-  <a class="dock-item" data-target="hero" href="#hero"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12 12 3l9 9"/><path d="M5 10v10h14V10"/></svg><span class="dock-tip">扉</span></a>
-  <a class="dock-item" data-target="main" href="#main"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span class="dock-tip" data-i18n="sec_main">宝物庫</span></a>
-  <a class="dock-item" data-target="witch" href="#witch"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M6 6l2.5 2.5M18 6l-2.5 2.5M4 14c0-3 3-5 8-5s8 2 8 5-3 8-8 8-8-5-8-8Z"/></svg><span class="dock-tip" data-i18n="sec_witch">魔女の館</span></a>
-  <a class="dock-item" data-target="contents" href="#contents"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg><span class="dock-tip" data-i18n="sec_contents">目録</span></a>
-  <a class="dock-item" data-target="sns" href="#sns"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="2"/><circle cx="5" cy="19" r="2"/><circle cx="19" cy="19" r="2"/><path d="M12 7v6M12 13 5 17M12 13l7 4"/></svg><span class="dock-tip" data-i18n="sec_sns">星座</span></a>
-  <a class="dock-item" data-target="embeds" href="#embeds"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="M9 4v16M4 9h5"/></svg><span class="dock-tip" data-i18n="sec_embed">魔法書</span></a>
-  <div class="dock-sep"></div>
-  <button class="dock-btn" id="paletteBtn" aria-label="検索"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></button>
-  <button class="dock-btn" id="settingsBtnD" aria-label="設定"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
-</aside>
-
-<!-- ============ Mobile top bar ============ -->
-<header class="mbar" id="mbar">
-  <div class="brand"><span class="dot"></span> ZOJEZU</div>
-  <div class="acts">
-    <button id="paletteBtnM" aria-label="検索"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></button>
-    <button id="settingsBtnM" aria-label="設定"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
-  </div>
-</header>
-
-<!-- ============ Mobile bottom tab dock ============ -->
-<nav class="tabbar" id="tabbar">
-  <a class="tab-item" data-target="hero" href="#hero"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12 12 3l9 9"/><path d="M5 10v10h14V10"/></svg>扉</a>
-  <a class="tab-item" data-target="main" href="#main"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>宝物庫</a>
-  <a class="tab-item" data-target="witch" href="#witch"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M6 6l2.5 2.5M18 6l-2.5 2.5M4 14c0-3 3-5 8-5s8 2 8 5-3 8-8 8-8-5-8-8Z"/></svg>魔女</a>
-  <a class="tab-item" data-target="sns" href="#sns"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="2"/><circle cx="5" cy="19" r="2"/><circle cx="19" cy="19" r="2"/><path d="M12 7v6M12 13 5 17M12 13l7 4"/></svg>星座</a>
-  <a class="tab-item" data-target="embeds" href="#embeds"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="M9 4v16M4 9h5"/></svg>魔法書</a>
-</nav>
+<!-- ============ Shared header (loaded from header.html) ============ -->
+<div id="headerRoot"></div>
 
 <!-- ============ Settings panel ============ -->
 <div class="settings-panel" id="settingsPanel" role="dialog" aria-label="設定">
@@ -515,8 +418,8 @@ footer{ text-align:center; padding:70px 24px 130px; }
         <g fill="url(#ringGrad)"><circle cx="180" cy="0" r="3"/><circle cx="-180" cy="0" r="3"/><circle cx="0" cy="180" r="3"/><circle cx="0" cy="-180" r="3"/></g>
       </svg>
     </div>
-    <h1><span data-i18n-html="hero_title">ZOJEZU 公式<br><span class="glow">星詠みの書斎</span></span></h1>
-    <p class="lead" data-i18n="hero_lead">ZOJEZU（ゾジェズ）公式サイトです。星と魔法陣が導く、少し不思議な創作の世界へ。</p>
+    <h1><span data-i18n-html="hero_title">ZoJeZu 公式<br><span class="glow">星詠みの書斎</span></span></h1>
+    <p class="lead" data-i18n="hero_lead">ZoJeZu（ゾジェズ）公式サイトです。星と魔法陣が導く、少し不思議な創作の世界へ。</p>
     <div class="hero-cta">
       <a class="btn btn-primary magnetic" data-target="main" href="#main"><span data-i18n="cta_enter">世界を巡る</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
       <a class="btn btn-ghost magnetic" href="https://zojezu.f5.si/ai"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2a4 4 0 0 1 4 4v1a4 4 0 0 1-8 0V6a4 4 0 0 1 4-4z"/><path d="M6 10v1a6 6 0 0 0 12 0v-1"/><path d="M9 18h6"/><path d="M10 21h4"/></svg><span data-i18n="cta_ai">AIと話す</span></a>
@@ -532,7 +435,7 @@ footer{ text-align:center; padding:70px 24px 130px; }
       <div class="announce-badge">✧ お知らせ ✧</div>
       <div class="announce-title">活動名変更について</div>
       <div class="announce-body">
-        <p>いつも応援ありがとうございます！<br>9月7日に、活動名を「おいさし」から「<strong>ZOJEZU（ゾジェズ）</strong>」へ変更いたしました。</p>
+        <p>いつも応援ありがとうございます！<br>9月7日に、活動名を「おいさし」から「<strong>ZoJeZu（ゾジェズ）</strong>」へ変更いたしました。</p>
         <div class="announce-sub">◆ 変更の理由</div>
         <ul class="announce-list">
           <li>キャラクター名と活動名を分けて分かりやすくするため</li>
@@ -540,7 +443,7 @@ footer{ text-align:center; padding:70px 24px 130px; }
         </ul>
         <div class="announce-sub">◆ キャラクター「おいさし」について</div>
         <p>キャラクターとしての「おいさし」は今後も変わらずそのまま登場します！</p>
-        <div class="announce-highlight">今後は「作者：ZOJEZU（ゾジェズ）」と「キャラ：おいさし」として活動してまいります。</div>
+        <div class="announce-highlight">今後は「作者：ZoJeZu（ゾジェズ）」と「キャラ：おいさし」として活動してまいります。</div>
       </div>
     </div>
   </section>
@@ -583,7 +486,7 @@ footer{ text-align:center; padding:70px 24px 130px; }
     <div class="constellation">
       <svg class="const-svg" id="constSvg"></svg>
       <div class="const-nodes" id="constNodes">
-        <div class="node hub"><div class="ic">✦</div><span>ZOJEZU</span></div>
+        <div class="node hub"><div class="ic">✦</div><span>ZoJeZu</span></div>
         <a class="node" href="https://www.youtube.com/@zojezu" target="_blank" rel="noopener"><div class="ic" style="background:rgba(255,0,0,.15);color:#ff5252"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.5 31.5 0 0 0 0 12a31.5 31.5 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.5 31.5 0 0 0 24 12a31.5 31.5 0 0 0-.5-5.8zM9.75 15.5v-7l6.5 3.5-6.5 3.5z"/></svg></div><span>YouTube</span></a>
         <a class="node" href="https://www.instagram.com/zojezu/" target="_blank" rel="noopener"><div class="ic" style="background:rgba(214,61,148,.15);color:var(--pink)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.2c3.2 0 3.6 0 4.9.1 3.3.1 4.8 1.7 4.9 4.9.1 1.3.1 1.7.1 4.9s0 3.6-.1 4.9c-.1 3.2-1.7 4.8-4.9 4.9-1.3.1-1.7.1-4.9.1s-3.6 0-4.9-.1c-3.3-.1-4.8-1.7-4.9-4.9-.1-1.3-.1-1.7-.1-4.9s0-3.6.1-4.9c.1-3.2 1.7-4.8 4.9-4.9 1.3-.1 1.7-.1 4.9-.1zM12 0C8.7 0 8.3 0 7 .1 2.7.3.3 2.7.1 7 0 8.3 0 8.7 0 12s0 3.7.1 5c.2 4.3 2.6 6.7 6.9 6.9 1.3.1 1.7.1 5 .1s3.7 0 5-.1c4.3-.2 6.7-2.6 6.9-6.9.1-1.3.1-1.7.1-5s0-3.7-.1-5c-.2-4.3-2.6-6.7-6.9-6.9C15.7 0 15.3 0 12 0zm0 5.8a6.2 6.2 0 1 0 0 12.4 6.2 6.2 0 0 0 0-12.4zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.4-10.5a1.4 1.4 0 1 1-2.9 0 1.4 1.4 0 0 1 2.9 0z"/></svg></div><span>Instagram</span></a>
         <a class="node" href="https://www.facebook.com/zojez" target="_blank" rel="noopener"><div class="ic" style="background:rgba(66,103,178,.18);color:#7a9ee8"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.07C24 5.41 18.63 0 12 0S0 5.41 0 12.07C0 18.1 4.39 23.1 10.13 24v-8.44H7.08v-3.49h3.04V9.41c0-3.02 1.8-4.7 4.54-4.7 1.31 0 2.68.24 2.68.24v2.97h-1.5c-1.5 0-1.96.93-1.96 1.89v2.26h3.32l-.53 3.5h-2.8V24C19.62 23.1 24 18.1 24 12.07z"/></svg></div><span>Facebook</span></a>
@@ -614,7 +517,7 @@ footer{ text-align:center; padding:70px 24px 130px; }
   <footer>
     <div class="footer-runes">✦ ✧ ✦ ✧ ✦</div>
     <div class="footer-pill"><span>✦</span><span data-i18n="footer">設定からテーマ・言語を変更できます</span></div>
-    <div class="footer-copy">© ZOJEZU Official</div>
+    <div class="footer-copy">© ZoJeZu Official</div>
   </footer>
 
   </div>
@@ -629,32 +532,32 @@ footer{ text-align:center; padding:70px 24px 130px; }
   /* ---------------- i18n ---------------- */
   var i18n = {
     ja:{ settings:'設定', theme:'テーマ', language:'言語', auto:'自動', dark:'ダーク', light:'ライト',
-      badge_realm:'幻想世界へようこそ', hero_title:'ZOJEZU 公式<br><span class="glow">星詠みの書斎</span>',
-      hero_lead:'ZOJEZU（ゾジェズ）公式サイトです。星と魔法陣が導く、少し不思議な創作の世界へ。',
+      badge_realm:'幻想世界へようこそ', hero_title:'ZoJeZu 公式<br><span class="glow">星詠みの書斎</span>',
+      hero_lead:'ZoJeZu（ゾジェズ）公式サイトです。星と魔法陣が導く、少し不思議な創作の世界へ。',
       cta_enter:'世界を巡る', cta_ai:'AIと話す', scroll:'SCROLL',
       eyebrow_main:'THE VAULT · 宝物庫', eyebrow_witch:'THE WITCH · 魔女の館', eyebrow_contents:'THE CATALOG · 目録',
       eyebrow_sns:'THE CONSTELLATION · 星座', eyebrow_embed:'THE GRIMOIRE · 魔法の書',
-      sec_main:'メインメニュー', sec_witch:'おいじぃ魔女', sec_contents:'コンテンツ', sec_sns:'SNS（ゾジェズ公式）', sec_embed:'埋め込み投稿',
+      sec_hero:'扉', sec_main:'メインメニュー', sec_witch:'おいじぃ魔女', sec_contents:'コンテンツ', sec_sns:'SNS（ゾジェズ公式）', sec_embed:'埋め込み投稿',
       card_logo:'ロゴページ', card_logo_desc:'公式ロゴ・ビジュアル', card_char:'キャラクター紹介', card_char_desc:'メンバー・キャラ一覧',
       card_faq:'FAQ', card_faq_desc:'疑問をサクッと解決', card_music:'ゾジェズミュージック', card_music_desc:'公式音楽チャンネル・試聴',
       card_ai:'ゾジェズAI', card_ai_desc:'AIとおしゃべりしよう', card_witch:'おいじぃ魔女のホームページ', card_witch_desc:'魔女の世界へようこそ',
       card_trivia:'おいじぃ魔女のヤバい雑学', card_trivia_desc:'衝撃の知識が満載',
       music:'音楽', ai_pill:'AI', game:'ゲーム', blog:'ブログ', sns_note:'おいじぃ魔女・雑学のSNSはこちら',
-      footer:'ZOJEZU Official — 設定からテーマ・言語を変更できます',
+      footer:'ZoJeZu Official — 設定からテーマ・言語を変更できます',
       offline_title:'オフラインです', online_desc:'インターネットに再接続しました', egg_found:'隠しルーンを発見！' },
     en:{ settings:'Settings', theme:'Theme', language:'Language', auto:'Auto', dark:'Dark', light:'Light',
-      badge_realm:'Welcome to the Realm', hero_title:'ZOJEZU Official<br><span class="glow">Star-Reader\u2019s Atelier</span>',
-      hero_lead:'Welcome to the official ZOJEZU website — a realm guided by stars and runes.',
+      badge_realm:'Welcome to the Realm', hero_title:'ZoJeZu Official<br><span class="glow">Star-Reader\u2019s Atelier</span>',
+      hero_lead:'Welcome to the official ZoJeZu website — a realm guided by stars and runes.',
       cta_enter:'Enter the Realm', cta_ai:'Talk to the AI', scroll:'SCROLL',
       eyebrow_main:'THE VAULT', eyebrow_witch:'THE WITCH', eyebrow_contents:'THE CATALOG',
       eyebrow_sns:'THE CONSTELLATION', eyebrow_embed:'THE GRIMOIRE',
-      sec_main:'Main Menu', sec_witch:'Oijii Witch', sec_contents:'Contents', sec_sns:'SNS (ZOJEZU Official)', sec_embed:'Featured Posts',
+      sec_hero:'Hero', sec_main:'Main Menu', sec_witch:'Oijii Witch', sec_contents:'Contents', sec_sns:'SNS (ZoJeZu Official)', sec_embed:'Featured Posts',
       card_logo:'Logo Page', card_logo_desc:'Official logo & visuals', card_char:'Characters', card_char_desc:'Members & character list',
-      card_faq:'FAQ', card_faq_desc:'Quick answers', card_music:'ZOJEZU Music', card_music_desc:'Official music channel',
-      card_ai:'ZOJEZU AI', card_ai_desc:'Chat with the AI', card_witch:'Oijii Witch Homepage', card_witch_desc:'Welcome to the witch world',
+      card_faq:'FAQ', card_faq_desc:'Quick answers', card_music:'ZoJeZu Music', card_music_desc:'Official music channel',
+      card_ai:'ZoJeZu AI', card_ai_desc:'Chat with the AI', card_witch:'Oijii Witch Homepage', card_witch_desc:'Welcome to the witch world',
       card_trivia:'Oijii Witch Trivia', card_trivia_desc:'Shocking knowledge awaits',
       music:'Music', ai_pill:'AI', game:'Games', blog:'Blog', sns_note:'Oijii Witch & trivia SNS',
-      footer:'ZOJEZU Official — Change theme & language in Settings',
+      footer:'ZoJeZu Official — Change theme & language in Settings',
       offline_title:'You\u2019re offline', online_desc:'Your connection has been restored', egg_found:'Hidden rune discovered!' }
   };
   function resolveLang(pref){ if(pref==='ja'||pref==='en') return pref; var n=(navigator.language||'ja').toLowerCase(); return n.indexOf('ja')===0?'ja':'en'; }
@@ -688,15 +591,14 @@ footer{ text-align:center; padding:70px 24px 130px; }
 
   /* ---------------- settings panel ---------------- */
   var settingsPanel=document.getElementById('settingsPanel');
-  function openSettings(){ settingsPanel.classList.add('open'); }
+  function openSettings(){ settingsPanel.classList.add('open'); closeMenu(); }
   function closeSettings(){ settingsPanel.classList.remove('open'); }
   function toggleSettings(){ settingsPanel.classList.contains('open')?closeSettings():openSettings(); }
-  ['settingsBtnD','settingsBtnM'].forEach(function(id){ var b=document.getElementById(id); if(b) b.addEventListener('click', function(e){ e.stopPropagation(); toggleSettings(); }); });
   document.getElementById('settingsClose').addEventListener('click', closeSettings);
   document.getElementById('themeOptions').addEventListener('click', function(e){ var b=e.target.closest('button'); if(b) applyTheme(b.dataset.value); });
   document.getElementById('langOptions').addEventListener('click', function(e){ var b=e.target.closest('button'); if(b) applyLang(b.dataset.value); });
   document.addEventListener('click', function(e){
-    if(settingsPanel.classList.contains('open') && !settingsPanel.contains(e.target) && e.target.id!=='settingsBtnD' && e.target.id!=='settingsBtnM' && !e.target.closest('#settingsBtnD') && !e.target.closest('#settingsBtnM')){ closeSettings(); }
+    if(settingsPanel.classList.contains('open') && !settingsPanel.contains(e.target) && !e.target.closest('#settingsBtn')){ closeSettings(); }
   });
 
   /* ---------------- intro loader ---------------- */
@@ -712,32 +614,87 @@ footer{ text-align:center; padding:70px 24px 130px; }
   function easeInOutQuint(t){ return t<0.5 ? 16*t*t*t*t*t : 1-Math.pow(-2*t+2,5)/2; }
   function scrollToId(id){
     var el=document.getElementById(id); if(!el) return;
-    var headerOffset = window.innerWidth<=900 ? 66 : 24;
+    var headerOffset = 76; /* fixed header height (~64px) + a little breathing room */
     var startY=window.pageYOffset, targetY=el.getBoundingClientRect().top+startY-headerOffset;
     var dist=targetY-startY, duration=Math.min(900, 350+Math.abs(dist)*0.25), startTime=null;
     function step(ts){ if(!startTime) startTime=ts; var p=Math.min((ts-startTime)/duration,1);
       window.scrollTo(0, startY+dist*easeInOutQuint(p)); if(p<1) requestAnimationFrame(step); }
     requestAnimationFrame(step);
   }
-  document.querySelectorAll('[data-target]').forEach(function(a){
-    a.addEventListener('click', function(e){ e.preventDefault(); scrollToId(a.getAttribute('data-target')); });
-  });
-  document.getElementById('dockMark').addEventListener('click', function(){ scrollToId('hero'); });
+  function bindDataTargets(root){
+    (root||document).querySelectorAll('[data-target]').forEach(function(a){
+      if(a.dataset.boundTarget) return; a.dataset.boundTarget='1';
+      a.addEventListener('click', function(e){ e.preventDefault(); scrollToId(a.getAttribute('data-target')); });
+    });
+  }
+  bindDataTargets();
 
-  /* ---------------- scrollspy + progress ring ---------------- */
+  /* ---------------- scrollspy (nav-desktop / nav-mobile active link) ---------------- */
   var sectionIds=['hero','main','witch','contents','sns','embeds'];
-  var dockItems=document.querySelectorAll('.dock-item'); var tabItems=document.querySelectorAll('.tab-item');
-  var progressBar=document.getElementById('progressBar'); var CIRC=106.8;
   function onScroll(){
-    var doc=document.documentElement; var max=doc.scrollHeight-doc.clientHeight;
-    var pct = max>0 ? window.scrollY/max : 0;
-    progressBar.style.strokeDashoffset = String(CIRC - CIRC*pct);
     var current='hero'; var mid=window.scrollY+window.innerHeight*0.35;
     sectionIds.forEach(function(id){ var el=document.getElementById(id); if(el && el.offsetTop<=mid) current=id; });
-    dockItems.forEach(function(d){ d.classList.toggle('active', d.dataset.target===current); });
-    tabItems.forEach(function(t){ t.classList.toggle('active', t.dataset.target===current); });
+    document.querySelectorAll('.nav-desktop [data-target], .nav-mobile [data-target]').forEach(function(a){
+      a.classList.toggle('active', a.dataset.target===current);
+    });
   }
   window.addEventListener('scroll', onScroll, {passive:true}); onScroll();
+
+  /* ---------------- shared header (fetched from header.html) ---------------- */
+  var headerRoot=document.getElementById('headerRoot');
+  var headerEl, hamburger, navMobile;
+  function toggleMenu(){
+    var isOpen=navMobile.classList.toggle('open');
+    hamburger.classList.toggle('active', isOpen);
+    hamburger.setAttribute('aria-expanded', isOpen);
+    body.style.overflow = isOpen ? 'hidden' : '';
+    if(isOpen) closeSettings();
+  }
+  function closeMenu(){
+    if(!navMobile) return;
+    navMobile.classList.remove('open');
+    hamburger.classList.remove('active');
+    hamburger.setAttribute('aria-expanded','false');
+    body.style.overflow='';
+  }
+  function closeAll(){ closeMenu(); closeSettings(); }
+  window.closeAll=closeAll; window.closeMenu=closeMenu;
+
+  fetch('header.html').then(function(r){ return r.text(); }).then(function(html){
+    headerRoot.innerHTML = html;
+    headerEl=document.getElementById('header');
+    hamburger=document.getElementById('hamburger');
+    navMobile=document.getElementById('navMobile');
+
+    bindDataTargets(headerRoot);
+    applyLang(currentLangPref); /* fill in data-i18n text on the freshly injected header */
+
+    var settingsBtn=document.getElementById('settingsBtn');
+    if(settingsBtn) settingsBtn.addEventListener('click', function(e){ e.stopPropagation(); toggleSettings(); });
+
+    var paletteBtnH=document.getElementById('paletteBtnH');
+    if(paletteBtnH) paletteBtnH.addEventListener('click', openPalette);
+
+    if(hamburger) hamburger.addEventListener('click', toggleMenu);
+
+    var headerLogo=document.getElementById('headerLogo');
+    if(headerLogo) headerLogo.addEventListener('dblclick', function(e){
+      e.preventDefault();
+      burst.classList.add('show'); setTimeout(function(){ burst.classList.remove('show'); }, 2200);
+    });
+
+    function onHeaderScroll(){ if(headerEl) headerEl.classList.toggle('scrolled', window.scrollY>20); }
+    window.addEventListener('scroll', onHeaderScroll, {passive:true}); onHeaderScroll();
+
+    document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeAll(); });
+
+    if(fine){
+      headerRoot.querySelectorAll('a,button').forEach(function(el){
+        el.addEventListener('pointerenter', function(){ cur.classList.add('big'); });
+        el.addEventListener('pointerleave', function(){ cur.classList.remove('big'); });
+      });
+    }
+  }).catch(function(err){ console.error('header.html の読み込みに失敗しました', err); });
 
   /* ---------------- reveal on scroll ---------------- */
   var io=new IntersectionObserver(function(entries){ entries.forEach(function(en){ if(en.isIntersecting) en.target.classList.add('visible'); }); }, {threshold:.1, rootMargin:'0px 0px -60px 0px'});
@@ -778,8 +735,8 @@ footer{ text-align:center; padding:70px 24px 130px; }
     {icon:'☰', label:'目録（コンテンツ）', en:'Contents', target:'contents'},
     {icon:'☆', label:'星座（SNS）', en:'SNS', target:'sns'},
     {icon:'▤', label:'魔法の書（埋め込み投稿）', en:'Grimoire', target:'embeds'},
-    {icon:'♪', label:'ゾジェズミュージックを開く', en:'Open ZOJEZU Music', href:'https://zojezu.f5.si/music'},
-    {icon:'⚙', label:'ゾジェズAIと話す', en:'Talk to ZOJEZU AI', href:'https://zojezu.f5.si/ai'},
+    {icon:'♪', label:'ゾジェズミュージックを開く', en:'Open ZoJeZu Music', href:'https://zojezu.f5.si/music'},
+    {icon:'⚙', label:'ゾジェズAIと話す', en:'Talk to ZoJeZu AI', href:'https://zojezu.f5.si/ai'},
     {icon:'✎', label:'設定を開く', en:'Open Settings', action:'settings'}
   ];
   var paletteVeil=document.getElementById('paletteVeil'), palette=document.getElementById('palette'), paletteInput=document.getElementById('paletteInput'), paletteList=document.getElementById('paletteList');
@@ -799,7 +756,6 @@ footer{ text-align:center; padding:70px 24px 130px; }
     else if(it.href) window.open(it.href,'_blank');
     else if(it.action==='settings') openSettings();
   }
-  ['paletteBtn','paletteBtnM'].forEach(function(id){ var b=document.getElementById(id); if(b) b.addEventListener('click', openPalette); });
   paletteVeil.addEventListener('click', closePalette);
   paletteInput.addEventListener('input', renderPalette);
   paletteList.addEventListener('click', function(e){ var el=e.target.closest('.palette-item'); if(el) choose(parseInt(el.dataset.i,10)); });
@@ -862,9 +818,6 @@ footer{ text-align:center; padding:70px 24px 130px; }
   document.addEventListener('keydown', function(e){
     if(e.key.length===1){ buf=(buf+e.key).slice(-6).toLowerCase(); if(buf==='zojezu'){ burst.classList.add('show'); setTimeout(function(){ burst.classList.remove('show'); }, 2200); } }
   });
-  var logoTaps=0, logoTapTimer=null;
-  document.getElementById('dockMark').addEventListener('dblclick', function(){ burst.classList.add('show'); setTimeout(function(){ burst.classList.remove('show'); }, 2200); });
-
   /* ---------------- network toast ---------------- */
   var toast=document.getElementById('toast'), toastText=document.getElementById('toastText'), toastIcon=document.getElementById('toastIcon');
   var offlineSVG='<line x1="1" y1="1" x2="23" y2="23"/><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/><path d="M10.71 5.05A16 16 0 0 1 22.58 9"/><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/>';

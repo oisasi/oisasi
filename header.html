@@ -1,41 +1,179 @@
 <!--
-  header.html
-  ※ このファイルは <html>/<head>/<body> を含まない「断片HTML」です。
-     index.html 等から fetch() で読み込み、<div id="header-placeholder"> に挿入されます。
-     単体でブラウザから直接開いても正しく表示されません（それが正常です）。
+  ZoJeZu 共通ヘッダー（外部ファイル）
+  faq.html のヘッダー構造・デザインを流用し、中身（ロゴ・ナビ・文言）を ZoJeZu 用に書き換えたもの。
+  index.html からは fetch() で読み込んで #headerRoot に挿入して使用する。
+  他のページに同じヘッダーを追加したい場合も、このファイルを同様に読み込むだけでよい。
 -->
-<header class="site-header" id="siteHeader">
-  <div class="site-header__inner">
-    <a href="/" class="site-logo">
-      <img src="/assets/img/logo.png" alt="サイトロゴ" width="36" height="36">
-      <span class="site-logo__text">MySite</span>
+<style>
+  :root{
+    --header-h: 64px;
+    --nav-max: 1180px;
+    --header-bg: color-mix(in srgb, var(--ink) 78%, transparent);
+    --header-bg-scrolled: color-mix(in srgb, var(--ink) 94%, transparent);
+    --menu-bg: color-mix(in srgb, var(--ink) 97%, transparent);
+  }
+
+  /* HEADER */
+  .header{
+    position:fixed; top:0; left:0; right:0; height:var(--header-h); z-index:1000;
+    background:var(--header-bg);
+    backdrop-filter:blur(20px) saturate(1.6); -webkit-backdrop-filter:blur(20px) saturate(1.6);
+    border-bottom:1px solid var(--line);
+    transition:background .35s, box-shadow .35s;
+  }
+  .header.scrolled{ background:var(--header-bg-scrolled); box-shadow:0 10px 40px rgba(0,0,0,.3); }
+  .header-inner{
+    max-width:var(--nav-max); height:100%; margin:0 auto; padding:0 16px 0 20px;
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+  }
+  .logo{
+    display:flex; align-items:center; gap:10px; text-decoration:none; color:var(--text);
+    font-weight:900; font-size:16px; letter-spacing:.02em; flex-shrink:0; z-index:1001;
+    transition:transform .3s; font-family:'Cinzel',serif;
+  }
+  .logo:hover{ transform:scale(1.03); }
+  .logo-mark{
+    width:38px; height:38px; border-radius:11px; display:grid; place-items:center; flex-shrink:0;
+    background:linear-gradient(135deg,var(--pink),var(--violet),var(--cyan)); color:#fff;
+    font-family:'Cinzel',serif; font-weight:900; font-size:15px;
+    box-shadow:0 4px 16px color-mix(in srgb, var(--pink) 35%, transparent);
+    transition:transform .4s, box-shadow .4s;
+  }
+  .logo:hover .logo-mark{ transform:rotate(-8deg) scale(1.08); box-shadow:0 6px 22px color-mix(in srgb, var(--pink) 50%, transparent); }
+  .logo-text span{
+    background:linear-gradient(120deg,var(--text),var(--pink) 60%,var(--violet));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    background-size:200% auto; animation:hdrTextShine 6s linear infinite;
+  }
+  @keyframes hdrTextShine{ 0%{background-position:0% center;} 100%{background-position:200% center;} }
+
+  .nav-desktop{ display:none; align-items:center; gap:4px; }
+  .nav-desktop a{
+    padding:8px 14px; border-radius:11px; color:var(--muted); text-decoration:none;
+    font-size:14px; font-weight:700; transition:all .3s cubic-bezier(.22,1,.36,1); white-space:nowrap; position:relative;
+  }
+  .nav-desktop a::after{
+    content:''; position:absolute; left:14px; right:14px; bottom:5px; height:2px;
+    background:linear-gradient(90deg,var(--pink),var(--violet)); border-radius:2px;
+    transform:scaleX(0); transition:transform .3s cubic-bezier(.22,1,.36,1);
+  }
+  .nav-desktop a:hover{ color:var(--text); background:var(--glass); }
+  .nav-desktop a:hover::after{ transform:scaleX(1); }
+  .nav-desktop a.accent{
+    background:linear-gradient(135deg,var(--pink),var(--violet)); color:#fff;
+    box-shadow:0 4px 18px color-mix(in srgb, var(--pink) 35%, transparent);
+  }
+  .nav-desktop a.accent::after{ display:none; }
+  .nav-desktop a.accent:hover{ transform:translateY(-2px); box-shadow:0 8px 24px color-mix(in srgb, var(--pink) 50%, transparent); }
+
+  .header-actions{ display:flex; align-items:center; gap:8px; z-index:1001; }
+  .icon-btn{
+    width:40px; height:40px; border:none; border-radius:12px; background:var(--glass);
+    color:var(--text); display:grid; place-items:center; transition:all .3s cubic-bezier(.22,1,.36,1);
+  }
+  .icon-btn:hover{ background:var(--glass-2); transform:rotate(30deg) scale(1.08); }
+  .icon-btn:active{ transform:scale(.92); }
+  .icon-btn svg{ width:19px; height:19px; }
+
+  .hamburger{
+    display:flex; flex-direction:column; justify-content:center; gap:5px;
+    width:40px; height:40px; padding:10px; border:none; background:var(--glass);
+    border-radius:12px; transition:background .25s;
+  }
+  .hamburger:hover{ background:var(--glass-2); }
+  .hamburger span{
+    display:block; height:2px; width:100%; background:var(--text); border-radius:2px;
+    transition:all .4s cubic-bezier(.22,1,.36,1); transform-origin:center;
+  }
+  .hamburger.active span:nth-child(1){ transform:translateY(7px) rotate(45deg); }
+  .hamburger.active span:nth-child(2){ opacity:0; transform:scaleX(0); }
+  .hamburger.active span:nth-child(3){ transform:translateY(-7px) rotate(-45deg); }
+
+  /* MOBILE MENU */
+  .nav-mobile{
+    position:fixed; inset:0; z-index:999; background:var(--menu-bg);
+    backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px);
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px;
+    opacity:0; visibility:hidden; pointer-events:none;
+    transition:all .45s cubic-bezier(.22,1,.36,1);
+  }
+  .nav-mobile.open{ opacity:1; visibility:visible; pointer-events:auto; }
+  .nav-mobile a{
+    display:flex; align-items:center; gap:14px; padding:17px 28px; min-width:260px;
+    border-radius:16px; color:var(--text); text-decoration:none; font-size:18px; font-weight:700;
+    background:var(--glass); border:1px solid var(--line);
+    transform:translateY(28px) scale(.96); opacity:0;
+    transition:all .45s cubic-bezier(.22,1,.36,1);
+  }
+  .nav-mobile.open a{ transform:translateY(0) scale(1); opacity:1; }
+  .nav-mobile.open a:nth-child(1){ transition-delay:.06s; }
+  .nav-mobile.open a:nth-child(2){ transition-delay:.11s; }
+  .nav-mobile.open a:nth-child(3){ transition-delay:.16s; }
+  .nav-mobile.open a:nth-child(4){ transition-delay:.21s; }
+  .nav-mobile.open a:nth-child(5){ transition-delay:.26s; }
+  .nav-mobile.open a:nth-child(6){ transition-delay:.31s; }
+  .nav-mobile.open a:nth-child(7){ transition-delay:.36s; }
+  .nav-mobile a:hover, .nav-mobile a:active{
+    background:linear-gradient(135deg,color-mix(in srgb, var(--pink) 22%, transparent),color-mix(in srgb, var(--violet) 16%, transparent));
+    border-color:color-mix(in srgb, var(--pink) 45%, transparent);
+    transform:scale(1.04);
+  }
+  .nav-mobile .icon{
+    width:38px; height:38px; border-radius:11px; display:grid; place-items:center; font-size:19px;
+    background:linear-gradient(145deg,color-mix(in srgb, var(--pink) 28%, transparent),color-mix(in srgb, var(--violet) 22%, transparent));
+    transition:transform .35s;
+  }
+  .nav-mobile a:hover .icon{ transform:rotate(-10deg) scale(1.1); }
+  .nav-mobile-footer{ margin-top:36px; font-size:13px; color:var(--muted); opacity:0; transition:opacity .4s .4s; }
+  .nav-mobile.open .nav-mobile-footer{ opacity:1; }
+
+  @media (min-width:901px){
+    .nav-desktop{ display:flex; }
+    .hamburger{ display:none; }
+    .nav-mobile{ display:none !important; }
+  }
+</style>
+
+<header class="header" id="header">
+  <div class="header-inner">
+    <a href="#hero" class="logo" id="headerLogo" data-target="hero">
+      <span class="logo-mark" aria-hidden="true">Z</span>
+      <span class="logo-text"><span>ZoJeZu</span></span>
     </a>
-
-    <!-- PC用ナビ -->
     <nav class="nav-desktop" aria-label="メインナビゲーション">
-      <a href="/">ホーム</a>
-      <a href="/about.html">About</a>
-      <a href="/works.html">Works</a>
-      <a href="/contact.html">Contact</a>
+      <a data-target="main" href="#main" data-i18n="sec_main">宝物庫</a>
+      <a data-target="witch" href="#witch" data-i18n="sec_witch">魔女の館</a>
+      <a data-target="contents" href="#contents" data-i18n="sec_contents">目録</a>
+      <a data-target="sns" href="#sns" data-i18n="sec_sns">星座</a>
+      <a data-target="embeds" href="#embeds" data-i18n="sec_embed">魔法書</a>
+      <a href="faq.html" data-i18n="card_faq">FAQ</a>
+      <a class="accent" href="https://zojezu.f5.si/ai" data-i18n="card_ai">ゾジェズAI</a>
     </nav>
-
-    <!-- ハンバーガーボタン -->
-    <button
-      class="hamburger"
-      id="hamburgerBtn"
-      aria-label="メニューを開く"
-      aria-expanded="false"
-      aria-controls="navMobile"
-    >
-      <span></span><span></span><span></span>
-    </button>
+    <div class="header-actions">
+      <button class="icon-btn" id="paletteBtnH" aria-label="検索" title="検索（/）">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      </button>
+      <button class="icon-btn" id="settingsBtn" aria-label="設定" title="設定">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+      </button>
+      <button class="hamburger" id="hamburger" aria-label="メニューを開く" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
   </div>
-
-  <!-- モバイル用メニュー -->
-  <nav class="nav-mobile" id="navMobile" aria-label="モバイルメニュー">
-    <a href="/">ホーム</a>
-    <a href="/about.html">About</a>
-    <a href="/works.html">Works</a>
-    <a href="/contact.html">Contact</a>
-  </nav>
 </header>
+
+<nav class="nav-mobile" id="navMobile" aria-label="モバイルメニュー">
+  <a href="#hero" data-target="hero" onclick="closeAll()"><span class="icon">⌂</span> <span data-i18n="sec_hero">扉</span></a>
+  <a href="#main" data-target="main" onclick="closeAll()"><span class="icon">✦</span> <span data-i18n="sec_main">宝物庫</span></a>
+  <a href="#witch" data-target="witch" onclick="closeAll()"><span class="icon">🔮</span> <span data-i18n="sec_witch">魔女の館</span></a>
+  <a href="#contents" data-target="contents" onclick="closeAll()"><span class="icon">☰</span> <span data-i18n="sec_contents">目録</span></a>
+  <a href="#sns" data-target="sns" onclick="closeAll()"><span class="icon">☆</span> <span data-i18n="sec_sns">星座</span></a>
+  <a href="#embeds" data-target="embeds" onclick="closeAll()"><span class="icon">▤</span> <span data-i18n="sec_embed">魔法書</span></a>
+  <a href="faq.html" onclick="closeAll()"><span class="icon">💬</span> <span data-i18n="card_faq">FAQ</span></a>
+  <a href="https://zojezu.f5.si/ai" onclick="closeAll()"><span class="icon">🤖</span> <span data-i18n="card_ai">ゾジェズAI</span></a>
+  <div class="nav-mobile-footer">ZoJeZu Official</div>
+</nav>
