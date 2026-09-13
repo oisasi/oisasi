@@ -1,0 +1,134 @@
+/* =========================================================
+   header.css
+   共通ヘッダー / ハンバーガーメニューのスタイル
+   ========================================================= */
+
+:root {
+  --header-h: 64px;
+  --header-bg: #ffffff;
+  --header-border: rgba(0, 0, 0, 0.08);
+  --text: #1a1a1a;
+  --accent: #5b4bff;
+}
+
+/* 画面に読み込まれるまでの「カクッ」を防ぐため、
+   プレースホルダーに最低限の高さを確保しておく */
+#header-placeholder {
+  min-height: var(--header-h);
+}
+
+.site-header {
+  position: sticky;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  height: var(--header-h);
+  background: var(--header-bg);
+  border-bottom: 1px solid var(--header-border);
+}
+
+.site-header__inner {
+  max-width: 1180px;
+  margin: 0 auto;
+  height: 100%;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.site-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  color: var(--text);
+  font-weight: 700;
+}
+
+.site-logo img {
+  display: block;
+  border-radius: 8px;
+}
+
+/* ---- PC用ナビ ---- */
+.nav-desktop {
+  display: flex;
+  gap: 28px;
+}
+.nav-desktop a {
+  color: var(--text);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+}
+.nav-desktop a:hover {
+  color: var(--accent);
+}
+
+/* ---- ハンバーガーボタン ---- */
+.hamburger {
+  display: none; /* PCでは非表示。モバイルで表示に切り替える */
+  position: relative;
+  width: 32px;
+  height: 32px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  z-index: 1100;
+}
+.hamburger span {
+  position: absolute;
+  left: 6px;
+  right: 6px;
+  height: 2px;
+  background: var(--text);
+  transition: transform 0.25s ease, opacity 0.25s ease, top 0.25s ease;
+}
+.hamburger span:nth-child(1) { top: 10px; }
+.hamburger span:nth-child(2) { top: 16px; }
+.hamburger span:nth-child(3) { top: 22px; }
+
+/* ボタンが .active になったら「×」に変形 */
+.hamburger.active span:nth-child(1) { top: 16px; transform: rotate(45deg); }
+.hamburger.active span:nth-child(2) { opacity: 0; }
+.hamburger.active span:nth-child(3) { top: 16px; transform: rotate(-45deg); }
+
+/* ---- モバイル用メニュー（画面外に隠しておき、openでスライドイン） ---- */
+.nav-mobile {
+  position: fixed;
+  top: var(--header-h);
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--header-bg);
+  border-bottom: 1px solid var(--header-border);
+  transform: translateY(-8px);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: transform 0.25s ease, opacity 0.25s ease, visibility 0.25s;
+  z-index: 999;
+}
+.nav-mobile.open {
+  transform: translateY(0);
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+.nav-mobile a {
+  padding: 14px 20px;
+  color: var(--text);
+  text-decoration: none;
+  border-top: 1px solid var(--header-border);
+  font-weight: 600;
+}
+.nav-mobile a:first-child { border-top: none; }
+
+/* ---- レスポンシブ切り替え ---- */
+@media (max-width: 768px) {
+  .nav-desktop { display: none; }
+  .hamburger { display: block; }
+}

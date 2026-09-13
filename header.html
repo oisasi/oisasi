@@ -1,0 +1,41 @@
+<!--
+  header.html
+  ※ このファイルは <html>/<head>/<body> を含まない「断片HTML」です。
+     index.html 等から fetch() で読み込み、<div id="header-placeholder"> に挿入されます。
+     単体でブラウザから直接開いても正しく表示されません（それが正常です）。
+-->
+<header class="site-header" id="siteHeader">
+  <div class="site-header__inner">
+    <a href="/" class="site-logo">
+      <img src="/assets/img/logo.png" alt="サイトロゴ" width="36" height="36">
+      <span class="site-logo__text">MySite</span>
+    </a>
+
+    <!-- PC用ナビ -->
+    <nav class="nav-desktop" aria-label="メインナビゲーション">
+      <a href="/">ホーム</a>
+      <a href="/about.html">About</a>
+      <a href="/works.html">Works</a>
+      <a href="/contact.html">Contact</a>
+    </nav>
+
+    <!-- ハンバーガーボタン -->
+    <button
+      class="hamburger"
+      id="hamburgerBtn"
+      aria-label="メニューを開く"
+      aria-expanded="false"
+      aria-controls="navMobile"
+    >
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+
+  <!-- モバイル用メニュー -->
+  <nav class="nav-mobile" id="navMobile" aria-label="モバイルメニュー">
+    <a href="/">ホーム</a>
+    <a href="/about.html">About</a>
+    <a href="/works.html">Works</a>
+    <a href="/contact.html">Contact</a>
+  </nav>
+</header>
