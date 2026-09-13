@@ -8,20 +8,27 @@
   :root{
     --header-h: 64px;
     --nav-max: 1180px;
-    --header-bg: color-mix(in srgb, var(--ink) 78%, transparent);
-    --header-bg-scrolled: color-mix(in srgb, var(--ink) 94%, transparent);
-    --menu-bg: color-mix(in srgb, var(--ink) 97%, transparent);
+    /* Liquid Glassのぼかしを強調するため、背景の透明度を高く設定 */
+    --header-bg: color-mix(in srgb, var(--ink) 45%, transparent);
+    --header-bg-scrolled: color-mix(in srgb, var(--ink) 65%, transparent);
+    --menu-bg: color-mix(in srgb, var(--ink) 55%, transparent);
   }
 
   /* HEADER */
   .header{
     position:fixed; top:0; left:0; right:0; height:var(--header-h); z-index:1000;
     background:var(--header-bg);
-    backdrop-filter:blur(20px) saturate(1.6); -webkit-backdrop-filter:blur(20px) saturate(1.6);
-    border-bottom:1px solid var(--line);
-    transition:background .35s, box-shadow .35s;
+    /* iPhone特有の強いブラーと彩度アップ */
+    backdrop-filter:blur(30px) saturate(200%); -webkit-backdrop-filter:blur(30px) saturate(200%);
+    border-bottom:0.5px solid color-mix(in srgb, var(--text) 15%, transparent);
+    /* ガラスのエッジを表現するインナーシャドウ */
+    box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.1), 0 4px 16px rgba(0,0,0,0.02);
+    transition:background .4s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow .4s cubic-bezier(0.25, 0.8, 0.25, 1);
   }
-  .header.scrolled{ background:var(--header-bg-scrolled); box-shadow:0 10px 40px rgba(0,0,0,.3); }
+  .header.scrolled{ 
+    background:var(--header-bg-scrolled); 
+    box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.1), 0 10px 40px rgba(0,0,0,.15); 
+  }
   .header-inner{
     max-width:var(--nav-max); height:100%; margin:0 auto; padding:0 16px 0 20px;
     display:flex; align-items:center; justify-content:space-between; gap:12px;
@@ -92,7 +99,8 @@
   /* MOBILE MENU */
   .nav-mobile{
     position:fixed; inset:0; z-index:999; background:var(--menu-bg);
-    backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px);
+    /* モバイルメニューにも強いLiquid Glass効果を適用 */
+    backdrop-filter:blur(35px) saturate(200%); -webkit-backdrop-filter:blur(35px) saturate(200%);
     display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px;
     opacity:0; visibility:hidden; pointer-events:none;
     transition:all .45s cubic-bezier(.22,1,.36,1);
@@ -101,7 +109,10 @@
   .nav-mobile a{
     display:flex; align-items:center; gap:14px; padding:17px 28px; min-width:260px;
     border-radius:16px; color:var(--text); text-decoration:none; font-size:18px; font-weight:700;
-    background:var(--glass); border:1px solid var(--line);
+    /* ボタン自体にも薄いガラス感を持たせる */
+    background:color-mix(in srgb, var(--glass) 60%, transparent); 
+    border:1px solid color-mix(in srgb, var(--line) 40%, transparent);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
     transform:translateY(28px) scale(.96); opacity:0;
     transition:all .45s cubic-bezier(.22,1,.36,1);
   }
